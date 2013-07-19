@@ -32,12 +32,20 @@ public class PlayerEventHandler {
             if (item != null && item.itemID == Item.field_111212_ci.itemID)			// Name Tag
             {
 
+            	// Check if the tag have a name
             	if (item.hasDisplayName()) 
             	{
+            		// Set the name to that villager
             		EntityLiving villager = (EntityLiving)event.target;
             		villager.setCustomNameTag(item.getDisplayName());
-            		--item.stackSize;
+            		
+            		// Consumes the item if not in Creative
+                    if (!event.entityPlayer.capabilities.isCreativeMode)
+                    {
+                    	--item.stackSize;
+                    }
 
+                    // Cancel the regular event (trade GUI)
             		event.setCanceled(true);
             	}
 
