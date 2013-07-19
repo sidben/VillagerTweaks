@@ -99,6 +99,11 @@ public class ModVillagerTweaks {
 		PlayerEventHandler playerEventHandler = new PlayerEventHandler();
 		MinecraftForge.EVENT_BUS.register(playerEventHandler);
 		
+
+		// Register my custom entity event handler
+		EntityEventHandler entityEventHandler = new EntityEventHandler();
+		MinecraftForge.EVENT_BUS.register(entityEventHandler);
+		
 	}
 	
 	
