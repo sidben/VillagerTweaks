@@ -104,6 +104,11 @@ public class ModVillagerTweaks {
 		EntityEventHandler entityEventHandler = new EntityEventHandler();
 		MinecraftForge.EVENT_BUS.register(entityEventHandler);
 		
+
+		// Register my custom mob spawn event handler
+		MobSpawnController mobSpawnController = new MobSpawnController();
+		MinecraftForge.EVENT_BUS.register(mobSpawnController);
+		
 	}
 	
 	
