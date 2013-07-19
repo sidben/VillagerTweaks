@@ -32,8 +32,8 @@ public class PlayerEventHandler {
             if (item != null && item.itemID == Item.field_111212_ci.itemID)			// Name Tag
             {
 
-            	// Check if the tag have a name
-            	if (item.hasDisplayName()) 
+            	// Check if the tag have a name and the player is sneaking
+            	if (item.hasDisplayName() && event.entityPlayer.isSneaking()) 
             	{
             		// Set the name to that villager
             		EntityLiving villager = (EntityLiving)event.target;
