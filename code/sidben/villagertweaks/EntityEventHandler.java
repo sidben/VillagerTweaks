@@ -1,5 +1,7 @@
 package sidben.villagertweaks;
 
+import java.util.Random;
+
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.item.Item;
@@ -10,7 +12,7 @@ import net.minecraftforge.event.entity.living.LivingDropsEvent;
 
 
 /*
- * Ref: ZeroLevels/ChickenShed
+ * Initial Reference: ZeroLevels/ChickenShed
  * https://github.com/ZeroLevels/ChickenShed/blob/4214365b5087c46377ace54c33cdbfe80c9aa77c/vazkii/chickenshed/ChickenShed.java
  */
 
@@ -30,47 +32,52 @@ public class EntityEventHandler {
 		if (event.entity.worldObj.isRemote) return;
 		
 
+		// It's a zombie!
 		if (event.entity instanceof EntityZombie) 
 		{
+			boolean haveIngot = false;
+			int emeralds = 0;
+			int targetEmeraldChance = 40 + (11 * event.lootingLevel);		// Chance to get an emerald, should range from 40% to 73%
+			ItemStack droppedItem;
 			EntityZombie zombie = (EntityZombie) event.entity;
 			
-			// Only adult villager zombies will be affected
-			if (zombie.isChild() || !zombie.isVillager()) return;
 
+			
+			// Only adult villager zombies will be affected, and only if killed by players
+			if (zombie.isChild() || !zombie.isVillager() || !event.recentlyHit) return;
+			
 
-			// This zombie will drop an emerald?
-			// boolean haveEmerald = false; 
-			
-			EntityItem item = new EntityItem(zombie.worldObj, zombie.posX, zombie.posY, zombie.posZ);
-			ItemStack stack = new ItemStack(Item.emerald.itemID, 1, 0);
-			item.getDataWatcher().updateObject(10, stack);
-			event.drops.add(item);
-			
-			
-			/*
-			for (EntityItem item : event.drops) 
-			{
-				if(item != null) 
-				{
-					// The watchable object 10 is the itemstack of the item entity
-					ItemStack originalStack = item.getDataWatcher().getWatchableObjectItemStack(10);
-					ItemStack stack = originalStack.copy();
-					if(stack != null && stack.itemID == Item.feather.itemID) {
-						stack.stackSize = MathHelper.getRandomIntegerInRange(item.worldObj.rand, 1, 1);
-						item.getDataWatcher().updateObject(10, stack); // Update the object with the new stack
-						setFeather = true; // A feather was found
-					}
+			// Gets the current dropped items
+			for(int i = 0; i < event.drops.size(); i++) {
+				droppedItem = event.drops.get(i).getEntityItem(); 
+				if (droppedItem != null) {
+					if (droppedItem.itemID == Item.ingotIron.itemID) haveIngot = true;
 				}
 			}
+			
 
-			if(!setFeather && 1 > 0) { // If a feather wasn't found, it adds one, if the minimum isn't 0 already that is
-				EntityItem item = new EntityItem(chicken.worldObj, chicken.posX, chicken.posY, chicken.posZ);
-				int stackSize = MathHelper.getRandomIntegerInRange(item.worldObj.rand, 1, 1);
-				ItemStack stack = new ItemStack(Item.feather.itemID, stackSize, 0);
+
+			// Never drops emeralds when dropping iron ingot
+			if (!haveIngot)		
+			{
+				// Will this zombie drop an emerald?
+				Random rand = new Random();
+				int chanceEmerald = rand.nextInt(100) + 1;
+				if (chanceEmerald <= targetEmeraldChance) emeralds = 1;		// drop 1 emerald, yay!
+
+				// Debug
+				ModVillagerTweaks.logDebugInfo("    Drop Chance: " + chanceEmerald + "/" + targetEmeraldChance + " = " + emeralds);
+			}
+
+			// Adds the emeralds to the drop list
+			if (emeralds > 0)
+			{
+				EntityItem item = new EntityItem(zombie.worldObj, zombie.posX, zombie.posY, zombie.posZ);
+				ItemStack stack = new ItemStack(Item.emerald.itemID, emeralds, 0);
 				item.getDataWatcher().updateObject(10, stack);
 				event.drops.add(item);
 			}
-			*/
+			
 		}
 	}
 	
