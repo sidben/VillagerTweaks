@@ -49,13 +49,15 @@ public class EntityEventHandler {
 			//----------------------------------------------------
 
 			// Will this zombie drop a feather?
-			int chanceFeather = rand.nextInt(400);
-			if (chanceFeather <= targetFeatherChance) {
-				// Adds 1 feather to the drop list
-				EntityItem itemFeather = new EntityItem(zombie.worldObj, zombie.posX, zombie.posY, zombie.posZ);
-				ItemStack stackFeather = new ItemStack(Item.feather.itemID, 1, 0);
-				itemFeather.getDataWatcher().updateObject(10, stackFeather);
-				event.drops.add(itemFeather);
+			if (ConfigLoader.zombieDropFeather) {
+				int chanceFeather = rand.nextInt(400);
+				if (chanceFeather <= targetFeatherChance) {
+					// Adds 1 feather to the drop list
+					EntityItem itemFeather = new EntityItem(zombie.worldObj, zombie.posX, zombie.posY, zombie.posZ);
+					ItemStack stackFeather = new ItemStack(Item.feather.itemID, 1, 0);
+					itemFeather.getDataWatcher().updateObject(10, stackFeather);
+					event.drops.add(itemFeather);
+				}
 			}
 			
 			
@@ -64,40 +66,44 @@ public class EntityEventHandler {
 			// Bonus Emerald
 			//----------------------------------------------------
 
-			// Only adult villager zombies will be affected, and only if killed by players
-			if (zombie.isChild() || !zombie.isVillager() || !event.recentlyHit) return;
-			
+			if (ConfigLoader.zombieVillagerDropEmerald) {
 
-			// Gets the current dropped items
-			for(int i = 0; i < event.drops.size(); i++) {
-				droppedItem = event.drops.get(i).getEntityItem(); 
-				if (droppedItem != null) {
-					if (droppedItem.itemID == Item.ingotIron.itemID) haveIngot = true;
+				// Only adult villager zombies will be affected, and only if killed by players
+				if (zombie.isChild() || !zombie.isVillager() || !event.recentlyHit) return;
+				
+	
+				// Gets the current dropped items
+				for(int i = 0; i < event.drops.size(); i++) {
+					droppedItem = event.drops.get(i).getEntityItem(); 
+					if (droppedItem != null) {
+						if (droppedItem.itemID == Item.ingotIron.itemID) haveIngot = true;
+					}
 				}
+				
+	
+	
+				// Never drops emeralds when dropping iron ingot
+				if (!haveIngot)		
+				{
+					// Will this zombie drop an emerald?
+					int chanceEmerald = rand.nextInt(100) + 1;
+					if (chanceEmerald <= targetEmeraldChance) emeralds = 1;		// drop 1 emerald, yay!
+	
+					// Debug
+					ModVillagerTweaks.logDebugInfo("    Drop Chance: " + chanceEmerald + "/" + targetEmeraldChance + " = " + emeralds);
+				}
+	
+				// Adds the emeralds to the drop list
+				if (emeralds > 0)
+				{
+					EntityItem item = new EntityItem(zombie.worldObj, zombie.posX, zombie.posY, zombie.posZ);
+					ItemStack stack = new ItemStack(Item.emerald.itemID, emeralds, 0);
+					item.getDataWatcher().updateObject(10, stack);
+					event.drops.add(item);
+				}
+
 			}
-			
 
-
-			// Never drops emeralds when dropping iron ingot
-			if (!haveIngot)		
-			{
-				// Will this zombie drop an emerald?
-				int chanceEmerald = rand.nextInt(100) + 1;
-				if (chanceEmerald <= targetEmeraldChance) emeralds = 1;		// drop 1 emerald, yay!
-
-				// Debug
-				ModVillagerTweaks.logDebugInfo("    Drop Chance: " + chanceEmerald + "/" + targetEmeraldChance + " = " + emeralds);
-			}
-
-			// Adds the emeralds to the drop list
-			if (emeralds > 0)
-			{
-				EntityItem item = new EntityItem(zombie.worldObj, zombie.posX, zombie.posY, zombie.posZ);
-				ItemStack stack = new ItemStack(Item.emerald.itemID, emeralds, 0);
-				item.getDataWatcher().updateObject(10, stack);
-				event.drops.add(item);
-			}
-			
 		}
 	}
 	

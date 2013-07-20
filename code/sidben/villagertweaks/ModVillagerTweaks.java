@@ -30,63 +30,16 @@ public class ModVillagerTweaks {
 	// Says where the client and server 'proxy' code is loaded.
 	@SidedProxy(clientSide=Reference.ClientProxyClass, serverSide=Reference.ServerProxyClass)
 	public static CommonProxy proxy;
+	
 
-	
-	
-	
-	
-	// Debug mode
-	public static boolean onDebug;							// Indicates if the MOD is on debug mode. Extra info will be tracked on the log.
-
-	
-	
 	
 	
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-
 		
+		// Loads the config
 		Configuration config = new Configuration(event.getSuggestedConfigurationFile());
-
-		try 
-        {
-        	// loading the configuration from its file
-        	config.load();
-        	
-        	/*
-        	// Debug
-        	ModVillagerTweaks.onDebug 					= config.get(customRecordCategory, "onDebug", false).getBoolean(false);
-
-        	// Load blocks and items IDs
-        	ModVillagerTweaks.redstoneJukeboxIdleID 	= config.getBlock("redstoneJukeboxIdleID", 520).getInt(520);
-        	ModVillagerTweaks.redstoneJukeboxActiveID 	= config.getBlock("redstoneJukeboxActiveID", 521).getInt(521);
-        	ModVillagerTweaks.blankRecordItemID 		= config.getItem("blankRecordItemID", 7200).getInt(7200);
-        	ModVillagerTweaks.customRecordItemID 		= config.getItem("customRecordItemID", 7201).getInt(7201);
-
-        	// Merchant config
-        	ModVillagerTweaks.customRecordOffersMin	= config.get(customRecordCategory, "customRecordOffersMin", 2).getInt(2);
-        	ModVillagerTweaks.customRecordOffersMax	= config.get(customRecordCategory, "customRecordOffersMax", 4).getInt(4);
-        	ModVillagerTweaks.customRecordPriceMin		= config.get(customRecordCategory, "customRecordPriceMin", 5).getInt(5);
-        	ModVillagerTweaks.customRecordPriceMax		= config.get(customRecordCategory, "customRecordPriceMax", 9).getInt(9);
-        	
-        	// Extra validation on the merchant config (min and max values)
-        	if (ModVillagerTweaks.customRecordOffersMin < 1) ModVillagerTweaks.customRecordOffersMin = 1;
-        	if (ModVillagerTweaks.customRecordOffersMax < ModVillagerTweaks.customRecordOffersMin) ModVillagerTweaks.customRecordOffersMax = ModVillagerTweaks.customRecordOffersMin;
-        	if (ModVillagerTweaks.customRecordOffersMax > ModVillagerTweaks.maxOffers) ModVillagerTweaks.customRecordOffersMax = ModVillagerTweaks.maxOffers;
-        	if (ModVillagerTweaks.customRecordOffersMin < 1) ModVillagerTweaks.customRecordPriceMin = 1;
-        	if (ModVillagerTweaks.customRecordPriceMax < ModVillagerTweaks.customRecordPriceMin) ModVillagerTweaks.customRecordPriceMax = ModVillagerTweaks.customRecordPriceMin;
-        	*/
-        } 
-        catch (Exception e) 
-        {
-        	FMLLog.log(Level.SEVERE, "Error loading the configuration of the Redstone Jukebox Mod. Error message: " + e.getMessage() + " / " + e.toString());
-        } 
-        finally 
-        {
-        	// saving the configuration to its file
-        	config.save();
-        }
-        
+		ConfigLoader.load(config);
         
 		
 	}
@@ -135,7 +88,7 @@ public class ModVillagerTweaks {
 		if (Reference.ForceDebug) {
 			System.out.println(info);
 		} else {
-			if (onDebug || level != Level.INFO) FMLLog.log(Reference.ModID, level, "Debug: " + info, "");
+			if (ConfigLoader.onDebug || level != Level.INFO) FMLLog.log(Reference.ModID, level, "Debug: " + info, "");
 		}
 	}
 	

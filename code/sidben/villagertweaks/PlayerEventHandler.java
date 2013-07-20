@@ -27,29 +27,33 @@ public class PlayerEventHandler {
         if (event.target instanceof EntityVillager)
         {
 
-        	// Check if the player is holding a Name Tag
-            ItemStack item = event.entityPlayer.inventory.getCurrentItem();
-            if (item != null && item.itemID == Item.field_111212_ci.itemID)			// Name Tag
-            {
+        	if (ConfigLoader.canNameVillagers) {
 
-            	// Check if the tag have a name and the player is sneaking
-            	if (item.hasDisplayName() && event.entityPlayer.isSneaking()) 
-            	{
-            		// Set the name to that villager
-            		EntityLiving villager = (EntityLiving)event.target;
-            		villager.setCustomNameTag(item.getDisplayName());
-            		
-            		// Consumes the item if not in Creative
-                    if (!event.entityPlayer.capabilities.isCreativeMode)
-                    {
-                    	--item.stackSize;
-                    }
-
-                    // Cancel the regular event (trade GUI)
-            		event.setCanceled(true);
-            	}
-
-            }
+        		// Check if the player is holding a Name Tag
+	            ItemStack item = event.entityPlayer.inventory.getCurrentItem();
+	            if (item != null && item.itemID == Item.field_111212_ci.itemID)			// Name Tag
+	            {
+	
+	            	// Check if the tag have a name and the player is sneaking
+	            	if (item.hasDisplayName() && event.entityPlayer.isSneaking()) 
+	            	{
+	            		// Set the name to that villager
+	            		EntityLiving villager = (EntityLiving)event.target;
+	            		villager.setCustomNameTag(item.getDisplayName());
+	            		
+	            		// Consumes the item if not in Creative
+	                    if (!event.entityPlayer.capabilities.isCreativeMode)
+	                    {
+	                    	--item.stackSize;
+	                    }
+	
+	                    // Cancel the regular event (trade GUI)
+	            		event.setCanceled(true);
+	            	}
+	
+	            }
+	            
+        	}
 
             
         }
