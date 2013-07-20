@@ -38,11 +38,32 @@ public class EntityEventHandler {
 			boolean haveIngot = false;
 			int emeralds = 0;
 			int targetEmeraldChance = 40 + (11 * event.lootingLevel);		// Chance to get an emerald, should range from 40% to 73%
+			int targetFeatherChance = 19;									// Chance to get a feather ~5%
 			ItemStack droppedItem;
+			Random rand = new Random();
 			EntityZombie zombie = (EntityZombie) event.entity;
 			
 
+			//----------------------------------------------------
+			// Bonus Feather
+			//----------------------------------------------------
+
+			// Will this zombie drop a feather?
+			int chanceFeather = rand.nextInt(400);
+			if (chanceFeather <= targetFeatherChance) {
+				// Adds 1 feather to the drop list
+				EntityItem itemFeather = new EntityItem(zombie.worldObj, zombie.posX, zombie.posY, zombie.posZ);
+				ItemStack stackFeather = new ItemStack(Item.feather.itemID, 1, 0);
+				itemFeather.getDataWatcher().updateObject(10, stackFeather);
+				event.drops.add(itemFeather);
+			}
 			
+			
+			
+			//----------------------------------------------------
+			// Bonus Emerald
+			//----------------------------------------------------
+
 			// Only adult villager zombies will be affected, and only if killed by players
 			if (zombie.isChild() || !zombie.isVillager() || !event.recentlyHit) return;
 			
@@ -61,7 +82,6 @@ public class EntityEventHandler {
 			if (!haveIngot)		
 			{
 				// Will this zombie drop an emerald?
-				Random rand = new Random();
 				int chanceEmerald = rand.nextInt(100) + 1;
 				if (chanceEmerald <= targetEmeraldChance) emeralds = 1;		// drop 1 emerald, yay!
 
