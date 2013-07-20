@@ -4,6 +4,8 @@ import java.util.List;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 
+import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.entity.monster.EntityWitch;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.biome.SpawnListEntry;
 import net.minecraftforge.event.ForgeSubscribe;
@@ -14,34 +16,84 @@ public class MobSpawnController {
 
 	
 	@ForgeSubscribe
-	public void getPotentialSpawns(PotentialSpawns e)
+	public void getPotentialSpawns(PotentialSpawns event)
 	{
-		List<SpawnListEntry> mobsList = e.list;
-		BiomeGenBase biome = e.world.getBiomeGenForCoords(e.x, e.z);
+		List<SpawnListEntry> mobsList = event.list;
+		BiomeGenBase biome = event.world.getBiomeGenForCoords(event.x, event.z);
+		
+		// Witch spawn custom rules
+		int witchBiome = BiomeGenBase.swampland.biomeID;
+		int witchMoon = 4;			// New moon - Debug: time set 108000
+		int witchMinY = 62;
+		int witchMaxY = 71;
+		int witchChanceBasic = 2;
+		int witchChanceRain = 4;
+		int witchListIndex = -1;
 		
 		
-		// Debug
-		/*
-		System.out.println("=================================================");
-		System.out.println("MobSpawnController.getPotentialSpawns()");
-		System.out.println("	Side:       " + FMLCommonHandler.instance().getEffectiveSide());
-		System.out.println("	Time:       " + e.world.getWorldTime());
-		System.out.println("	Rain:       " + e.world.isRaining());
-		System.out.println("	Moon Phase: " + e.world.getMoonPhase());
-		System.out.println("	List size:  " + e.list.size());
-		System.out.println("    Coords:     " + e.x + ", " + e.y + ", " + e.z);
-		System.out.println("	Biome:      " + biome.biomeID + " / " + biome.biomeName);
-		System.out.println("");
-		System.out.println("  Lista:");
-		for(int i = 0; i < mobsList.size(); i++)
+		if (event.type == EnumCreatureType.monster && biome.biomeID == witchBiome && event.y >= witchMinY && event.y <= witchMaxY) 
 		{
-			System.out.println("	#" + i + ": " + mobsList.get(i).entityClass.toString());
-		}
-		System.out.println("=================================================");
-		*/
-		
-		// TODO: Make witches spawn on swamps at new moon nights
 
+			// Finds out if there is a witch in the list
+			for(int i = 0; i < mobsList.size(); i++) {
+				if (mobsList.get(i).entityClass.equals(EntityWitch.class)) 
+				{
+					witchListIndex = i;
+					break;
+				}
+			}
+
+			System.out.println("	have witch? = " + (witchListIndex >= 0));
+			if (witchListIndex >= 0) {
+				System.out.println("	Chance = " + mobsList.get(witchListIndex).itemWeight);
+			}
+			
+			
+			// If starts/stops raining, update the chance
+			if (witchListIndex >= 0) {
+				if (event.world.isRaining() && mobsList.get(witchListIndex).itemWeight != witchChanceRain) {
+					mobsList.get(witchListIndex).itemWeight = witchChanceRain;
+					ModVillagerTweaks.logDebugInfo("    Updating witch spawn chance - rain started");
+				}
+				if (!event.world.isRaining() && mobsList.get(witchListIndex).itemWeight != witchChanceBasic) {
+					mobsList.get(witchListIndex).itemWeight = witchChanceBasic;
+					ModVillagerTweaks.logDebugInfo("    Updating witch spawn chance - rain stopped");
+				}
+			}
+			
+			
+			
+			if (event.world.getMoonPhase() == witchMoon && witchListIndex < 0) 
+			{
+				/*
+				 * All requirements filled, add Witches to the possible mobs spawn.
+				 * 
+				 * Signature: SpawnListEntry(entityClass, weightedProb, min, max)
+				 */
+				int witchChance = event.world.isRaining() ? witchChanceRain : witchChanceBasic;		// 2x more likely to spawn on raining nights
+				mobsList.add(new SpawnListEntry(EntityWitch.class, witchChance, 1, 3));
+
+				// Debug
+				ModVillagerTweaks.logDebugInfo("    Adding witches on " + event.x + "/" + event.z + " (weight " + witchChance + ")");
+			}
+			
+			else if (event.world.getMoonPhase() != witchMoon && witchListIndex >= 0 && witchListIndex < mobsList.size())
+			{
+				/*
+				 * No longer able to spawn witches, remove them
+				 */
+
+				mobsList.remove(witchListIndex);
+				
+				// Debug
+				ModVillagerTweaks.logDebugInfo("    Removing witches from " + event.x + "/" + event.z);
+			}
+		
+			
+			
+
+		}
+		
 
 	}
 	
