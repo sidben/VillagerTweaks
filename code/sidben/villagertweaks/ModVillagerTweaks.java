@@ -135,7 +135,7 @@ public class ModVillagerTweaks {
 		if (Reference.ForceDebug) {
 			System.out.println(info);
 		} else {
-			if (onDebug || level != Level.INFO) FMLLog.log("SidbenRedstoneJukebox", level, "Debug: " + info, "");
+			if (onDebug || level != Level.INFO) FMLLog.log(Reference.ModID, level, "Debug: " + info, "");
 		}
 	}
 	

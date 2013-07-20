@@ -21,6 +21,7 @@ public class MobSpawnController {
 		
 		
 		// Debug
+		/*
 		System.out.println("=================================================");
 		System.out.println("MobSpawnController.getPotentialSpawns()");
 		System.out.println("	Side:       " + FMLCommonHandler.instance().getEffectiveSide());
@@ -37,6 +38,9 @@ public class MobSpawnController {
 			System.out.println("	#" + i + ": " + mobsList.get(i).entityClass.toString());
 		}
 		System.out.println("=================================================");
+		*/
+		
+		// TODO: Make witches spawn on swamps at new moon nights
 
 
 	}
