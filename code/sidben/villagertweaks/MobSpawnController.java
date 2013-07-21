@@ -31,6 +31,8 @@ public class MobSpawnController {
 			int witchMinY = 62;
 			int witchMaxY = 71;
 			int witchListIndex = -1;
+			boolean isHut = false;
+			
 			
 			
 			if (event.type == EnumCreatureType.monster && biome.biomeID == witchBiome && event.y >= witchMinY && event.y <= witchMaxY) 
@@ -44,15 +46,31 @@ public class MobSpawnController {
 						break;
 					}
 				}
-	
-				System.out.println("	have witch? = " + (witchListIndex >= 0));
+				
+				
+				// DEBUG 
+				/*
 				if (witchListIndex >= 0) {
-					System.out.println("	Chance = " + mobsList.get(witchListIndex).itemWeight);
+					System.out.println("	Witch Chance = " + mobsList.get(witchListIndex).itemWeight + " index " + witchListIndex + " of " + mobsList.size());
+					for(int i = 0; i < mobsList.size(); i++)
+					{
+						System.out.println("	  #" + i + ": " + mobsList.get(i).entityClass.toString());
+					}
 				}
+				*/
 				
-				
-				// If starts/stops raining, update the chance
+
+				// There is a Witch in the spawn list
 				if (witchListIndex >= 0) {
+					// If there is only Witches on the list, this is a Witch Hut, where my rules don't apply
+					if (mobsList.size() == 1) isHut = true;
+					if (isHut) {
+						ModVillagerTweaks.logDebugInfo("    In a witch hut - returning to vanilla rules");
+						return;
+					}
+
+					
+					// If starts/stops raining, update the chance
 					if (event.world.isRaining() && mobsList.get(witchListIndex).itemWeight != ConfigLoader.witchChanceRain) {
 						mobsList.get(witchListIndex).itemWeight = ConfigLoader.witchChanceRain;
 						ModVillagerTweaks.logDebugInfo("    Updating witch spawn chance - rain started");
@@ -72,8 +90,8 @@ public class MobSpawnController {
 					 * 
 					 * Signature: SpawnListEntry(entityClass, weightedProb, min, max)
 					 */
-					int witchChance = event.world.isRaining() ? ConfigLoader.witchChanceRain : ConfigLoader.witchChanceBasic;		// 2x more likely to spawn on raining nights
-					mobsList.add(new SpawnListEntry(EntityWitch.class, witchChance, 1, 3));
+					int witchChance = event.world.isRaining() ? ConfigLoader.witchChanceRain : ConfigLoader.witchChanceBasic;
+					mobsList.add(new SpawnListEntry(EntityWitch.class, witchChance, 1, 2));
 	
 					// Debug
 					ModVillagerTweaks.logDebugInfo("    Adding witches on " + event.x + "/" + event.z + " (weight " + witchChance + ")");

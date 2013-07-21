@@ -62,6 +62,11 @@ public class ModVillagerTweaks {
 		MobSpawnController mobSpawnController = new MobSpawnController();
 		MinecraftForge.EVENT_BUS.register(mobSpawnController);
 		
+
+		// Register my custom world event handler
+		WorldEventHandler worldEventHandler = new WorldEventHandler();
+		MinecraftForge.EVENT_BUS.register(worldEventHandler);
+		
 	}
 	
 	
