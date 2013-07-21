@@ -35,6 +35,7 @@ public class MobSpawnController {
 			
 			
 			
+			
 			if (event.type == EnumCreatureType.monster && biome.biomeID == witchBiome && event.y >= witchMinY && event.y <= witchMaxY) 
 			{
 	
@@ -46,19 +47,7 @@ public class MobSpawnController {
 						break;
 					}
 				}
-				
-				
-				// DEBUG 
-				/*
-				if (witchListIndex >= 0) {
-					System.out.println("	Witch Chance = " + mobsList.get(witchListIndex).itemWeight + " index " + witchListIndex + " of " + mobsList.size());
-					for(int i = 0; i < mobsList.size(); i++)
-					{
-						System.out.println("	  #" + i + ": " + mobsList.get(i).entityClass.toString());
-					}
-				}
-				*/
-				
+
 
 				// There is a Witch in the spawn list
 				if (witchListIndex >= 0) {
@@ -83,7 +72,7 @@ public class MobSpawnController {
 				
 				
 				
-				if (event.world.getMoonPhase() == witchMoon && witchListIndex < 0) 
+				if (event.world.getMoonPhase() == witchMoon && witchListIndex < 0 && !event.world.isDaytime()) 
 				{
 					/*
 					 * All requirements filled, add Witches to the possible mobs spawn.
