@@ -36,7 +36,7 @@ public class MobSpawnController {
 			
 			
 			
-			if (event.type == EnumCreatureType.monster && biome.biomeID == witchBiome && event.y >= witchMinY && event.y <= witchMaxY) 
+			if (event.type == EnumCreatureType.monster && biome.biomeID == witchBiome) 
 			{
 	
 				// Finds out if there is a witch in the list
@@ -71,8 +71,18 @@ public class MobSpawnController {
 				}
 				
 				
-				
-				if (event.world.getMoonPhase() == witchMoon && witchListIndex < 0 && !event.world.isDaytime()) 
+				/*
+				 * ----------------------------------------------------------------
+				 * Requirements to add Witch:
+				 * ----------------------------------------------------------------
+				 *   - No witches at the current mob list
+				 *   - New moon night
+				 *   - Not daytime
+				 *   - Must be between Y 62 and T 71 (surface of the swamp)
+				 * 
+				 * When any of those requirements changes, the witch is removed. 
+				 */
+				if (event.world.getMoonPhase() == witchMoon && witchListIndex < 0 && !event.world.isDaytime() && (event.y >= witchMinY && event.y <= witchMaxY)) 
 				{
 					/*
 					 * All requirements filled, add Witches to the possible mobs spawn.
@@ -83,18 +93,18 @@ public class MobSpawnController {
 					mobsList.add(new SpawnListEntry(EntityWitch.class, witchChance, 1, 2));
 	
 					// Debug
-					ModVillagerTweaks.logDebugInfo("    Adding witches on " + event.x + "/" + event.z + " (weight " + witchChance + ")");
+					ModVillagerTweaks.logDebugInfo("    Adding witches on " + event.x + "/" + event.y + "/" + event.z + " (weight " + witchChance + ")");
 				}
 				
-				else if (event.world.getMoonPhase() != witchMoon && witchListIndex >= 0 && witchListIndex < mobsList.size())
+				else if (witchListIndex >= 0 && (event.world.getMoonPhase() != witchMoon || event.world.isDaytime() || !(event.y >= witchMinY && event.y <= witchMaxY)))
 				{
 					/*
-					 * No longer able to spawn witches, remove them
+					 * No longer able to spawn witches, remove them.
 					 */
 					mobsList.remove(witchListIndex);
 					
 					// Debug
-					ModVillagerTweaks.logDebugInfo("    Removing witches from " + event.x + "/" + event.z);
+					ModVillagerTweaks.logDebugInfo("    Removing witches from " + event.x + "/" + event.y + "/" + event.z);
 				}
 			
 				
