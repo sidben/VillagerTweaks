@@ -17,3 +17,6 @@ Download
 
 v1.0 for Minecraft 1.6.2 - http://adf.ly/Sap0W
 
+
+
+![Villager Tweaks Banner](http://i.imgur.com/hJ7WQMW.jpg)
