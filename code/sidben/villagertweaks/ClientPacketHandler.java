@@ -1,19 +1,16 @@
 package sidben.villagertweaks;
 
 
-import cpw.mods.fml.common.network.IPacketHandler;
-import cpw.mods.fml.common.network.Player;
 import net.minecraft.network.INetworkManager;
 import net.minecraft.network.packet.Packet250CustomPayload;
+import cpw.mods.fml.common.network.IPacketHandler;
+import cpw.mods.fml.common.network.Player;
 
 
 
-public class ClientPacketHandler  implements IPacketHandler 
-{
+public class ClientPacketHandler implements IPacketHandler {
 
-	@Override
-	public void onPacketData(INetworkManager manager, Packet250CustomPayload payload, Player player)
-	{
-	}
-	
+    @Override
+    public void onPacketData(INetworkManager manager, Packet250CustomPayload payload, Player player) {}
+
 }

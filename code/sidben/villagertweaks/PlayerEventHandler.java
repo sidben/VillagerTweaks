@@ -1,5 +1,6 @@
 package sidben.villagertweaks;
 
+
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.item.Item;
@@ -11,56 +12,48 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 
 
-
 public class PlayerEventHandler {
 
+    @SideOnly(Side.CLIENT)
+    @ForgeSubscribe
+    public void onEntityInteractEvent(EntityInteractEvent event) {
+        /*
+         * OBS: This method is called whenever a player interacts with something
+         * (right-click)
+         */
 
-	@SideOnly(Side.CLIENT)
-	@ForgeSubscribe
-	public void onEntityInteractEvent(EntityInteractEvent event)
-	{
-		/*
-		 * OBS: This method is called whenever a player interacts with something (right-click)
-		 */
+        // check if the player right-clicked a villager
+        if (event.target instanceof EntityVillager) {
 
-		// check if the player right-clicked a villager
-        if (event.target instanceof EntityVillager)
-        {
+            if (ConfigLoader.canNameVillagers) {
 
-        	if (ConfigLoader.canNameVillagers) {
+                // Check if the player is holding a Name Tag
+                ItemStack item = event.entityPlayer.inventory.getCurrentItem();
+                if (item != null && item.itemID == Item.field_111212_ci.itemID) // Name
+                                                                                // Tag
+                {
 
-        		// Check if the player is holding a Name Tag
-	            ItemStack item = event.entityPlayer.inventory.getCurrentItem();
-	            if (item != null && item.itemID == Item.field_111212_ci.itemID)			// Name Tag
-	            {
-	
-	            	// Check if the tag have a name and the player is sneaking
-	            	if (item.hasDisplayName() && event.entityPlayer.isSneaking()) 
-	            	{
-	            		// Set the name to that villager
-	            		EntityLiving villager = (EntityLiving)event.target;
-	            		villager.setCustomNameTag(item.getDisplayName());
-	            		
-	            		// Consumes the item if not in Creative
-	                    if (!event.entityPlayer.capabilities.isCreativeMode)
-	                    {
-	                    	--item.stackSize;
-	                    }
-	
-	                    // Cancel the regular event (trade GUI)
-	            		event.setCanceled(true);
-	            	}
-	
-	            }
-	            
-        	}
+                    // Check if the tag have a name and the player is sneaking
+                    if (item.hasDisplayName() && event.entityPlayer.isSneaking()) {
+                        // Set the name to that villager
+                        EntityLiving villager = (EntityLiving) event.target;
+                        villager.setCustomNameTag(item.getDisplayName());
 
-            
+                        // Consumes the item if not in Creative
+                        if (!event.entityPlayer.capabilities.isCreativeMode) {
+                            --item.stackSize;
+                        }
+
+                        // Cancel the regular event (trade GUI)
+                        event.setCanceled(true);
+                    }
+
+                }
+
+            }
+
         }
 
+    }
 
-       
-	}
-
-	
 }
