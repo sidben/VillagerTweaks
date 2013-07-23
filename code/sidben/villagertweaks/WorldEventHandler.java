@@ -1,6 +1,8 @@
 package sidben.villagertweaks;
 
 
+import cpw.mods.fml.common.FMLCommonHandler;
+import net.minecraft.entity.passive.EntityVillager;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 
@@ -24,6 +26,17 @@ public class WorldEventHandler {
          * System.out.println("================================================="
          * ); //}
          */
+        
+        if (event.entity instanceof EntityVillager) {
+            EntityVillager villager = (EntityVillager) event.entity;
+            int taskFireworksPriority = 8;
+            
+            // Debug
+            System.out.println("Adding AI task to villager on " + event.entity.posX + ", " + event.entity.posY + ", " + event.entity.posZ);
+            System.out.println(" Side:       " + FMLCommonHandler.instance().getEffectiveSide());
+
+            villager.tasks.addTask(taskFireworksPriority, new EntityAILaunchFireworks(villager));
+        }
 
     }
 
