@@ -2,7 +2,6 @@ package sidben.villagertweaks;
 
 
 import java.util.logging.Level;
-
 import net.minecraftforge.common.Configuration;
 import cpw.mods.fml.common.FMLLog;
 
@@ -10,8 +9,7 @@ import cpw.mods.fml.common.FMLLog;
 
 class ConfigLoader {
 
-    // Indicates if the mod is on debug mode. Extra info will be tracked on the
-    // log.
+    // Indicates if the mod is on debug mode. Extra info will be tracked on the log.
     public static boolean onDebug;
 
     // Main config values

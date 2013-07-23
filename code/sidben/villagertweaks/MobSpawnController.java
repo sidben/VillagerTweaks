@@ -65,11 +65,11 @@ public class MobSpawnController {
                 /*
                  * ----------------------------------------------------------------
                  * Requirements to add Witch:
-                 * ---------------------------------------------------------------- 
-                 *   - No witches at the current mob list 
-                 *   - New moon night 
-                 *   - Not daytime 
-                 *   - Must be between Y 62 and Y 71 (surface of the swamp)
+                 * ----------------------------------------------------------------
+                 * - No witches at the current mob list
+                 * - New moon night
+                 * - Not daytime
+                 * - Must be between Y 62 and Y 71 (surface of the swamp)
                  * 
                  * When any of those requirements changes, the witch is removed.
                  */

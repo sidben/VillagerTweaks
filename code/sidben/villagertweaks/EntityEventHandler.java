@@ -57,8 +57,8 @@ public class EntityEventHandler {
             Random rand = new Random();
             EntityZombie zombie = (EntityZombie) event.entity;
 
-            
-            
+
+
             // ----------------------------------------------------
             // Bonus Feather
             // ----------------------------------------------------
@@ -75,8 +75,8 @@ public class EntityEventHandler {
                 }
             }
 
-            
-            
+
+
             // ----------------------------------------------------
             // Bonus Emerald
             // ----------------------------------------------------
