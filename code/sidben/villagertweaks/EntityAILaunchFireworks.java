@@ -1,5 +1,7 @@
 package sidben.villagertweaks;
 
+import java.util.Random;
+
 import cpw.mods.fml.common.FMLCommonHandler;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.item.EntityFireworkRocket;
@@ -127,13 +129,49 @@ public class EntityAILaunchFireworks extends EntityAIBase {
         System.out.println("AIFireworks.UpdateTask");
         
         
+        /*
+         * Fireworks Reference:
+         * 
+         * 
+            Type:
+                0   Small Ball
+                1   Large Ball
+                2   Star
+                3   Creeper
+                4   Burst
+            
+            Colors:
+                White       15790320
+                Light gray  11250603
+                Gray        4408131
+                Black       1973019
+                Red         11743532
+                Green       3887386
+                Brown       5320730
+                Blue        2437522
+                Cyan        2651799
+                Pink        14188952
+                Lime        4312372
+                Yellow      14602026
+                Light Blue  6719955
+                Magenta     12801229
+                Orange      15435844
+                Purple      8073150
+
+         */
         
+        Random r = this.villager.worldObj.rand;
         double rocketX = this.villager.posX;
         double rocketY = this.villager.posY + 1;
         double rocketZ = this.villager.posZ;
-        byte rocketFlight = 1;
-        // int[] rocketColor = new int[1];
-        int[] rocketColor = {14602026, 3887386};
+        byte rocketFlight = (byte) (r.nextInt(2)+1);
+        byte rocketType = (byte) r.nextInt(5); 
+        int rocketEffect = r.nextInt(100);
+        boolean haveTwinkle = (rocketEffect > 10 && rocketEffect < 25);
+        boolean haveTrail = (rocketEffect > 60 && rocketEffect < 68);
+        // int[] possibleColors = {15790320, 11250603, 4408131, 1973019, 11743532, 3887386, 5320730, 2437522, 2651799, 14188952, 4312372, 14602026, 6719955, 12801229, 15435844, 8073150};
+        int[] possibleColors = {15790320, 11250603, 11743532, 2437522, 2651799, 14188952, 4312372, 14602026, 6719955, 12801229, 15435844, 8073150};
+        int[] rocketColor = {possibleColors[r.nextInt(possibleColors.length)]};
         ItemStack rocketStack = new ItemStack(Item.firework);
         
         
@@ -142,8 +180,9 @@ public class EntityAILaunchFireworks extends EntityAIBase {
         NBTTagList boomTagList = new NBTTagList("Explosions");
         NBTTagCompound boomTagCompound = new NBTTagCompound();
 
-        boomTagCompound.setByte("Type", (byte) 0);
-        boomTagCompound.setBoolean("Flicker", true);
+        boomTagCompound.setByte("Type", (byte) rocketType);
+        if (haveTwinkle) boomTagCompound.setBoolean("Flicker", true);
+        if (haveTrail) boomTagCompound.setBoolean("Trail", true);
         boomTagCompound.setIntArray("Colors", rocketColor);
         boomTagList.appendTag(boomTagCompound);
 
