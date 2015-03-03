@@ -1,5 +1,6 @@
 package sidben.villagertweaks;
 
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -7,6 +8,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import sidben.villagertweaks.handler.ConfigurationHandler;
+import sidben.villagertweaks.handler.PlayerEventHandler;
 import sidben.villagertweaks.init.MyBlocks;
 import sidben.villagertweaks.init.MyItems;
 import sidben.villagertweaks.init.MyRecipes;
@@ -54,6 +56,9 @@ public class ModVillagerTweaks
 
         // Recipes
         MyRecipes.register();
+        
+        // Event Handlers
+        MinecraftForge.EVENT_BUS.register(new PlayerEventHandler());
     }
 
 
