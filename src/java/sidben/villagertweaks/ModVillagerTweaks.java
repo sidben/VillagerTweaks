@@ -8,6 +8,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import sidben.villagertweaks.handler.ConfigurationHandler;
+import sidben.villagertweaks.handler.EntityEventHandler;
 import sidben.villagertweaks.handler.PlayerEventHandler;
 import sidben.villagertweaks.init.MyBlocks;
 import sidben.villagertweaks.init.MyItems;
@@ -59,6 +60,7 @@ public class ModVillagerTweaks
         
         // Event Handlers
         MinecraftForge.EVENT_BUS.register(new PlayerEventHandler());
+        MinecraftForge.EVENT_BUS.register(new EntityEventHandler());
     }
 
 
