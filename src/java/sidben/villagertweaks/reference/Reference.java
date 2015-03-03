@@ -10,6 +10,4 @@ public class Reference {
     public static final String  ClientProxyClass   	= "sidben.villagertweaks.proxy.ClientProxy";
     public static final String  GuiFactoryClass   	= "sidben.villagertweaks.client.gui.GuiFactory";
 
-    //public static final String  Channel            = "chSidbenTutorial";
-
 }

@@ -57,7 +57,7 @@ public class ModVillagerTweaks
 
         // Recipes
         MyRecipes.register();
-        
+
         // Event Handlers
         MinecraftForge.EVENT_BUS.register(new PlayerEventHandler());
         MinecraftForge.EVENT_BUS.register(new EntityEventHandler());

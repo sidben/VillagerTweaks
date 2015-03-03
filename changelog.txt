@@ -1,0 +1,14 @@
+v2.0 - MC 1.8 - 2015-03 [rc]
+
+- Updated to 1.8;
+- Current Features:
+	- Zombie Villagers may drop emeralds (15% chance + 5% per looting level);
+	- Regular zombies may drop feathers (5% chance);
+	- Villagers can be named by sneaking + right-clicking on them with a name tag;
+- Removed requiring player kill to drop emeralds, the chance is low enough;
+- Removed Witches spawning on swamps since vanilla added that a while ago;
+
+
+
+sidbenmc.wordpress.com
+github.com/sidben
