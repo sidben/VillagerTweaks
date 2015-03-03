@@ -38,6 +38,7 @@ public class ConfigurationHandler {
 	private static void loadConfig()
 	{
 		// Load properties
+	    onDebug = config.getBoolean("on_debug", Configuration.CATEGORY_GENERAL, false, "Adds extra info messages to the forge log.");
 	    canNameVillagers = config.getBoolean("villager_naming", Configuration.CATEGORY_GENERAL, true, "Enables naming villagers with Name Tags.");
         zombieVillagerDropEmerald = config.getBoolean("zombie_villager_drops_emerald", Configuration.CATEGORY_GENERAL, true, "Enables zombie villagers dropping emeralds.");
         zombieDropFeather = config.getBoolean("zombie_drops_feather", Configuration.CATEGORY_GENERAL, true, "Enables regular zombies dropping feathers.");

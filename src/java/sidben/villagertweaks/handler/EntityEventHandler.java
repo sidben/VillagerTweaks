@@ -23,8 +23,10 @@ public class EntityEventHandler
         }
 
 
-        LogHelper.info("Is zombie? [" +(event.entity instanceof EntityZombie)+ "]");
-        LogHelper.info("Emerald config enabled? [" +ConfigurationHandler.zombieVillagerDropEmerald+ "]");
+        if (ConfigurationHandler.onDebug) {
+            LogHelper.info("Is zombie? [" +(event.entity instanceof EntityZombie)+ "]");
+            LogHelper.info("Emerald config enabled? [" +ConfigurationHandler.zombieVillagerDropEmerald+ "]");
+        }
         
         
         // It's a zombie!
@@ -38,10 +40,11 @@ public class EntityEventHandler
             final EntityZombie zombie = (EntityZombie) event.entity;
 
 
-            LogHelper.info("is zombie child? [" +zombie.isChild()+ "]");
-            LogHelper.info("is zombie villager? [" +zombie.isVillager()+ "]");
-            LogHelper.info("Looting Level [" +event.lootingLevel+ "]");
-
+            if (ConfigurationHandler.onDebug) {
+                LogHelper.info("is zombie child? [" +zombie.isChild()+ "]");
+                LogHelper.info("is zombie villager? [" +zombie.isVillager()+ "]");
+                LogHelper.info("Looting Level [" +event.lootingLevel+ "]");
+            }
             
 
             // ----------------------------------------------------
@@ -55,7 +58,7 @@ public class EntityEventHandler
                 if (!zombie.isChild() && !zombie.isVillager()) {
                     
                     final int chanceFeather = rand.nextInt(100) + 1;
-                    LogHelper.info("Regular zombie - Chance do drop feather = [" +chanceFeather+ " < " +targetFeatherChance+ "]");
+                    if (ConfigurationHandler.onDebug) LogHelper.info("Regular zombie - Chance do drop feather = [" +chanceFeather+ " < " +targetFeatherChance+ "]");
                     if (chanceFeather <= targetFeatherChance) {
                         // Adds 1 feather to the drop list
                         final EntityItem itemFeather = new EntityItem(zombie.worldObj, zombie.posX, zombie.posY, zombie.posZ);
@@ -89,14 +92,14 @@ public class EntityEventHandler
                             }
                         }
                     }
-                    LogHelper.info("Villager zombie - Have ingot? [" +haveIngot+ "]");
+                    if (ConfigurationHandler.onDebug) LogHelper.info("Villager zombie - Have ingot? [" +haveIngot+ "]");
     
     
                     // Never drops emeralds when dropping iron ingot
                     if (!haveIngot) {
                         // Will this zombie drop an emerald?
                         final int chanceEmerald = rand.nextInt(100) + 1;
-                        LogHelper.info("Villager zombie - Chance do drop emerald = [" +chanceEmerald+ " < " +targetEmeraldChance+ "]");
+                        if (ConfigurationHandler.onDebug) LogHelper.info("Villager zombie - Chance do drop emerald = [" +chanceEmerald+ " < " +targetEmeraldChance+ "]");
                         if (chanceEmerald <= targetEmeraldChance) {
                             emeralds = 1; // drop 1 emerald, yay!
                         }
