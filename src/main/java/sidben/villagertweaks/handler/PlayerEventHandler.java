@@ -1,11 +1,14 @@
 package sidben.villagertweaks.handler;
 
 import java.util.Iterator;
+import java.util.Map;
 import sidben.villagertweaks.helper.LogHelper;
 import sidben.villagertweaks.tracker.EventTracker;
 import sidben.villagertweaks.tracker.SpecialEventsTracker;
 import sidben.villagertweaks.tracker.SpecialEventsTracker.EventType;
 import net.minecraft.block.Block;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.monster.EntityIronGolem;
@@ -15,6 +18,8 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.entity.player.EntityInteractEvent;
 import net.minecraftforge.event.world.BlockEvent.MultiPlaceEvent;
@@ -78,7 +83,7 @@ public class PlayerEventHandler
         int snowAmount = 0;
         
         String customName = "";
-
+        Map pumpkinEnchants = null;
         
         
         // Check the replaced blocks to see if it contains golem materials
@@ -99,6 +104,9 @@ public class PlayerEventHandler
             // Name
             ItemStack item = event.itemInHand;
             if (item.getItem() == Item.getItemFromBlock(Blocks.pumpkin) && item.hasDisplayName()) customName = item.getDisplayName();
+            
+            // Enchantments
+            pumpkinEnchants = EnchantmentHelper.getEnchantments(item);
 
         }
         
@@ -160,6 +168,46 @@ public class PlayerEventHandler
                         target.setCustomNameTag(customName);
                         
                     }
+                    
+                   
+                    // Check if it's an enchanted pumpkin
+                    if (pumpkinEnchants != null && pumpkinEnchants.size() > 0) {
+                        
+                        Iterator i = pumpkinEnchants.keySet().iterator();
+                        while (i.hasNext())
+                        {
+                            int j = ((Integer)i.next()).intValue();
+                            Enchantment enchantment = Enchantment.getEnchantmentById(j);
+                            int level = ((Integer)pumpkinEnchants.get(Integer.valueOf(j))).intValue();
+                            
+                            if (enchantment == Enchantment.unbreaking) { 
+                                LogHelper.info("    Adding resistance");
+                                ((EntityLiving)target).addPotionEffect(new PotionEffect(Potion.resistance.id, 720000, 0));   // gives resistance boost for 600 minutes
+                            }
+
+                            else if (enchantment == Enchantment.sharpness) { 
+                                LogHelper.info("    Adding strength");
+                                ((EntityLiving)target).addPotionEffect(new PotionEffect(Potion.damageBoost.id, 720000, 0));   // gives resistance boost for 600 minutes
+                            }
+
+                            else if (enchantment == Enchantment.efficiency) { 
+                                LogHelper.info("    Adding speed");
+                                ((EntityLiving)target).addPotionEffect(new PotionEffect(Potion.moveSpeed.id, 720000, 0));   // gives resistance boost for 600 minutes
+                            }
+
+                            else if (enchantment == Enchantment.infinity) { 
+                                LogHelper.info("    Adding health");
+                                ((EntityLiving)target).addPotionEffect(new PotionEffect(Potion.healthBoost.id, 720000, 14));   // gives resistance boost for 600 minutes - adds 60 health
+                                ((EntityLiving)target).heal(160);
+                            }
+                            
+                        }
+
+                        LogHelper.info("    - Health: " + ((EntityLiving)target).getHealth());
+                        LogHelper.info("    - Max Health: " + ((EntityLiving)target).getMaxHealth());
+                        
+                    }
+                    
 
                 }
                 

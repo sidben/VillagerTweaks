@@ -9,6 +9,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
+import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.entity.player.EntityInteractEvent;
 import net.minecraftforge.event.world.BlockEvent.PlaceEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -21,7 +22,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class TickEventHandler
 {
     
-    private static final int factor = 200;
+    private static final int tickFactor = 600;
     
     
 
@@ -33,7 +34,7 @@ public class TickEventHandler
             SpecialEventsTracker.canStartTracking = true;
 
             MinecraftServer server = MinecraftServer.getServer();
-            if (server.getTickCounter() % factor == 0) {
+            if (server.getTickCounter() % tickFactor == 0) {
                 
                 LogHelper.info("tick [" + server.getTickCounter() + "]");
                 SpecialEventsTracker.cleanExpired();
@@ -42,6 +43,8 @@ public class TickEventHandler
         }
 
     }
+    
+    
     
     
 

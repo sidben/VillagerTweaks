@@ -11,6 +11,7 @@ import sidben.villagertweaks.handler.ConfigurationHandler;
 import sidben.villagertweaks.handler.EntityEventHandler;
 import sidben.villagertweaks.handler.PlayerEventHandler;
 import sidben.villagertweaks.handler.TickEventHandler;
+import sidben.villagertweaks.handler.WorldEventHandler;
 import sidben.villagertweaks.init.MyBlocks;
 import sidben.villagertweaks.init.MyItems;
 import sidben.villagertweaks.init.MyRecipes;
@@ -62,6 +63,7 @@ public class ModVillagerTweaks
         // Event Handlers
         MinecraftForge.EVENT_BUS.register(new PlayerEventHandler());
         MinecraftForge.EVENT_BUS.register(new EntityEventHandler());
+        MinecraftForge.EVENT_BUS.register(new WorldEventHandler());
 
         FMLCommonHandler.instance().bus().register(new TickEventHandler());
     }
