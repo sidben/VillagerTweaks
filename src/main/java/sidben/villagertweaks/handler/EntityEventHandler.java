@@ -2,6 +2,8 @@ package sidben.villagertweaks.handler;
 
 import java.util.Random;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.monster.EntityIronGolem;
+import net.minecraft.entity.monster.EntitySnowman;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.init.Items;
@@ -13,6 +15,9 @@ import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import sidben.villagertweaks.helper.LogHelper;
+import sidben.villagertweaks.tracker.EventTracker;
+import sidben.villagertweaks.tracker.SpecialEventsTracker;
+import sidben.villagertweaks.tracker.SpecialEventsTracker.EventType;
 
 
 public class EntityEventHandler
@@ -146,14 +151,14 @@ public class EntityEventHandler
          */
 
         if (event.entity instanceof EntityVillager) {
-            if (event.source instanceof EntityDamageSource) {
-                if (event.source.getEntity() != null && event.source.getEntity() instanceof EntityZombie) {
+            if (event.source.getEntity() != null && event.source.getEntity() instanceof EntityZombie) {
+                final EntityVillager villager = (EntityVillager) event.entity;
+                String name = "";
+                
+                //SpecialEventsTracker.add(EventType.VILLAGER, villager.getPosition(), name, null);
+                LogHelper.info("A zombie just killed this villager: [" + villager.toString() + "]");
+                LogHelper.info("Will he come back as a zombie? Find out on the next episode of Dragon Cube Z!");
 
-                    final EntityVillager villager = (EntityVillager) event.entity;
-                    LogHelper.info("A zombie just killed this villager: [" + villager.toString() + "]");
-                    LogHelper.info("Will he come back as a zombie? Find out on the next episode of Dragon Cube Z!");
-
-                }
             }
         }
         // LogHelper.info("Entity death, type [" +event.entity.toString()+ "], dmg source [" +event.source.toString()+
@@ -167,12 +172,14 @@ public class EntityEventHandler
     {
 
         // Check if a zombie villager spawned (from villager) or if a villager spawned (from cured zombie)
-
+        
+//        if (!event.world.isRemote) {
+            
         if (event.entity instanceof EntityZombie) {
             final EntityZombie zombie = (EntityZombie) event.entity;
 
             if (zombie.isVillager()) {
-                LogHelper.info("Zombie Villager joined world: [" + event.entity.toString() + "]");
+                LogHelper.info("Zombie Villager joined world: [" + zombie.toString() + "]");
             }
 
         }
@@ -181,10 +188,30 @@ public class EntityEventHandler
             final EntityVillager villager = (EntityVillager) event.entity;
 
             if (!villager.isChild()) {
-                LogHelper.info("Adult villager joined world: [" + event.entity.toString() + "]");
+                LogHelper.info("Adult villager joined world: [" + villager.toString() + "]");
             }
 
         }
+
+        else if (event.entity instanceof EntityIronGolem && !event.world.isRemote) {
+            final EntityIronGolem golem = (EntityIronGolem) event.entity;
+
+            if (golem.isPlayerCreated()) {
+                LogHelper.info("Player built Iron Golem joined world: [" + golem.toString() + "]");
+                SpecialEventsTracker.add(EventType.GOLEM, golem.getEntityId(), golem.getPosition());
+            }
+
+        }
+
+        else if (event.entity instanceof EntitySnowman && !event.world.isRemote) {
+            final EntitySnowman golem = (EntitySnowman) event.entity;
+
+            LogHelper.info("Snowman joined the world: [" + golem.toString() + "]");
+            SpecialEventsTracker.add(EventType.GOLEM, golem.getEntityId(), golem.getPosition());
+
+        }
+
+//        }
 
     }
 
@@ -211,10 +238,15 @@ public class EntityEventHandler
             // Based on the [onUpdate] event from zombies
             if (!zombie.worldObj.isRemote && zombie.isConverting()) {
                 final int nextConversionTime = zombie.conversionTime - zombie.getConversionTimeBoost();
+                
                 if (nextConversionTime <= 0) {
+                    String name = "";
+                    //SpecialEventsTracker.add(EventType.ZOMBIE, zombie.getPosition(), name, null);
                     LogHelper.info("Oh baby, this zombie is about to be cured! " + zombie.toString() + "");
+                    
                 } else {
                     LogHelper.info("Zombie being cured in: [" + zombie.conversionTime + " -> " + nextConversionTime + "]");
+                    
                 }
             }
 
