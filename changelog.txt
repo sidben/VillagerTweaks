@@ -1,6 +1,6 @@
 v2.0 - MC 1.8 - 2015-03 [rc]
 
-- Updated to 1.8;
+- Updated to Minecraft 1.8;
 - Current Features:
 	- Zombie Villagers may drop emeralds (15% chance + 5% per looting level);
 	- Regular zombies may drop feathers (5% chance);
@@ -10,5 +10,6 @@ v2.0 - MC 1.8 - 2015-03 [rc]
 
 
 
+curse.com/mc-mods/minecraft/villager-tweaks
 sidbenmc.wordpress.com
 github.com/sidben

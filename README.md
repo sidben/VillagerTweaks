@@ -12,9 +12,17 @@ Features
 To see all the features, check the [Releases Changelog](https://github.com/sidben/VillagerTweaks/releases).
 
 
+Project Links
+-------------
+
+http://www.curse.com/mc-mods/minecraft/villager-tweaks
+http://minecraft.curseforge.com/mc-mods/62481-villager-tweaks
+
+
 Download
 --------
 
+v2.0 and up - http://minecraft.curseforge.com/mc-mods/62481-villager-tweaks/files
 v1.0 for Minecraft 1.6.2 - http://adf.ly/Sap0W
 
 
