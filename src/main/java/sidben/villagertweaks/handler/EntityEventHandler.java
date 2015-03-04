@@ -4,9 +4,13 @@ import java.util.Random;
 import sidben.villagertweaks.helper.LogHelper;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntityZombie;
+import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
+import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 
@@ -122,4 +126,29 @@ public class EntityEventHandler
 
     }
 
+    
+    
+    @SubscribeEvent
+    public void onLivingDeath(LivingDeathEvent event)
+    {
+        
+        LogHelper.info("Entity death, type [" +event.entity.toString()+ "], dmg source [" +event.source.toString()+ "] type [" +event.source.damageType+ "]");
+        
+    }
+    
+
+    
+
+    
+    @SubscribeEvent
+    public void onEntityJoinWorld(EntityJoinWorldEvent event)
+    {
+        
+        LogHelper.info("Entity join world: [" +event.entity.toString()+ "]");
+        
+    }
+
+    
+  
+    
 }
