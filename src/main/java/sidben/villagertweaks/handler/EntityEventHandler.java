@@ -9,6 +9,7 @@ import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EntityDamageSource;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
@@ -27,11 +28,7 @@ public class EntityEventHandler
     public void onLivingDrops(LivingDropsEvent event)
     {
 
-        // Break the method if the world is a client
-        if (event.entity.worldObj.isRemote) {
-            return;
-        }
-
+        
 
         if (ConfigurationHandler.onDebug) {
             LogHelper.info("Is zombie? [" + (event.entity instanceof EntityZombie) + "]");
@@ -40,7 +37,7 @@ public class EntityEventHandler
 
 
         // It's a zombie!
-        if (event.entity instanceof EntityZombie) {
+        if (event.entity instanceof EntityZombie && !event.entity.worldObj.isRemote) {
             final int targetEmeraldChance = 15 + 5 * event.lootingLevel;
             final int targetFeatherChance = 5;
             boolean haveIngot = false;
@@ -134,6 +131,8 @@ public class EntityEventHandler
             }
 
         }
+
+
 
     }
 
@@ -250,6 +249,29 @@ public class EntityEventHandler
                 }
             }
 
+        }
+        
+        else if (event.entity instanceof EntityIronGolem) {
+            
+            final EntityIronGolem golem = (EntityIronGolem) event.entity;
+            Random rand = golem.worldObj.rand;
+
+            if (golem.worldObj.isRemote) {
+
+                float pct = 0;
+                if (golem.getHealth() > 0) pct = golem.getHealth() / golem.getMaxHealth();
+
+                // Spawn smoke if he is damaged
+                if (pct < 0.3F) {
+                    if (rand.nextInt(60) == 0) {
+                        for (int i = 0; i < 2; ++i)
+                        {
+                            golem.worldObj.spawnParticle(EnumParticleTypes.CLOUD, golem.posX + (rand.nextDouble() - 0.5D) * (double)golem.width, golem.posY + rand.nextDouble() * (double)golem.height - 0.25D, golem.posZ + (rand.nextDouble() - 0.5D) * (double)golem.width, 0D, 0.1D, 0D, new int[0]);
+                        }
+                    }
+                }
+                
+            }
         }
 
 
