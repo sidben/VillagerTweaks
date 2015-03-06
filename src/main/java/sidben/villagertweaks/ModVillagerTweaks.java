@@ -7,6 +7,7 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.relauncher.Side;
 import sidben.villagertweaks.handler.ConfigurationHandler;
 import sidben.villagertweaks.handler.EntityEventHandler;
 import sidben.villagertweaks.handler.PlayerEventHandler;
@@ -49,11 +50,13 @@ public class ModVillagerTweaks
     @Mod.EventHandler
     public void load(FMLInitializationEvent event)
     {
-        // Item renderer
-        MyItems.registerRender();
+        if (event.getSide() == Side.CLIENT) {  // Note - polish code later
+            // Item renderer
+            MyItems.registerRender();
 
-        // Block renderer
-        MyBlocks.registerRender();
+            // Block renderer
+            MyBlocks.registerRender();      
+        }
 
         // Recipes
         MyRecipes.register();
