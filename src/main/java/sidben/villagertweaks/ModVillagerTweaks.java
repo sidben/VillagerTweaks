@@ -1,12 +1,8 @@
 package sidben.villagertweaks;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.ModelCow;
-import net.minecraft.client.model.ModelIronGolem;
-import net.minecraft.client.renderer.entity.RenderCow;
 import net.minecraft.entity.monster.EntityIronGolem;
-import net.minecraft.entity.passive.EntityCow;
-import net.minecraft.entity.passive.EntityMooshroom;
+import net.minecraft.entity.monster.EntityZombie;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
@@ -16,6 +12,7 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import sidben.villagertweaks.client.renderer.entity.RenderCrackedIronGolem;
+import sidben.villagertweaks.client.renderer.entity.RenderZombieVillager;
 import sidben.villagertweaks.handler.ConfigurationHandler;
 import sidben.villagertweaks.handler.EntityEventHandler;
 import sidben.villagertweaks.handler.PlayerEventHandler;
@@ -80,6 +77,9 @@ public class ModVillagerTweaks
         if (event.getSide() == Side.CLIENT) {
             Minecraft.getMinecraft().getRenderManager().entityRenderMap.remove(EntityIronGolem.class);
             Minecraft.getMinecraft().getRenderManager().entityRenderMap.put(EntityIronGolem.class, new RenderCrackedIronGolem(Minecraft.getMinecraft().getRenderManager()));
+
+            Minecraft.getMinecraft().getRenderManager().entityRenderMap.remove(EntityZombie.class);
+            Minecraft.getMinecraft().getRenderManager().entityRenderMap.put(EntityZombie.class, new RenderZombieVillager(Minecraft.getMinecraft().getRenderManager()));
         }
         
     }
