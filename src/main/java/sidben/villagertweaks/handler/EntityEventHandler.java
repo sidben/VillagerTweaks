@@ -8,13 +8,16 @@ import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.EnumParticleTypes;
+import net.minecraftforge.event.entity.EntityEvent.EntityConstructing;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import sidben.villagertweaks.common.ExtendedVillagerZombie;
 import sidben.villagertweaks.helper.LogHelper;
 import sidben.villagertweaks.tracker.EventTracker;
 import sidben.villagertweaks.tracker.SpecialEventsTracker;
@@ -179,6 +182,50 @@ public class EntityEventHandler
 
             if (zombie.isVillager()) {
                 LogHelper.info("Zombie Villager joined world: [" + zombie.toString() + "]");
+                
+
+                ExtendedVillagerZombie x = (ExtendedVillagerZombie) zombie.getExtendedProperties(ExtendedVillagerZombie.id);
+                LogHelper.info("    2) TEMP - PROFESSION: [" + x.getProfession() + "]");
+
+                
+                // Check if the zombie villager has a profession. If not, may assign one at random. 
+/*                
+                final String jobKey = "Profession";
+                NBTTagCompound tag = new NBTTagCompound();
+                zombie.readEntityFromNBT(tag);
+                
+                LogHelper.info("    1) TEMP - HAS PRF: [" + tag.hasKey(jobKey)  + "]");
+                LogHelper.info("    1) TEMP - PROFESSION: [" + tag.getInteger(jobKey)  + "]");
+                LogHelper.info("    1) TEMP - HAS VI: [" + !tag.getCompoundTag("VillagerInfo").hasNoTags()  + "]");
+                LogHelper.info("    1) TEMP - HAS VIP: [" + tag.getCompoundTag("VillagerInfo").getInteger("Profession")  + "]");
+                
+                ExtendedVillagerZombie x = (ExtendedVillagerZombie) zombie.getExtendedProperties("ExtendedVillagerZombie");
+                
+                LogHelper.info("    2) TEMP - HAS VI: [" + x.getProfession() + "]");
+*/                 
+                
+                /*
+                if (!tag.hasKey(jobKey)) {
+                    // Assign one profession at random (70% chance)
+                    int newProfession = event.world.rand.nextInt(7) - 2;
+                    
+                    if (newProfession >= 0) {
+                        tag.setInteger(jobKey, newProfession);
+                    } else {
+                        tag.setInteger(jobKey, -1);
+                    }
+                    zombie.writeEntityToNBT(tag);
+
+                }
+                else  {
+                    
+
+                }
+                    
+                
+                LogHelper.info("    2) TEMP - HAS PRF: [" + tag.hasKey(jobKey)  + "]");
+                LogHelper.info("    2) TEMP - PROFESSION: [" + tag.getInteger(jobKey)  + "]");
+                */
             }
 
         }
@@ -277,6 +324,30 @@ public class EntityEventHandler
 
     }
 
+
+    
+
+
+    @SubscribeEvent
+    public void onEntityConstructing(EntityConstructing event) {
+
+        if (event.entity instanceof EntityZombie) {
+//            final EntityZombie zombie = (EntityZombie) event.entity;
+            
+/*            
+            LogHelper.info("onEntityConstructing");
+            LogHelper.info("    is zombie child? [" + zombie.isChild() + "]");
+            LogHelper.info("    is zombie villager? [" + zombie.isVillager() + "]");
+*/
+            
+//            if (zombie.isVillager()) {
+//                LogHelper.info("Adding exntended properties");
+                event.entity.registerExtendedProperties(ExtendedVillagerZombie.id, new ExtendedVillagerZombie());
+//            }
+        }
+        
+    }
+    
 
 
 }
