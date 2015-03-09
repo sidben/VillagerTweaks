@@ -61,6 +61,19 @@ public class ZombieVillagerProfessionMessage implements IMessage
     
     
     
+    @Override 
+    public String toString() {
+        StringBuilder r = new StringBuilder();
+        
+        r.append("Entity ID = ");
+        r.append(this.getEntityID());
+        r.append(", Profession = ");
+        r.append(this.getProfession());
+        
+        return r.toString();
+    }
+    
+    
     
     
     
@@ -73,7 +86,7 @@ public class ZombieVillagerProfessionMessage implements IMessage
             
             LogHelper.info("Woo, I got a package!");
             LogHelper.info("    " + ctx.side);
-            LogHelper.info("    Entity [" + message._entityID + "], Profession [" + message._profession + "]");
+            LogHelper.info("    " + message);
             
             if (message.getEntityID() > 0 && message.getProfession() >= 0) {
                 // Saves the info to be used later, when the entity actually loads

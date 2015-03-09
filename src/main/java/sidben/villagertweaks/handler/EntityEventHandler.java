@@ -218,17 +218,9 @@ public class EntityEventHandler
                     
                     if (tracked != null) {
                         // If found, copy the data from the villager
-
-                        if (tracked.getCustomName() != "") zombie.setCustomNameTag(tracked.getCustomName());
-                        // zombie.isChild() = tracked.  // TODO: adult / child info preservation (check for chicken jockeys)
-                        if (tracked.getObject() instanceof Integer) {
-                            properties.setProfession((Integer)tracked.getObject());
-                        } else {
-                            properties.assignRandomProfessionIfNeeded();
-                        }
+                        tracked.updateZombie(zombie, properties);
                         
-                    }
-                    else {
+                    } else {
                         // If not, assign a random profession
                         properties.assignRandomProfessionIfNeeded();
 
@@ -261,7 +253,7 @@ public class EntityEventHandler
 
             if (golem.isPlayerCreated()) {
                 LogHelper.info("Player built Iron Golem joined world: [" + golem.toString() + "]");
-                ServerInfoTracker.add(EventType.GOLEM, golem.getEntityId(), golem.getPosition());
+                ServerInfoTracker.add(golem);
             }
 
         }
@@ -271,7 +263,7 @@ public class EntityEventHandler
             final EntitySnowman golem = (EntitySnowman) event.entity;
 
             LogHelper.info("Snowman joined the world: [" + golem.toString() + "]");
-            ServerInfoTracker.add(EventType.GOLEM, golem.getEntityId(), golem.getPosition());
+            ServerInfoTracker.add(golem);
 
         }
 

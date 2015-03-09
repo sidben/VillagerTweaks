@@ -1,5 +1,10 @@
 package sidben.villagertweaks.tracker;
 
+import sidben.villagertweaks.common.ExtendedVillagerZombie;
+import net.minecraft.entity.monster.EntityIronGolem;
+import net.minecraft.entity.monster.EntitySnowman;
+import net.minecraft.entity.monster.EntityZombie;
+import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.util.Vec3i;
 
 
@@ -13,62 +18,140 @@ public class EventTracker {
     private int _entityID;
 
     
-    // Position where the event happened
+    /**
+     * Position where the event happened
+     * 
+     */
     public Vec3i getPosition()
     {
         return _position;
     }
 
-    // Does the event involves something with a custom name? Store it here.
+    /**
+     * Does the event involves something with a custom name? Store it here.
+     * 
+     */
     public String getCustomName()
     {
         return _customName;
     }
 
-    // Does the event has extra information? Use this generic object.
+    /**
+     *  Does the event has extra information? Use this generic object.
+     * 
+     */
     public Object getObject()
     {
         return _specialInfo;
     }
 
-    // Returns the entity ID being tracked, if any.
+    /** 
+     * Returns the entity ID being tracked, if any.
+     * 
+     */
     public int getEntityID()
     {
         return _entityID;
     }
 
-    // Returns the tick in which this entry was created (Tick of Birth).
+    /**
+     *  Sets the tick in which this entry was created (Tick of Birth).
+     * 
+     */
+    public void setTOB(int tick)
+    {
+        this._tickAdded = tick;
+    }
+
+    /**
+     *  Gets the tick in which this entry was created (Tick of Birth).
+     * 
+     */
     public int getTOB()
     {
         return _tickAdded;
     }
-
-
     
-    
+    /**
+     * Forces this object to "expire" so it won't be used again.
+     * 
+     */
     public void expireNow() {
         this._tickAdded = -1;
     }
     
     
-    public EventTracker(int entityID, Vec3i pos, String customName, Object extraInfo, int expire) {
+    
+    
+    private EventTracker(int entityID, Vec3i pos, String customName, Object extraInfo) {
         this._entityID = entityID;
         this._customName = customName;
         this._position = pos;
         this._specialInfo = extraInfo;
-        this._tickAdded = expire;
+        this._tickAdded = 0;
     }
 
-    /*
-    public EventTracker(int entityID, String customName, Object extraInfo, int expire) {
-        this._entityID = entityID;
-        this._customName = customName;
-        this._position = null;
-        this._specialInfo = extraInfo;
-        this._expire = expire;
+    public EventTracker(EntityVillager villager) {
+        this(0, villager.getPosition(), villager.getCustomNameTag(), new Object[] { villager.getProfession(), villager.isChild() });
+        // NOTE: This event tracks villagers that just died by zombies, so the EntityID is 
+        // not required, since the villager don't exist anymore.
+        
+        /*
+        Object[] extraInfo = new Object[2];
+        extraInfo[0] = villager.getProfession();
+        extraInfo[1] = villager.isChild();
+        String name = villager.getCustomNameTag();
+        
+        this(villager.getEntityId(), villager.getPosition(), name, extraInfo);
+        */
     }
-    */
+    
+    public EventTracker(EntityIronGolem golem) {
+        this(golem.getEntityId(), golem.getPosition(), "", null);
+        // NOTE: custom info will be applied by the pumpkin, no need to track
+        // anything but the golem ID and position. Pumpkin code will find the entity
+        // and get whatever information it needs.
+    }
 
+    public EventTracker(EntitySnowman golem) {
+        this(golem.getEntityId(), golem.getPosition(), "", null);
+        // NOTE: custom info will be applied by the pumpkin, no need to track
+        // anything but the golem ID and position. Pumpkin code will find the entity
+        // and get whatever information it needs.
+    }
+
+    
+    
+
+    /**
+     * Updates a zombie entity with the villager info this object is tracking. 
+     * 
+     */
+    public void updateZombie(EntityZombie zombie, ExtendedVillagerZombie properties)
+    {
+        
+        // Note: I must trust that this object actually contain a villager info. If not, the cast below will fail.
+        Object[] extraInfo = (Object[]) this.getObject();
+        int profession = (Integer) extraInfo[0];
+        boolean isBaby = (Boolean) extraInfo[1];
+        
+        // Custom name
+        if (this.getCustomName() != "") zombie.setCustomNameTag(this.getCustomName());
+        
+        // Adult or child
+        zombie.setChild(isBaby);
+        
+        // Profession
+        if (profession >= 0 && profession <= 4) {   // vanilla professions
+            properties.setProfession(profession);
+        } else {
+            properties.setProfession(-1);           // vanilla zombie villager
+        }
+        
+    }
+
+    
+    
 
     
     @Override 
@@ -101,5 +184,6 @@ public class EventTracker {
         
         return r.toString();
     }
+
     
 }

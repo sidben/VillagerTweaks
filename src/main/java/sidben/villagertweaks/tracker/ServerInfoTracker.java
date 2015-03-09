@@ -3,6 +3,8 @@ package sidben.villagertweaks.tracker;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import net.minecraft.entity.monster.EntityIronGolem;
+import net.minecraft.entity.monster.EntitySnowman;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.server.MinecraftServer;
 import sidben.villagertweaks.helper.LogHelper;
@@ -73,35 +75,50 @@ public class ServerInfoTracker
     /**
      * Adds informations that should be tracked on the server. 
      */
-    public static void add(EventType type, int entityID, BlockPos pos) {
-        add(type, entityID, pos, "", null);
-    }
+    //public static void add(EventType type, int entityID, BlockPos pos) {
+    //    add(type, entityID, pos, "", null);
+    //}
 
     
     /**
      * Adds informations that should be tracked on the server. 
      */
-    public static void add(EventType type, int entityID, BlockPos pos, String customName, Object extraInfo) {
-        MinecraftServer server = MinecraftServer.getServer();
-        add(type, new EventTracker(entityID, pos, customName, extraInfo, server.getTickCounter()));
-    }
+    //public static void add(EventType type, int entityID, BlockPos pos, String customName, Object extraInfo) {
+    //    MinecraftServer server = MinecraftServer.getServer();
+    //    add(type, new EventTracker(entityID, pos, customName, extraInfo, server.getTickCounter()));
+    //}
 
 
     /**
-     * Adds informations that should be tracked on the server. 
+     * Adds villager information that should be tracked on the server. 
      */
     public static void add(EntityVillager villager)
     {
-        String name = villager.getCustomNameTag(); 
-        int profession = villager.getProfession();
-        ServerInfoTracker.add(EventType.VILLAGER, 0, villager.getPosition(), name, profession);
+        ServerInfoTracker.add(EventType.VILLAGER, new EventTracker(villager));
     }
+
+    /**
+     * Adds golem informations that should be tracked on the server. 
+     */
+    public static void add(EntityIronGolem golem)
+    {
+        ServerInfoTracker.add(EventType.GOLEM, new EventTracker(golem));
+    }
+    
+    /**
+     * Adds golem informations that should be tracked on the server. 
+     */
+    public static void add(EntitySnowman golem)
+    {
+        ServerInfoTracker.add(EventType.GOLEM, new EventTracker(golem));
+    }
+    
     
     
     /**
      * Adds informations that should be tracked on the server. 
      */
-    protected static void add(EventType type, EventTracker event) {
+    private static void add(EventType type, EventTracker event) {
         if (event == null) return;
         if (!canStartTracking) return;
         
@@ -109,6 +126,12 @@ public class ServerInfoTracker
         LogHelper.info("> Tracking a new event of type [" +type+ "] - [" +event+ "]");
         
         
+        // Adds the "tick of birth" to control when the event will expire
+        MinecraftServer server = MinecraftServer.getServer();
+        event.setTOB(server.getTickCounter());
+        
+        
+        // Adds the event to the specific list
         switch (type) {
             case GOLEM:
                 ServerInfoTracker.golemTracker.add(event);
