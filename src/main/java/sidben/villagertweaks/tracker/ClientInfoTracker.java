@@ -1,8 +1,14 @@
 package sidben.villagertweaks.tracker;
 
 import java.util.HashMap;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.monster.EntityZombie;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import sidben.villagertweaks.common.ExtendedVillagerZombie;
+import sidben.villagertweaks.helper.LogHelper;
 import sidben.villagertweaks.network.ZombieVillagerProfessionMessage;
 
 
@@ -40,6 +46,48 @@ public class ClientInfoTracker
         ZombieVillagerProfessionMessage msg = ClientInfoTracker.LoadedZombies.get(entityID);
         ClientInfoTracker.LoadedZombies.remove(entityID);         // removes from the list, it's not needed anymore
         return msg;
+    }
+    
+    
+    /**
+     * Attempts to locate the entity by it's ID and apply the 
+     * extended properties.
+     */
+    @SideOnly(Side.CLIENT)
+    public static void SyncZombieMessage(int entityID) {
+        LogHelper.info("== SyncZombieMessage(" + entityID + ") ==");
+        
+        // Seeks if the entity ID is loaded
+        WorldClient world = Minecraft.getMinecraft().theWorld;
+        Entity entity = world.getEntityByID(entityID);
+
+        if (entity instanceof EntityZombie) {
+            LogHelper.info("    Zombie found, loading message");
+            ClientInfoTracker.SyncZombieMessage((EntityZombie)entity);
+
+        }
+        else {
+            LogHelper.info("    Entity not found");
+            
+        }
+        
+    }
+
+    /**
+     * Attempts to locate a message with Extended Properties and apply to the zombie. 
+     */
+    @SideOnly(Side.CLIENT)
+    public static void SyncZombieMessage(EntityZombie zombie) {
+        ZombieVillagerProfessionMessage msg = ClientInfoTracker.getZombieMessage(zombie.getEntityId());
+        if (msg != null) {
+            LogHelper.info("    Setting profession = " + msg.getProfession());
+            ExtendedVillagerZombie properties = ExtendedVillagerZombie.get(zombie);
+            properties.setProfession(msg.getProfession());
+
+        } 
+        else {
+            LogHelper.info("    Message not found");
+        }
     }
 
     

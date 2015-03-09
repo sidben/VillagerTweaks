@@ -7,8 +7,8 @@ import sidben.villagertweaks.common.ExtendedVillagerZombie;
 import sidben.villagertweaks.helper.LogHelper;
 import sidben.villagertweaks.network.ZombieVillagerProfessionMessage;
 import sidben.villagertweaks.tracker.EventTracker;
-import sidben.villagertweaks.tracker.SpecialEventsTracker;
-import sidben.villagertweaks.tracker.SpecialEventsTracker.EventType;
+import sidben.villagertweaks.tracker.ServerInfoTracker;
+import sidben.villagertweaks.tracker.ServerInfoTracker.EventType;
 import net.minecraft.block.Block;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -125,7 +125,7 @@ public class PlayerEventHandler
             LogHelper.info("    This player wanted to build a snowman at " + event.pos.toString());
             
             // Seek for a golem at that region
-            EventTracker tracked = SpecialEventsTracker.seek(EventType.GOLEM, event.pos);
+            EventTracker tracked = ServerInfoTracker.seek(EventType.GOLEM, event.pos);
             if (tracked != null) {
                 
                 // Check if the entity is alive and a snowman
@@ -157,7 +157,7 @@ public class PlayerEventHandler
             LogHelper.info("    This player built an iron golem at " + event.pos.toString());
 
             // Seek for a golem at that region
-            EventTracker tracked = SpecialEventsTracker.seek(EventType.GOLEM, event.pos);
+            EventTracker tracked = ServerInfoTracker.seek(EventType.GOLEM, event.pos);
             if (tracked != null) {
                 
                 // Check if the entity is alive and a snowman
@@ -236,9 +236,11 @@ public class PlayerEventHandler
     
     @SubscribeEvent
     public void onPlayerStartTracking(PlayerEvent.StartTracking event) {
+        /*
         LogHelper.info("== onPlayerStartTracking ==");
         LogHelper.info("    " + event.entityPlayer);
         LogHelper.info("    " + event.target);
+        */
 
     
         /*
@@ -248,6 +250,10 @@ public class PlayerEventHandler
         if (event.target instanceof EntityZombie && !event.entity.worldObj.isRemote) {
             final EntityZombie zombie = (EntityZombie) event.target;
     
+
+            LogHelper.info("== onPlayerStartTracking (Zombie) ==");
+            
+            
             if (zombie.isVillager()) {
                 LogHelper.info(" - Tracked a zombie villager -");
    
@@ -270,9 +276,13 @@ public class PlayerEventHandler
     
     }
 
+    
+    /*
     @SubscribeEvent
     public void onPlayerLoggedIn(PlayerLoggedInEvent event) {
         LogHelper.info("== onPlayerLoggedIn ==");
     }
+    // I may need this for multiplayer support
+    */
 
 }

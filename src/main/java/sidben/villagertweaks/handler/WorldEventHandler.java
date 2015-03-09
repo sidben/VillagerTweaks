@@ -3,8 +3,8 @@ package sidben.villagertweaks.handler;
 import java.util.Iterator;
 import java.util.Map;
 import sidben.villagertweaks.helper.LogHelper;
-import sidben.villagertweaks.tracker.SpecialEventsTracker;
-import sidben.villagertweaks.tracker.SpecialEventsTracker.EventType;
+import sidben.villagertweaks.tracker.ServerInfoTracker;
+import sidben.villagertweaks.tracker.ServerInfoTracker.EventType;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityLiving;
@@ -16,6 +16,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.entity.player.EntityInteractEvent;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.event.world.BlockEvent.PlaceEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -115,6 +116,16 @@ public class WorldEventHandler
 
     }
     
+
     
+    @SubscribeEvent
+    public void onWorldLoad(WorldEvent.Load event)
+    {
+        LogHelper.info("==> World Loaded <== (is remote? " + event.world.isRemote + ")");
+        
+        if (!event.world.isRemote) {
+            ServerInfoTracker.startTracking();
+        }
+    }
 
 }

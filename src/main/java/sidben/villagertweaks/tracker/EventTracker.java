@@ -9,7 +9,7 @@ public class EventTracker {
     private Vec3i _position;
     private String _customName;
     private Object _specialInfo;
-    private int _expire;
+    private int _tickAdded;
     private int _entityID;
 
     
@@ -37,18 +37,17 @@ public class EventTracker {
         return _entityID;
     }
 
-    // Holds a number that will be used to expire this entry from the list. 
-    // Events don't need to be tracked forever.
-    public int getExpire()
+    // Returns the tick in which this entry was created (Tick of Birth).
+    public int getTOB()
     {
-        return _expire;
+        return _tickAdded;
     }
 
 
     
     
     public void expireNow() {
-        this._expire = -1;
+        this._tickAdded = -1;
     }
     
     
@@ -57,7 +56,7 @@ public class EventTracker {
         this._customName = customName;
         this._position = pos;
         this._specialInfo = extraInfo;
-        this._expire = expire;
+        this._tickAdded = expire;
     }
 
     /*
@@ -86,7 +85,7 @@ public class EventTracker {
             r.append(this.getPosition().toString());
         }
         r.append(", ");
-        r.append("Expire = " + this.getExpire());
+        r.append("Tick of Birth = " + this.getTOB());
         r.append(", ");
         r.append("Custom Name = " + this.getCustomName());
         r.append(", ");
@@ -96,6 +95,8 @@ public class EventTracker {
         }
         else {
             r.append(this.getObject().getClass().getName());
+            r.append(":");
+            r.append(this.getObject().toString());
         }
         
         return r.toString();

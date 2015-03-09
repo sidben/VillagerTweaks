@@ -9,6 +9,7 @@ import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraftforge.event.entity.EntityEvent.EntityConstructing;
@@ -25,8 +26,8 @@ import sidben.villagertweaks.helper.LogHelper;
 import sidben.villagertweaks.network.ZombieVillagerProfessionMessage;
 import sidben.villagertweaks.tracker.ClientInfoTracker;
 import sidben.villagertweaks.tracker.EventTracker;
-import sidben.villagertweaks.tracker.SpecialEventsTracker;
-import sidben.villagertweaks.tracker.SpecialEventsTracker.EventType;
+import sidben.villagertweaks.tracker.ServerInfoTracker;
+import sidben.villagertweaks.tracker.ServerInfoTracker.EventType;
 
 
 public class EntityEventHandler
@@ -35,13 +36,6 @@ public class EntityEventHandler
     @SubscribeEvent
     public void onLivingDrops(LivingDropsEvent event)
     {
-
-        
-
-        if (ConfigurationHandler.onDebug) {
-            LogHelper.info("Is zombie? [" + (event.entity instanceof EntityZombie) + "]");
-            LogHelper.info("Emerald config enabled? [" + ConfigurationHandler.zombieVillagerDropEmerald + "]");
-        }
 
 
         // It's a zombie!
@@ -149,27 +143,21 @@ public class EntityEventHandler
     @SubscribeEvent
     public void onLivingDeath(LivingDeathEvent event)
     {
-        /*
-         * // NOTE: This event only detects when a villager is killed by a zombie.
-         * if (event.entity instanceof EntityZombie || event.entity instanceof EntityVillager) {
-         * LogHelper.info("Entity death, type [" +event.entity.toString()+ "], dmg source [" +event.source.toString()+
-         * "] type [" +event.source.damageType+ "]");
-         * }
-         */
-
         if (event.entity instanceof EntityVillager) {
             if (event.source.getEntity() != null && event.source.getEntity() instanceof EntityZombie) {
-                final EntityVillager villager = (EntityVillager) event.entity;
-                String name = "";
                 
-                //SpecialEventsTracker.add(EventType.VILLAGER, villager.getPosition(), name, null);
-                LogHelper.info("A zombie just killed this villager: [" + villager.toString() + "]");
+                // A villager was killed by a zombie and may be zombified. Adds to the tracker for future check.
+                final EntityVillager villager = (EntityVillager) event.entity;
+                ServerInfoTracker.add(villager);
+
+                LogHelper.info("A zombie just killed this villager: [" + villager.toString() + "] at [" + villager.getPosition() + "], profession [" + villager.getProfession() + "]");
                 LogHelper.info("Will he come back as a zombie? Find out on the next episode of Dragon Cube Z!");
+                LogHelper.info(" - Entity ToD " + MinecraftServer.getServer().getTickCounter());
 
             }
         }
-        // LogHelper.info("Entity death, type [" +event.entity.toString()+ "], dmg source [" +event.source.toString()+
-        // "] type [" +event.source.damageType+ "]");
+
+    
     }
 
 
@@ -178,6 +166,7 @@ public class EntityEventHandler
     @SubscribeEvent
     public void onEntityJoinWorld(EntityJoinWorldEvent event)
     {
+        /*
         if (event.entity instanceof EntityZombie) {
             LogHelper.info("== onEntityJoinWorld ==");
             LogHelper.info("   remote " + event.world.isRemote);
@@ -190,6 +179,7 @@ public class EntityEventHandler
 
             LogHelper.info("== /onEntityJoinWorld ==");
         }
+        */
         
 
         
@@ -206,20 +196,50 @@ public class EntityEventHandler
             
             if (event.world.isRemote) {
                 LogHelper.info("    CLIENT - Looking for special info");
+                ClientInfoTracker.SyncZombieMessage(zombie);
+                // NOTE: On the client I don't check [isVillager] because the client don't have that info
                 
-                ZombieVillagerProfessionMessage msg = ClientInfoTracker.getZombieMessage(zombie.getEntityId());
-                LogHelper.info("    x = " + msg);
-                
-                if (msg != null) {
-                    LogHelper.info("    setting profession = " + msg.getProfession());
-                    ExtendedVillagerZombie properties = ExtendedVillagerZombie.get(zombie);
-                    properties.setProfession(msg.getProfession());
-                }
             }
             else {
-                LogHelper.info("    SERVER - define a profession");
-                ExtendedVillagerZombie properties = ExtendedVillagerZombie.get(zombie);
-                properties.assignRandomProfessionIfNeeded();
+                
+                LogHelper.info("    Entity ToB " + MinecraftServer.getServer().getTickCounter());
+
+                
+                if (zombie.isVillager()) {
+                    LogHelper.info("    SERVER - define a profession");
+
+                    ExtendedVillagerZombie properties = ExtendedVillagerZombie.get(zombie);
+
+                    
+                    // Looks on the event tracker for a villager that just died
+                    EventTracker tracked = ServerInfoTracker.seek(EventType.VILLAGER, zombie.getPosition());
+                    LogHelper.info("    tracked = " + tracked);
+                    
+                    
+                    if (tracked != null) {
+                        // If found, copy the data from the villager
+
+                        if (tracked.getCustomName() != "") zombie.setCustomNameTag(tracked.getCustomName());
+                        // zombie.isChild() = tracked.  // TODO: adult / child info preservation (check for chicken jockeys)
+                        if (tracked.getObject() instanceof Integer) {
+                            properties.setProfession((Integer)tracked.getObject());
+                        } else {
+                            properties.assignRandomProfessionIfNeeded();
+                        }
+                        
+                    }
+                    else {
+                        // If not, assign a random profession
+                        properties.assignRandomProfessionIfNeeded();
+
+                    }
+                    
+                    
+                    LogHelper.info("    ZOMBIE NAME " + zombie.getCustomNameTag());
+                    LogHelper.info("    ZOMBIE PROFESSION " + properties.getProfession());
+
+                    
+                }
                 
             }
 
@@ -241,7 +261,7 @@ public class EntityEventHandler
 
             if (golem.isPlayerCreated()) {
                 LogHelper.info("Player built Iron Golem joined world: [" + golem.toString() + "]");
-                SpecialEventsTracker.add(EventType.GOLEM, golem.getEntityId(), golem.getPosition());
+                ServerInfoTracker.add(EventType.GOLEM, golem.getEntityId(), golem.getPosition());
             }
 
         }
@@ -251,7 +271,7 @@ public class EntityEventHandler
             final EntitySnowman golem = (EntitySnowman) event.entity;
 
             LogHelper.info("Snowman joined the world: [" + golem.toString() + "]");
-            SpecialEventsTracker.add(EventType.GOLEM, golem.getEntityId(), golem.getPosition());
+            ServerInfoTracker.add(EventType.GOLEM, golem.getEntityId(), golem.getPosition());
 
         }
 

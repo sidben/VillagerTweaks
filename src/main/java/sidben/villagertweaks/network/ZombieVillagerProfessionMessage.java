@@ -75,9 +75,14 @@ public class ZombieVillagerProfessionMessage implements IMessage
             LogHelper.info("    " + ctx.side);
             LogHelper.info("    Entity [" + message._entityID + "], Profession [" + message._profession + "]");
             
-            if (message._entityID > 0 && message._profession >= 0) {
+            if (message.getEntityID() > 0 && message.getProfession() >= 0) {
                 // Saves the info to be used later, when the entity actually loads
                 ClientInfoTracker.addZombieMessage(message);
+                
+                // Attempts to sync the entity. Most of the times the entity won't be found 
+                // when this code execute, but on some cases the entity can join the world
+                // before the packet is received (e.g. villager gets zombified).
+                ClientInfoTracker.SyncZombieMessage(message.getEntityID());
             }
             
             return null;

@@ -81,7 +81,7 @@ public class ModVillagerTweaks
         MinecraftForge.EVENT_BUS.register(new EntityEventHandler());
         MinecraftForge.EVENT_BUS.register(new WorldEventHandler());
 
-        FMLCommonHandler.instance().bus().register(new TickEventHandler());     // NOTE: FIND A BETTER SOLUTION FOR THIS (ServerTickEvent is not a good idea)
+        FMLCommonHandler.instance().bus().register(new TickEventHandler());
         
         
         if (event.getSide() == Side.CLIENT) {

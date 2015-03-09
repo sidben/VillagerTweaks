@@ -28,7 +28,7 @@ public class ExtendedVillagerZombie implements IExtendedEntityProperties
     // Properties
     //---------------------------------------------------------
     private int profession;
-    private Boolean hasValidaData;
+    private Boolean hasValidaData;      // TODO: Attempt to refactor and get rid of this property
     
     
     public int getProfession()
