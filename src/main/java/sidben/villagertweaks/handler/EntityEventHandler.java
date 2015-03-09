@@ -16,9 +16,14 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
+import net.minecraftforge.event.entity.living.LivingSpawnEvent.AllowDespawn;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
+import sidben.villagertweaks.ModVillagerTweaks;
 import sidben.villagertweaks.common.ExtendedVillagerZombie;
 import sidben.villagertweaks.helper.LogHelper;
+import sidben.villagertweaks.network.ZombieVillagerProfessionMessage;
+import sidben.villagertweaks.tracker.ClientInfoTracker;
 import sidben.villagertweaks.tracker.EventTracker;
 import sidben.villagertweaks.tracker.SpecialEventsTracker;
 import sidben.villagertweaks.tracker.SpecialEventsTracker.EventType;
@@ -169,67 +174,58 @@ public class EntityEventHandler
 
 
 
+    
     @SubscribeEvent
     public void onEntityJoinWorld(EntityJoinWorldEvent event)
     {
+        if (event.entity instanceof EntityZombie) {
+            LogHelper.info("== onEntityJoinWorld ==");
+            LogHelper.info("   remote " + event.world.isRemote);
+            LogHelper.info("   " + event.entity);
+            
+            EntityZombie z = (EntityZombie) event.entity;
+            LogHelper.info("    IsVillager " + z.isVillager());
+            LogHelper.info("    Name " + z.getCustomNameTag());
+            LogHelper.info("    ID " + z.getEntityId());
 
-        // Check if a zombie villager spawned (from villager) or if a villager spawned (from cured zombie)
+            LogHelper.info("== /onEntityJoinWorld ==");
+        }
         
-//        if (!event.world.isRemote) {
+
+        
+        
+        
             
         if (event.entity instanceof EntityZombie) {
             final EntityZombie zombie = (EntityZombie) event.entity;
 
-            if (zombie.isVillager()) {
-                LogHelper.info("Zombie Villager joined world: [" + zombie.toString() + "]");
+            LogHelper.info("Zombie joined world: [" + zombie.toString() + "]");
+            LogHelper.info("    ID: [" + zombie.getEntityId() + "]");
+            LogHelper.info("    Villager: [" + zombie.isVillager() + "]");
+            
+            
+            if (event.world.isRemote) {
+                LogHelper.info("    CLIENT - Looking for special info");
                 
-
-                ExtendedVillagerZombie x = (ExtendedVillagerZombie) zombie.getExtendedProperties(ExtendedVillagerZombie.id);
-                LogHelper.info("    2) TEMP - PROFESSION: [" + x.getProfession() + "]");
-
+                ZombieVillagerProfessionMessage msg = ClientInfoTracker.getZombieMessage(zombie.getEntityId());
+                LogHelper.info("    x = " + msg);
                 
-                // Check if the zombie villager has a profession. If not, may assign one at random. 
-/*                
-                final String jobKey = "Profession";
-                NBTTagCompound tag = new NBTTagCompound();
-                zombie.readEntityFromNBT(tag);
-                
-                LogHelper.info("    1) TEMP - HAS PRF: [" + tag.hasKey(jobKey)  + "]");
-                LogHelper.info("    1) TEMP - PROFESSION: [" + tag.getInteger(jobKey)  + "]");
-                LogHelper.info("    1) TEMP - HAS VI: [" + !tag.getCompoundTag("VillagerInfo").hasNoTags()  + "]");
-                LogHelper.info("    1) TEMP - HAS VIP: [" + tag.getCompoundTag("VillagerInfo").getInteger("Profession")  + "]");
-                
-                ExtendedVillagerZombie x = (ExtendedVillagerZombie) zombie.getExtendedProperties("ExtendedVillagerZombie");
-                
-                LogHelper.info("    2) TEMP - HAS VI: [" + x.getProfession() + "]");
-*/                 
-                
-                /*
-                if (!tag.hasKey(jobKey)) {
-                    // Assign one profession at random (70% chance)
-                    int newProfession = event.world.rand.nextInt(7) - 2;
-                    
-                    if (newProfession >= 0) {
-                        tag.setInteger(jobKey, newProfession);
-                    } else {
-                        tag.setInteger(jobKey, -1);
-                    }
-                    zombie.writeEntityToNBT(tag);
-
+                if (msg != null) {
+                    LogHelper.info("    setting profession = " + msg.getProfession());
+                    ExtendedVillagerZombie properties = ExtendedVillagerZombie.get(zombie);
+                    properties.setProfession(msg.getProfession());
                 }
-                else  {
-                    
-
-                }
-                    
+            }
+            else {
+                LogHelper.info("    SERVER - define a profession");
+                ExtendedVillagerZombie properties = ExtendedVillagerZombie.get(zombie);
+                properties.assignRandomProfessionIfNeeded();
                 
-                LogHelper.info("    2) TEMP - HAS PRF: [" + tag.hasKey(jobKey)  + "]");
-                LogHelper.info("    2) TEMP - PROFESSION: [" + tag.getInteger(jobKey)  + "]");
-                */
             }
 
         }
 
+        
         else if (event.entity instanceof EntityVillager) {
             final EntityVillager villager = (EntityVillager) event.entity;
 
@@ -239,6 +235,7 @@ public class EntityEventHandler
 
         }
 
+        
         else if (event.entity instanceof EntityIronGolem && !event.world.isRemote) {
             final EntityIronGolem golem = (EntityIronGolem) event.entity;
 
@@ -249,6 +246,7 @@ public class EntityEventHandler
 
         }
 
+        
         else if (event.entity instanceof EntitySnowman && !event.world.isRemote) {
             final EntitySnowman golem = (EntitySnowman) event.entity;
 
@@ -257,7 +255,7 @@ public class EntityEventHandler
 
         }
 
-//        }
+
 
     }
 
@@ -281,6 +279,17 @@ public class EntityEventHandler
 
             final EntityZombie zombie = (EntityZombie) event.entity;
 
+            /*
+            // Update the skin
+            if (zombie.isVillager()) {
+                ExtendedVillagerZombie x = (ExtendedVillagerZombie) zombie.getExtendedProperties(ExtendedVillagerZombie.Identifier);
+                LogHelper.info("    --> Force notifying clients on entity update");
+                ModVillagerTweaks.NetworkWrapper.sendToAll(new ZombieVillagerProfessionMessage(zombie.getEntityId(), x.getProfession()));
+            }
+            */
+            
+            
+            
             // Based on the [onUpdate] event from zombies
             if (!zombie.worldObj.isRemote && zombie.isConverting()) {
                 final int nextConversionTime = zombie.conversionTime - zombie.getConversionTimeBoost();
@@ -331,19 +340,10 @@ public class EntityEventHandler
     @SubscribeEvent
     public void onEntityConstructing(EntityConstructing event) {
 
-        if (event.entity instanceof EntityZombie) {
-//            final EntityZombie zombie = (EntityZombie) event.entity;
-            
-/*            
-            LogHelper.info("onEntityConstructing");
-            LogHelper.info("    is zombie child? [" + zombie.isChild() + "]");
-            LogHelper.info("    is zombie villager? [" + zombie.isVillager() + "]");
-*/
-            
-//            if (zombie.isVillager()) {
-//                LogHelper.info("Adding exntended properties");
-                event.entity.registerExtendedProperties(ExtendedVillagerZombie.id, new ExtendedVillagerZombie());
-//            }
+        // Adds the Extended Properties to zombies
+        if (event.entity instanceof EntityZombie && ExtendedVillagerZombie.get((EntityZombie)event.entity) == null) {
+            // LogHelper.info(" -- Adding extended properties to Zombie [" + event.entity.getEntityId() + "]");
+            ExtendedVillagerZombie.register((EntityZombie) event.entity);
         }
         
     }

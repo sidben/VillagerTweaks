@@ -15,7 +15,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityZombie;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -25,7 +24,14 @@ import sidben.villagertweaks.reference.Reference;
 import com.google.common.collect.Lists;
 
 
-
+/*
+ * NOTE: I tried to inherit RenderZombie since I only need to change the villager model 
+ * and the resource, but the code wasn't working at all.
+ * 
+ * I decided to just duplicate RenderZombie inheriting from RenderBiped, not
+ * elegant but it works like a charm.
+ *   
+ */
 @SideOnly(Side.CLIENT)
 public class RenderZombieVillager extends RenderBiped
 {
@@ -40,7 +46,9 @@ public class RenderZombieVillager extends RenderBiped
 
     private final ModelBiped                    field_82434_o;
     private final ModelZombieVillagerProfession zombieVillagerProfessionModel;
+    @SuppressWarnings("rawtypes")
     private final List                          field_177121_n;
+    @SuppressWarnings("rawtypes")
     private final List                          field_177122_o;
 
 
@@ -127,8 +135,9 @@ public class RenderZombieVillager extends RenderBiped
     
         if (zombie.isVillager()) {
 
-            properties = (ExtendedVillagerZombie)zombie.getExtendedProperties(ExtendedVillagerZombie.id);
+            properties = ExtendedVillagerZombie.get(zombie);
             int profession = properties.getProfession();
+            
 
             switch(profession) {
                 case 0:

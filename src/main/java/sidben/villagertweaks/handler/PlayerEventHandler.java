@@ -2,7 +2,10 @@ package sidben.villagertweaks.handler;
 
 import java.util.Iterator;
 import java.util.Map;
+import sidben.villagertweaks.ModVillagerTweaks;
+import sidben.villagertweaks.common.ExtendedVillagerZombie;
 import sidben.villagertweaks.helper.LogHelper;
+import sidben.villagertweaks.network.ZombieVillagerProfessionMessage;
 import sidben.villagertweaks.tracker.EventTracker;
 import sidben.villagertweaks.tracker.SpecialEventsTracker;
 import sidben.villagertweaks.tracker.SpecialEventsTracker.EventType;
@@ -13,7 +16,9 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.monster.EntityIronGolem;
 import net.minecraft.entity.monster.EntitySnowman;
+import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.passive.EntityVillager;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -22,9 +27,11 @@ import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.entity.player.EntityInteractEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.BlockEvent.MultiPlaceEvent;
 import net.minecraftforge.event.world.BlockEvent.PlaceEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -32,7 +39,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class PlayerEventHandler
 {
 
-    // OBS: This method is called whenever a player interacts with something (right-click)
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public void onEntityInteractEvent(EntityInteractEvent event)
@@ -68,7 +74,8 @@ public class PlayerEventHandler
             }
 
         }
-
+        
+ 
     }
     
     
@@ -223,35 +230,49 @@ public class PlayerEventHandler
     @SubscribeEvent
     public void onPlayerBlockPlace(PlaceEvent event) 
     {
-        /*
-        LogHelper.info("onPlayerBlockPlace [" + event + "]");
-        
-        Block actualBlock = event.blockSnapshot.getCurrentBlock().getBlock();
-        
-        
-        LogHelper.info("    actual block = [" + actualBlock + "]");
-        */
-
-        /*
-        if (actualBlock == Blocks.pumpkin) {
-            LogHelper.info("A pumpkin was placed at [" + event.pos.toString() + "]");
-            
-            ItemStack item = event.itemInHand;
-            String customName = "";
-
-            if (item.hasDisplayName()) {
-                customName = item.getDisplayName();
-            }
-
-            
-            //if (!event.world.isRemote) {
-            //    SpecialEventsTracker.add(EventType.PUMPKIN, event.pos, customName, null);
-            //}
-            
-
-        }
-         */
     }
     
+    
+    
+    @SubscribeEvent
+    public void onPlayerStartTracking(PlayerEvent.StartTracking event) {
+        LogHelper.info("== onPlayerStartTracking ==");
+        LogHelper.info("    " + event.entityPlayer);
+        LogHelper.info("    " + event.target);
+
+    
+        /*
+         * Check if the player started tracking a zombie villager
+         * (happens on server-side). 
+         */
+        if (event.target instanceof EntityZombie && !event.entity.worldObj.isRemote) {
+            final EntityZombie zombie = (EntityZombie) event.target;
+    
+            if (zombie.isVillager()) {
+                LogHelper.info(" - Tracked a zombie villager -");
+   
+                // Check if the zombie has special properties
+                ExtendedVillagerZombie properties = ExtendedVillagerZombie.get(zombie);
+                LogHelper.info("    ID: [" + zombie.getEntityId() + "]");
+                LogHelper.info("    PROFESSION: [" + properties.getProfession() + "]");
+                
+                if (properties.getProfession() >= 0) {
+                    LogHelper.info("    --> notifying client");
+
+                    // Sends a message to the player, with the zombie extra info
+                    ModVillagerTweaks.NetworkWrapper.sendTo(
+                            new ZombieVillagerProfessionMessage(zombie.getEntityId(), properties.getProfession()), 
+                            (EntityPlayerMP) event.entityPlayer);
+                }
+    
+            }
+        }
+    
+    }
+
+    @SubscribeEvent
+    public void onPlayerLoggedIn(PlayerLoggedInEvent event) {
+        LogHelper.info("== onPlayerLoggedIn ==");
+    }
 
 }

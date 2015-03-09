@@ -8,22 +8,27 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.IExtendedEntityProperties;
 
 
-//
-// refs: 
-// jabelarminecraft.blogspot.com.br/p/minecraft-17x.html
-// github.com/coolAlias/Forge_Tutorials/blob/master/IExtendedEntityPropertiesTutorial.java
-//
+/**
+ * Adds extra NBT info to zombie villagers, so I can track info 
+ * like the villager original profession. 
+ */
 public class ExtendedVillagerZombie implements IExtendedEntityProperties
 {
 
-    public final static String id = "ExtendedVillagerZombie";
-    public final static String keyName = "VillagerInfo";
-    protected EntityZombie theEntity;
-    protected World theWorld;
+    public final static String Identifier = "VillagerInfo";
+    protected final static String ProfessionKey = "Profession";             // Controls zombie villager profession
+    protected final static String InitializedKey = "Defined";               // Controls if a zombie villager was assigned a profession
     
+    private final EntityZombie myLittleZombie;
+    protected World myWorld;
+
+    
+    
+    //---------------------------------------------------------
+    // Properties
+    //---------------------------------------------------------
     private int profession;
-    private Boolean flag;
-    
+    private Boolean hasValidaData;
     
     
     public int getProfession()
@@ -31,7 +36,52 @@ public class ExtendedVillagerZombie implements IExtendedEntityProperties
         return this.profession;
     }
     
+    public void setProfession(int profession)
+    {
+        this.profession = profession >= 0 ? profession : -1;
+        this.hasValidaData = true;
+    }
     
+    public void assignRandomProfessionIfNeeded()
+    {
+        if (this.profession <= -1 && (this.hasValidaData == null || !this.hasValidaData)) {
+            //     0 - 4 = gets a real vanilla profession (~70% chance)
+            //     < 0   = has no profession, should be a regular vanilla zombie villager
+            int p = this.myWorld.rand.nextInt(7) - 2;
+            this.setProfession(p);
+        }
+    }
+    
+    
+    
+    
+    
+    //---------------------------------------------------------
+    // Constructor
+    //---------------------------------------------------------
+    public ExtendedVillagerZombie(EntityZombie zombie)
+    {
+        this.myLittleZombie = zombie;
+        this.profession = -1;
+        this.hasValidaData = false;
+    }
+
+    
+    
+    
+    //---------------------------------------------------------
+    // Methods
+    //---------------------------------------------------------
+   
+    public static final void register(EntityZombie zombie)
+    {
+        zombie.registerExtendedProperties(ExtendedVillagerZombie.Identifier, new ExtendedVillagerZombie(zombie));
+    }
+    
+    public static final ExtendedVillagerZombie get(EntityZombie zombie)
+    {
+        return (ExtendedVillagerZombie)zombie.getExtendedProperties(ExtendedVillagerZombie.Identifier);
+    }
     
     
     
@@ -39,16 +89,17 @@ public class ExtendedVillagerZombie implements IExtendedEntityProperties
     public void saveNBTData(NBTTagCompound compound)
     {
         LogHelper.info("saveNBTData");
-        LogHelper.info("  - Profession " + this.profession);
-        LogHelper.info("  - Flag " + this.flag);
-        //LogHelper.info("  - villager " + theEntity.isVillager());
-        //LogHelper.info("  - Name " + theEntity.getDisplayName());
         
-        NBTTagCompound tag = new NBTTagCompound();
-        tag.setInteger("Profession", this.profession);
-        tag.setBoolean("Defined", this.flag);
+        if (this.hasValidaData == null) {
+            this.profession = -1;
+            this.hasValidaData = false;
+        }
+        
+        NBTTagCompound properties = new NBTTagCompound();
+        properties.setInteger(ExtendedVillagerZombie.ProfessionKey, this.profession);
+        properties.setBoolean(ExtendedVillagerZombie.InitializedKey, this.hasValidaData);
 
-        compound.setTag(keyName, tag); 
+        compound.setTag(ExtendedVillagerZombie.Identifier, properties); 
     }
 
     
@@ -56,52 +107,26 @@ public class ExtendedVillagerZombie implements IExtendedEntityProperties
     public void loadNBTData(NBTTagCompound compound)
     {
         LogHelper.info("loadNBTData");
-        //LogHelper.info("  - villager " + theEntity.isVillager());
-        //LogHelper.info("  - Name " + theEntity.getDisplayName());
+        LogHelper.info("    " + this.myLittleZombie.getEntityId());
         
-        NBTTagCompound tag = (NBTTagCompound)compound.getTag(keyName);
+        NBTTagCompound properties = (NBTTagCompound)compound.getTag(ExtendedVillagerZombie.Identifier);
 
-        this.profession = tag.getInteger("Profession");
-        this.flag = tag.getBoolean("Defined");
-        
-        if (!flag) {
-            LogHelper.info("   randomizing profession");
-//                            this.profession = this.theWorld.rand.nextInt(7) - 2;
-//                              if (this.profession < -1) this.profession = -1;
-
-            this.profession = this.theWorld.rand.nextInt(5);
-            this.flag = true;
-            
-            
-            tag.setInteger("Profession", this.profession);
-            tag.setBoolean("Defined", this.flag);
+        if (properties == null) {
+            hasValidaData = false;
+            profession = -1;
+        } 
+        else {
+            this.profession = properties.getInteger(ExtendedVillagerZombie.ProfessionKey);
+            this.hasValidaData = properties.getBoolean(ExtendedVillagerZombie.InitializedKey);
         }
-   
-    
-        LogHelper.info("  - Profession " + this.profession);
-        LogHelper.info("  - Flag " + this.flag);
+
     }
 
     
     @Override
     public void init(Entity entity, World world)
     {
-        theEntity = (EntityZombie)entity;
-        theWorld = world;
-
-        /*
-        LogHelper.info("init");
-        LogHelper.info("  - villager " + theEntity.isVillager());
-        LogHelper.info("  - Name " + theEntity.getCustomNameTag());
-        LogHelper.info("  - Profession " + this.profession);
-        LogHelper.info("  - Flag " + this.flag);
-        */
-
-        
-        /*
-        this.profession = world.rand.nextInt(7) - 2;
-        if (this.profession < -1) this.profession = -1;
-        */
+        myWorld = world;
     }
 
 }
