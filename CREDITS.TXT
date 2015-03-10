@@ -1,0 +1,37 @@
+
+Special Thanks
+==============
+
+Minecraft Forums: wailwail (Villager Consultant)
+Thanks to those above for ideas, opinions and inspiration for some features of this mod.
+
+
+
+
+Modding help and tutorials
+==========================
+
+- Pahimar (Let's Mod / Let's Mod Reboot series)
+	youtube.com/user/Pahimar/
+	
+- DrCyano (1.8 block rendering changes)
+	minecraftforum.net/forums/mapping-and-modding/minecraft-mods/modification-development/2272349-lessons-from-my-first-mc-1-8-mod
+
+- CoolAlias (IExtendedEntityProperties tutorial) 
+	github.com/coolAlias/Forge_Tutorials/blob/master/IExtendedEntityPropertiesTutorial.java
+	www.minecraftforum.net/forums/mapping-and-modding/mapping-and-modding-tutorials/1571567-forge-1-6-4-1-8-eventhandler-and
+	
+- Jabelar (IExtendedEntityProperties tutorial)
+	jabelarminecraft.blogspot.com.br/p/minecraft-17x.html
+	
+- Cazzar (SimpleNetworkWrapper tutorial)
+	cazzar.net/tutorials/minecraft/Forge-SimpleImpl-Tutorial/
+	
+- diesieben07 (SimpleNetworkWrapper tutorial)
+	www.minecraftforge.net/forum/index.php?topic=20135.0
+	
+- schwarzeszeux (Basic modeling tutorials)
+	schwarzeszeux.tumblr.com/post/13854104445/minecraft-modeling-tutorial-part-1-of-x
+
+- Phobophobe (achievements tutorial)
+	www.minecraftforum.net/forums/mapping-and-modding/mapping-and-modding-tutorials/1571530-1-7-10-forge-phobophobes-modding-tutorials-basic
