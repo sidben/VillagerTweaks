@@ -8,6 +8,8 @@ Thanks to those above for ideas, opinions and inspiration for some features of t
 
 
 
+
+
 Modding help and tutorials
 ==========================
 
@@ -35,3 +37,6 @@ Modding help and tutorials
 
 - Phobophobe (achievements tutorial)
 	www.minecraftforum.net/forums/mapping-and-modding/mapping-and-modding-tutorials/1571530-1-7-10-forge-phobophobes-modding-tutorials-basic
+	
+- robothacker (mob skin templates)
+	minecraftforum.net/forums/mapping-and-modding/resource-packs/resource-pack-discussion/1256183-mob-skin-templates-wither-bat-and-witch-added
