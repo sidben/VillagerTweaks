@@ -1,4 +1,8 @@
-v2.0 - MC 1.8 - 2015-03 [rc]
+v2.1 - MC 1.8 - 2015-03
+- Fixed server crash
+
+
+v2.0 - MC 1.8 - 2015-03
 
 - Updated to Minecraft 1.8;
 - Current Features:
@@ -11,5 +15,6 @@ v2.0 - MC 1.8 - 2015-03 [rc]
 
 
 curse.com/mc-mods/minecraft/villager-tweaks
+minecraftforum.net/forums/mapping-and-modding/minecraft-mods/1290617
 sidbenmc.wordpress.com
 github.com/sidben
