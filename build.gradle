@@ -17,12 +17,16 @@ buildscript {
 
 apply plugin: 'forge'
 
-version = "2.1"
+version = "2.2"
 group= "sidben.villagertweaks" 			// http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "VillagerTweaks[1.8]"
 
+jar {
+	manifest { attributes 'FMLAT': 'villagertweaks_at.cfg' }
+}
+
 minecraft {
-    version = "1.8-11.14.0.1299"
+    version = "1.8-11.14.1.1334"
     runDir = "../run"
     
     // the mappings can be changed at any time, and must be in the following format.

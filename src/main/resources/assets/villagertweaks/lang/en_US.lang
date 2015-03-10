@@ -1,5 +1,14 @@
-# Blocks
-
-# Items
-
-# Creative Tabs
+# Achievements
+achievement.name_villager=I Shall Call Him Squishy
+achievement.name_villager.desc=Change a villager name
+achievement.cure_villager=The Hero We Need
+achievement.cure_villager.desc=Cure a zombie villager
+achievement.infect_villager=The Hero We Deserve
+achievement.infect_villager.desc=Let a cured villager become infected again
+achievement.enchant_pumpkin=Fairy Godmother
+achievement.enchant_pumpkin.desc=Enchant a pumpkin 
+achievement.super_golem=Harder, Better, Faster, Stronger
+achievement.super_golem.desc=Create the most powerful Iron Golem
+achievement.snowman=Do You Want To Build a Snowman?
+achievement.snowman.desc=Create an enchanted Snow Golem
+ 
