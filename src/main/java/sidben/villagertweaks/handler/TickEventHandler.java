@@ -16,12 +16,12 @@ public class TickEventHandler
     @SubscribeEvent
     public void onPostServerTick(TickEvent.ServerTickEvent event)
     {
-        
+
         if (event.phase == Phase.END) {
 
             final MinecraftServer server = MinecraftServer.getServer();
             if (server.getTickCounter() % tickFactor == 0) {
-                
+
                 // Cleanup SpecialEventsTracker expired content
                 ServerInfoTracker.cleanExpired();
 

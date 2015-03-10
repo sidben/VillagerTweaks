@@ -22,9 +22,6 @@ import sidben.villagertweaks.handler.PlayerEventHandler;
 import sidben.villagertweaks.handler.TickEventHandler;
 import sidben.villagertweaks.handler.WorldEventHandler;
 import sidben.villagertweaks.init.MyAchievements;
-import sidben.villagertweaks.init.MyBlocks;
-import sidben.villagertweaks.init.MyItems;
-import sidben.villagertweaks.init.MyRecipes;
 import sidben.villagertweaks.network.ZombieVillagerProfessionMessage;
 import sidben.villagertweaks.proxy.IProxy;
 import sidben.villagertweaks.reference.Reference;
@@ -52,12 +49,6 @@ public class ModVillagerTweaks
         // Loads config
         ConfigurationHandler.init(event.getSuggestedConfigurationFile());
         FMLCommonHandler.instance().bus().register(new ConfigurationHandler());
-
-        // Loads items
-        MyItems.register();
-
-        // Loads blocks
-        MyBlocks.register();
         
         // Register network messages
         NetworkWrapper = NetworkRegistry.INSTANCE.newSimpleChannel(Reference.ModChannel);
@@ -65,18 +56,10 @@ public class ModVillagerTweaks
     }
 
 
+    @SuppressWarnings("unchecked")
     @Mod.EventHandler
     public void load(FMLInitializationEvent event)
     {
-        // Item renderer
-        MyItems.registerRender();
-
-        // Block renderer
-        MyBlocks.registerRender();
-
-        // Recipes
-        MyRecipes.register();
-
         // Achievements
         MyAchievements.register();
 
@@ -87,7 +70,7 @@ public class ModVillagerTweaks
 
         FMLCommonHandler.instance().bus().register(new TickEventHandler());
         
-        
+        // Entity renderer
         if (event.getSide() == Side.CLIENT) {
             Minecraft.getMinecraft().getRenderManager().entityRenderMap.remove(EntityIronGolem.class);
             Minecraft.getMinecraft().getRenderManager().entityRenderMap.put(EntityIronGolem.class, new RenderCrackedIronGolem(Minecraft.getMinecraft().getRenderManager()));

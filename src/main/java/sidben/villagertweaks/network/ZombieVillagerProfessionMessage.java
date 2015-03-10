@@ -1,6 +1,5 @@
 package sidben.villagertweaks.network;
 
-import sidben.villagertweaks.helper.LogHelper;
 import sidben.villagertweaks.tracker.ClientInfoTracker;
 import io.netty.buffer.ByteBuf;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -83,10 +82,6 @@ public class ZombieVillagerProfessionMessage implements IMessage
 
         @Override
         public IMessage onMessage(ZombieVillagerProfessionMessage message, MessageContext ctx) {
-            
-            LogHelper.info("Woo, I got a package!");
-            LogHelper.info("    " + ctx.side);
-            LogHelper.info("    " + message);
             
             if (message.getEntityID() > 0 && message.getProfession() >= 0) {
                 // Saves the info to be used later, when the entity actually loads

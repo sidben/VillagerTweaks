@@ -1,7 +1,6 @@
 package sidben.villagertweaks.handler;
 
 import java.util.Iterator;
-import java.util.Map;
 import sidben.villagertweaks.ModVillagerTweaks;
 import sidben.villagertweaks.common.ExtendedVillagerZombie;
 import sidben.villagertweaks.helper.LogHelper;
@@ -10,9 +9,6 @@ import sidben.villagertweaks.network.ZombieVillagerProfessionMessage;
 import sidben.villagertweaks.tracker.EventTracker;
 import sidben.villagertweaks.tracker.ServerInfoTracker;
 import sidben.villagertweaks.tracker.ServerInfoTracker.EventType;
-import net.minecraft.block.Block;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.monster.EntityIronGolem;
@@ -25,14 +21,11 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.entity.player.EntityInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.BlockEvent.MultiPlaceEvent;
-import net.minecraftforge.event.world.BlockEvent.PlaceEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -84,18 +77,11 @@ public class PlayerEventHandler
         else if (event.target instanceof EntityZombie) {
             EntityZombie zombie = (EntityZombie)event.target;
 
-            LogHelper.info("Clicked on a zombie...");
-            LogHelper.info("    - Villager: " + zombie.isVillager());
-            LogHelper.info("    - Has weakness potion: " + zombie.isPotionActive(Potion.weakness));
-            LogHelper.info("    - World remore: " + zombie.worldObj.isRemote);
-            
-            
             if (!zombie.worldObj.isRemote) {
                 
                 // Check if the player is holding a regular Golden Apple
                 final ItemStack item = event.entityPlayer.inventory.getCurrentItem();
                 if (item != null && item.getItem() == Items.golden_apple && item.getMetadata() == 0) {
-                    LogHelper.info("    ...with a golen apple in hand!");
                     
                     // Check if the target is a zombie villager with weakness potion active
                     // Also check if the zombie isn't converting, I only want to track the
@@ -106,6 +92,7 @@ public class PlayerEventHandler
                         ServerInfoTracker.startedCuringZombie(event.entityPlayer.getEntityId(), zombie.getEntityId());
                         
                     }
+                    
                 }
 
             }
@@ -127,7 +114,7 @@ public class PlayerEventHandler
         int snowAmount = 0;
         
         String customName = "";
-        Map pumpkinEnchants = null;
+        //Map pumpkinEnchants = null;
         
         
         // Check the replaced blocks to see if it contains golem materials
@@ -139,7 +126,11 @@ public class PlayerEventHandler
             else if (b.getReplacedBlock().getBlock() == Blocks.snow) snowAmount += 1;
         }
         
-        // LogHelper.info("    Found [" +pumpkinAmount+ "] pumpkins, [" +snowAmount+ "] snow and [" +ironAmount+ "] iron");
+        if (ConfigurationHandler.onDebug) {
+            LogHelper.info("onPlayerMultiBlockPlace()");
+            LogHelper.info("    Found [" +pumpkinAmount+ "] pumpkins, [" +snowAmount+ "] snow and [" +ironAmount+ "] iron"); 
+        }
+
         
 
         // Gets the custom info from the pumpkin
@@ -149,17 +140,19 @@ public class PlayerEventHandler
             ItemStack item = event.itemInHand;
             if (item.getItem() == Item.getItemFromBlock(Blocks.pumpkin) && item.hasDisplayName()) customName = item.getDisplayName();
             
+            /*
             // Enchantments
             pumpkinEnchants = EnchantmentHelper.getEnchantments(item);
+            */
 
         }
         
         
-        //
+        //----------------------------------------------------
         // Snowman pattern found
-        // 
+        //----------------------------------------------------
         if (pumpkinAmount == 1 && snowAmount == 2) {
-            LogHelper.info("    This player wanted to build a snowman at " + event.pos.toString());
+            if (ConfigurationHandler.onDebug) LogHelper.info("    This player wanted to build a snowman at " + event.pos.toString());
             
             // Seek for a golem at that region
             EventTracker tracked = ServerInfoTracker.seek(EventType.GOLEM, event.pos);
@@ -167,18 +160,14 @@ public class PlayerEventHandler
                 
                 // Check if the entity is alive and a snowman
                 Entity target = event.world.getEntityByID(tracked.getEntityID());
-                LogHelper.info("    Looking for an entity with ID [" +tracked.getEntityID()+ "], found " + target);
                 if (target instanceof EntitySnowman) {
-                    
-                    LogHelper.info("    It's a snowman, applying special effects");
+                   
+                    if (ConfigurationHandler.onDebug) LogHelper.info("    Snowman found, applying extra info");
                     
                     // Check if a custom name exists
                     if (customName != "") {
-                    
                         // Applies the custom name to the golem
-                        LogHelper.info("    Naming snowman [" +tracked.getEntityID()+ "] to [" +customName+ "]");
                         target.setCustomNameTag(customName);
-                        
                     }
 
                 }
@@ -187,11 +176,14 @@ public class PlayerEventHandler
             
         }
 
-        //
+
+        //----------------------------------------------------
         // Iron Golem pattern found
-        // 
+        //----------------------------------------------------
         else if (pumpkinAmount == 1 && ironAmount == 4) {
-            LogHelper.info("    This player built an iron golem at " + event.pos.toString());
+            if (ConfigurationHandler.onDebug) {
+                LogHelper.info("    This player built an iron golem at " + event.pos.toString());
+            }
 
             // Seek for a golem at that region
             EventTracker tracked = ServerInfoTracker.seek(EventType.GOLEM, event.pos);
@@ -199,21 +191,17 @@ public class PlayerEventHandler
                 
                 // Check if the entity is alive and a snowman
                 Entity target = event.world.getEntityByID(tracked.getEntityID());
-                LogHelper.info("    Looking for an entity with ID [" +tracked.getEntityID()+ "], found " + target);
                 if (target instanceof EntityIronGolem) {
                     
-                    LogHelper.info("    It's an iron golem, applying special effects");
+                    if (ConfigurationHandler.onDebug) LogHelper.info("    Iron Golem found, applying extra info");
                     
                     // Check if a custom name exists
                     if (customName != "") {
-                    
                         // Applies the custom name to the golem
-                        LogHelper.info("    Naming iron golem [" +tracked.getEntityID()+ "] to [" +customName+ "]");
                         target.setCustomNameTag(customName);
-                        
                     }
                     
-                   
+                    /*
                     // Check if it's an enchanted pumpkin
                     if (pumpkinEnchants != null && pumpkinEnchants.size() > 0) {
                         
@@ -251,7 +239,8 @@ public class PlayerEventHandler
                         LogHelper.info("    - Max Health: " + ((EntityLiving)target).getMaxHealth());
                         
                     }
-                    
+                   
+                    */
 
                 }
                 
@@ -264,21 +253,9 @@ public class PlayerEventHandler
     
     
     
-    @SubscribeEvent
-    public void onPlayerBlockPlace(PlaceEvent event) 
-    {
-    }
-    
-    
     
     @SubscribeEvent
     public void onPlayerStartTracking(PlayerEvent.StartTracking event) {
-        /*
-        LogHelper.info("== onPlayerStartTracking ==");
-        LogHelper.info("    " + event.entityPlayer);
-        LogHelper.info("    " + event.target);
-        */
-
     
         /*
          * Check if the player started tracking a zombie villager
@@ -286,22 +263,13 @@ public class PlayerEventHandler
          */
         if (event.target instanceof EntityZombie && !event.entity.worldObj.isRemote) {
             final EntityZombie zombie = (EntityZombie) event.target;
-    
 
-            LogHelper.info("== onPlayerStartTracking (Zombie) ==");
-            
-            
             if (zombie.isVillager()) {
-                LogHelper.info(" - Tracked a zombie villager -");
    
                 // Check if the zombie has special properties
                 ExtendedVillagerZombie properties = ExtendedVillagerZombie.get(zombie);
-                LogHelper.info("    ID: [" + zombie.getEntityId() + "]");
-                LogHelper.info("    PROFESSION: [" + properties.getProfession() + "]");
                 
                 if (properties.getProfession() >= 0) {
-                    LogHelper.info("    --> notifying client");
-
                     // Sends a message to the player, with the zombie extra info
                     ModVillagerTweaks.NetworkWrapper.sendTo(
                             new ZombieVillagerProfessionMessage(zombie.getEntityId(), properties.getProfession()), 
@@ -314,12 +282,6 @@ public class PlayerEventHandler
     }
 
     
-    /*
-    @SubscribeEvent
-    public void onPlayerLoggedIn(PlayerLoggedInEvent event) {
-        LogHelper.info("== onPlayerLoggedIn ==");
-    }
-    // I may need this for multiplayer support
-    */
+
 
 }

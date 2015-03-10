@@ -1,6 +1,6 @@
 package sidben.villagertweaks.init;
 
-import net.minecraft.init.Blocks;
+//import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.stats.Achievement;
 import net.minecraftforge.common.AchievementPage;
@@ -97,11 +97,15 @@ public class MyAchievements
         NameVillager = new Achievement(Reference.ModID + ".name_villager", "name_villager", 2, -3, Items.name_tag, null);
         CureVillager = new Achievement(Reference.ModID + ".cure_villager", "cure_villager", 1, 0, Items.golden_apple, null);
         InfectVillager = new Achievement(Reference.ModID + ".infect_villager", "infect_villager", 3, 0, Items.rotten_flesh, CureVillager);
+        /*
         EnchantPumpkin = new Achievement(Reference.ModID + ".enchant_pumpkin", "enchant_pumpkin", -3, -2, Blocks.pumpkin, null);
         SnowGolem = new Achievement(Reference.ModID + ".snowman", "snowman", -3, 2, Items.snowball, EnchantPumpkin);
         SuperGolem = new Achievement(Reference.ModID + ".super_golem", "super_golem", -5, 0, Blocks.iron_block, EnchantPumpkin).setSpecial();
 
         ModPage = new AchievementPage(Reference.ModName, NameVillager, CureVillager, InfectVillager, EnchantPumpkin, SnowGolem, SuperGolem);
+        */
+
+        ModPage = new AchievementPage(Reference.ModName, NameVillager, CureVillager, InfectVillager);
         AchievementPage.registerAchievementPage(ModPage);
     }
 

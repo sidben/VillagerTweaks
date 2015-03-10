@@ -8,7 +8,6 @@ import net.minecraft.entity.monster.EntityZombie;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import sidben.villagertweaks.common.ExtendedVillagerZombie;
-import sidben.villagertweaks.helper.LogHelper;
 import sidben.villagertweaks.network.ZombieVillagerProfessionMessage;
 
 
@@ -55,20 +54,14 @@ public class ClientInfoTracker
      */
     @SideOnly(Side.CLIENT)
     public static void SyncZombieMessage(int entityID) {
-        LogHelper.info("== SyncZombieMessage(" + entityID + ") ==");
-        
+
         // Seeks if the entity ID is loaded
         WorldClient world = Minecraft.getMinecraft().theWorld;
         Entity entity = world.getEntityByID(entityID);
 
+        // If found the entity, attempt to sync with info sent by the server 
         if (entity instanceof EntityZombie) {
-            LogHelper.info("    Zombie found, loading message");
             ClientInfoTracker.SyncZombieMessage((EntityZombie)entity);
-
-        }
-        else {
-            LogHelper.info("    Entity not found");
-            
         }
         
     }
@@ -78,16 +71,15 @@ public class ClientInfoTracker
      */
     @SideOnly(Side.CLIENT)
     public static void SyncZombieMessage(EntityZombie zombie) {
+        
+        // Try to locate messages sent by the server, containing special zombie info
         ZombieVillagerProfessionMessage msg = ClientInfoTracker.getZombieMessage(zombie.getEntityId());
+        
+        // If a message was found, update the local zombie with that info
         if (msg != null) {
-            LogHelper.info("    Setting profession = " + msg.getProfession());
             ExtendedVillagerZombie properties = ExtendedVillagerZombie.get(zombie);
             properties.setProfession(msg.getProfession());
-
         } 
-        else {
-            LogHelper.info("    Message not found");
-        }
     }
 
     

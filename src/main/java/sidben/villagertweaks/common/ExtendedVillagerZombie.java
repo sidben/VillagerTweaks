@@ -1,6 +1,5 @@
 package sidben.villagertweaks.common;
 
-import sidben.villagertweaks.helper.LogHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.nbt.NBTTagCompound;
@@ -19,6 +18,7 @@ public class ExtendedVillagerZombie implements IExtendedEntityProperties
     protected final static String ProfessionKey = "Profession";             // Controls zombie villager profession
     protected final static String InitializedKey = "Defined";               // Controls if a zombie villager was assigned a profession
     
+    @SuppressWarnings("unused")
     private final EntityZombie myLittleZombie;
     protected World myWorld;
 
@@ -88,8 +88,6 @@ public class ExtendedVillagerZombie implements IExtendedEntityProperties
     @Override
     public void saveNBTData(NBTTagCompound compound)
     {
-        LogHelper.info("saveNBTData");
-        
         if (this.hasValidaData == null) {
             this.profession = -1;
             this.hasValidaData = false;
@@ -106,9 +104,6 @@ public class ExtendedVillagerZombie implements IExtendedEntityProperties
     @Override
     public void loadNBTData(NBTTagCompound compound)
     {
-        LogHelper.info("loadNBTData");
-        LogHelper.info("    " + this.myLittleZombie.getEntityId());
-        
         NBTTagCompound properties = (NBTTagCompound)compound.getTag(ExtendedVillagerZombie.Identifier);
 
         if (properties == null) {

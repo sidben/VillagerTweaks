@@ -1,9 +1,13 @@
 package sidben.villagertweaks.handler;
 
+import sidben.villagertweaks.tracker.ServerInfoTracker;
+import net.minecraftforge.event.AnvilUpdateEvent;
+import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+
+/*
 import java.util.Iterator;
 import java.util.Map;
-import sidben.villagertweaks.helper.LogHelper;
-import sidben.villagertweaks.tracker.ServerInfoTracker;
 import sidben.villagertweaks.tracker.ServerInfoTracker.EventType;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -14,32 +18,23 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.entity.player.EntityInteractEvent;
-import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.event.world.BlockEvent.PlaceEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
+*/
 
 public class WorldEventHandler
 {
     
     
     
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     @SubscribeEvent
     public void onAnvilUpdate(AnvilUpdateEvent event)
     {
-
-        LogHelper.info("onAnvilUpdate!");
         /*
-        LogHelper.info("    " + event.getPhase());
-        LogHelper.info("    [" + event.left.getItem() +  "] + [" + event.right.getItem()  + "], cost [" + event.cost + "], material cost [" + event.materialCost +  "]");
-        */
         
         
         // Check for a pumpkin + enchanted book combo
@@ -112,7 +107,7 @@ public class WorldEventHandler
             
         }
         
-        
+        */
 
     }
     
@@ -121,8 +116,6 @@ public class WorldEventHandler
     @SubscribeEvent
     public void onWorldLoad(WorldEvent.Load event)
     {
-        LogHelper.info("==> World Loaded <== (is remote? " + event.world.isRemote + ")");
-        
         if (!event.world.isRemote) {
             ServerInfoTracker.startTracking();
         }
