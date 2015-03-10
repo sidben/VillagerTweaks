@@ -1,6 +1,7 @@
 package sidben.villagertweaks.handler;
 
 import java.util.Random;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntityIronGolem;
 import net.minecraft.entity.monster.EntitySnowman;
@@ -238,11 +239,19 @@ public class EntityEventHandler
         }
 
         
-        else if (event.entity instanceof EntityVillager) {
+        else if (event.entity instanceof EntityVillager && !event.world.isRemote) {
             final EntityVillager villager = (EntityVillager) event.entity;
 
-            if (!villager.isChild()) {
-                LogHelper.info("Adult villager joined world: [" + villager.toString() + "]");
+            LogHelper.info("Villager joined world: [" + villager.toString() + "]");
+
+            
+            // Looks on the event tracker for a zombie that was cured
+            EventTracker tracked = ServerInfoTracker.seek(EventType.ZOMBIE, villager.getPosition());
+            LogHelper.info("    tracked = " + tracked);
+
+            if (tracked != null) {
+                // If found, copy the data from the zombie
+                tracked.updateVillager(villager);
             }
 
         }
@@ -277,50 +286,30 @@ public class EntityEventHandler
     public void onLivingUpdateEvent(LivingUpdateEvent event)
     {
 
-        /*
-         * if (event.entity instanceof EntityZombie) {
-         * final EntityZombie zombie = (EntityZombie) event.entity;
-         * LogHelper.info("zombie.conversionTime [" + zombie.conversionTime + "]");
-         * LogHelper.info("zombie.conversionTime [" + zombie.getConversionTimeBoost() + "]");
-         * }
-         */
-
-
         // Check if a zombie is about to convert to villager
         if (event.entity instanceof EntityZombie) {
-
             final EntityZombie zombie = (EntityZombie) event.entity;
 
-            /*
-            // Update the skin
-            if (zombie.isVillager()) {
-                ExtendedVillagerZombie x = (ExtendedVillagerZombie) zombie.getExtendedProperties(ExtendedVillagerZombie.Identifier);
-                LogHelper.info("    --> Force notifying clients on entity update");
-                ModVillagerTweaks.NetworkWrapper.sendToAll(new ZombieVillagerProfessionMessage(zombie.getEntityId(), x.getProfession()));
-            }
-            */
-            
-            
             
             // Based on the [onUpdate] event from zombies
             if (!zombie.worldObj.isRemote && zombie.isConverting()) {
-                final int nextConversionTime = zombie.conversionTime - zombie.getConversionTimeBoost();
                 
-                if (nextConversionTime <= 0) {
-                    String name = "";
-                    //SpecialEventsTracker.add(EventType.ZOMBIE, zombie.getPosition(), name, null);
-                    LogHelper.info("Oh baby, this zombie is about to be cured! " + zombie.toString() + "");
-                    
-                } else {
-                    LogHelper.info("Zombie being cured in: [" + zombie.conversionTime + " -> " + nextConversionTime + "]");
-                    
+                // FOR DEBUG PURPOSES ONLY!!!!
+                if (zombie.conversionTime > 1000) zombie.conversionTime = 1000;
+                
+                final int nextConversionTime = zombie.conversionTime - zombie.getConversionTimeBoost();
+                LogHelper.info("Zombie being cured in: [" + zombie.conversionTime + " -> " + nextConversionTime + "]");
+               
+                // NOTE: if [conversionTime] is zero, the zombie already converted and it's too late to track
+                if (nextConversionTime <= 0 && zombie.conversionTime > 0) {
+                    LogHelper.info("Oh baby, this zombie is about to be cured! " + zombie.toString() + " in tick " + MinecraftServer.getServer().getTickCounter());
+                    ServerInfoTracker.add(zombie);
                 }
             }
 
         }
         
         else if (event.entity instanceof EntityIronGolem) {
-            
             final EntityIronGolem golem = (EntityIronGolem) event.entity;
             Random rand = golem.worldObj.rand;
 

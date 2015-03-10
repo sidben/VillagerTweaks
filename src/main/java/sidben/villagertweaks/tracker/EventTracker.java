@@ -95,15 +95,10 @@ public class EventTracker {
         this(0, villager.getPosition(), villager.getCustomNameTag(), new Object[] { villager.getProfession(), villager.isChild() });
         // NOTE: This event tracks villagers that just died by zombies, so the EntityID is 
         // not required, since the villager don't exist anymore.
-        
-        /*
-        Object[] extraInfo = new Object[2];
-        extraInfo[0] = villager.getProfession();
-        extraInfo[1] = villager.isChild();
-        String name = villager.getCustomNameTag();
-        
-        this(villager.getEntityId(), villager.getPosition(), name, extraInfo);
-        */
+    }
+    
+    public EventTracker(EntityZombie zombie, ExtendedVillagerZombie properties) {
+        this(zombie.getEntityId(), zombie.getPosition(), zombie.getCustomNameTag(), properties);
     }
     
     public EventTracker(EntityIronGolem golem) {
@@ -120,8 +115,9 @@ public class EventTracker {
         // and get whatever information it needs.
     }
 
+
     
-    
+
 
     /**
      * Updates a zombie entity with the villager info this object is tracking. 
@@ -129,7 +125,7 @@ public class EventTracker {
      */
     public void updateZombie(EntityZombie zombie, ExtendedVillagerZombie properties)
     {
-        
+
         // Note: I must trust that this object actually contain a villager info. If not, the cast below will fail.
         Object[] extraInfo = (Object[]) this.getObject();
         int profession = (Integer) extraInfo[0];
@@ -148,6 +144,27 @@ public class EventTracker {
             properties.setProfession(-1);           // vanilla zombie villager
         }
         
+    }
+
+    
+    /**
+     * Updates a villager entity with the zombie info this object is tracking.
+     * @param villager
+     */
+    public void updateVillager(EntityVillager villager)
+    {
+
+        // Note: I must trust that this object actually contain a zombie info. If not, the cast below will fail.
+        ExtendedVillagerZombie properties = (ExtendedVillagerZombie) this.getObject();
+        
+        // Custom name
+        if (this.getCustomName() != "") villager.setCustomNameTag(this.getCustomName());
+        
+        // Profession
+        if (properties.getProfession() >= 0 && properties.getProfession() <= 4) {   // vanilla professions
+            villager.setProfession(properties.getProfession());
+        }
+
     }
 
     
@@ -184,6 +201,7 @@ public class EventTracker {
         
         return r.toString();
     }
+
 
     
 }

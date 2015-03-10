@@ -5,8 +5,10 @@ import java.util.Iterator;
 import java.util.List;
 import net.minecraft.entity.monster.EntityIronGolem;
 import net.minecraft.entity.monster.EntitySnowman;
+import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.server.MinecraftServer;
+import sidben.villagertweaks.common.ExtendedVillagerZombie;
 import sidben.villagertweaks.helper.LogHelper;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.Vec3i;
@@ -34,19 +36,44 @@ import net.minecraft.util.Vec3i;
  * 
  * 1) Villager is killed and the source of damage is EntityZombie;
  * 2) I intercept [onLivingDeath] and add some info of the villager to this tracker - add(EntityVillager villager);
- * 3) World spawns a zombie villager (firing the [EntityJoinWorldEvent] event) at the exact position where the villager died;
- * 4) I intercept that event and, if on server side, seek for a villager (EventTracker) at that position;
- * 5) If villager info is found, it is copied to the zombie.
+ * 3) World spawns a zombie villager (firing the [EntityJoinWorldEvent] event) at the exact position where the 
+ * villager died, ignoring adult/child status (bug?);
+ * 4) Players in that region starts tracking the new entity;
  * 
  * Here I keep track of all villagers killed by zombies and add them to a list for a certain time.
+ * 
  * When a zombie villager spawns, I check if their spawn coordinates matches any villager that just died and, if so,
  * copy the information I stored on the EventTracker (mainly profession and custom name).
+ * 
  * After a zombie spawn, the [PlayerEvent.StartTracking] is fired and I use it to notify the clients about the
- * extended properties that were just copied. 
+ * extended properties that were just copied.
+ * 
+ *  
+ *  
+ * ZOMBIE VILLAGER -> VILLAGER
+ * 
+ * 1) Zombie villager starts to be cured (player used potion and golden apple);
+ * 2) EntityZombie fires the [startConversion] inner method, setting the conversion counter to something 
+ * between 3600~6000 ticks;
+ * 3) On every entity update, the counter is decreased by the amount defined in [getConversionTimeBoost];
+ * 4) When that counter reaches zero, EntityZombie fires the [convertToVillager] method, creating a new
+ * villager on the same location, preserving adult/child status;
+ * 5) After creating the new villager, the zombie is removed with [world.removeEntity] and the villager
+ * is added with [world.spawnEntityInWorld];
+ * 
+ * Here I listen to the [onLivingUpdateEvent], looking for zombie villagers about to convert. I try to 
+ * predict the next value of the counter, but since it has a rare random factor (iron bars and beds can give 
+ * a boost), it's not 100% reliable.
+ * 
+ * When I detect the zombie is about to convert on the next tick update, I add it to the tracker list.
+ * 
+ * I also listen to the [onEntityJoinWorld] and every time a villager joins the world, I check if a zombie
+ * villager just converted on that spot so I can copy the info. 
+ *
  * 
  */
 
-//@SideOnly(Side.SERVER)
+
 /**
  * Helper class to store certain server-side information until they are needed or expire.
  * 
@@ -96,9 +123,18 @@ public class ServerInfoTracker
     {
         ServerInfoTracker.add(EventType.VILLAGER, new EventTracker(villager));
     }
+    
+    /**
+     * Adds zombie information that should be tracked on the server. 
+     */
+    public static void add(EntityZombie zombie)
+    {
+        ExtendedVillagerZombie properties = ExtendedVillagerZombie.get(zombie);
+        ServerInfoTracker.add(EventType.ZOMBIE, new EventTracker(zombie, properties));
+    }
 
     /**
-     * Adds golem informations that should be tracked on the server. 
+     * Adds golem information that should be tracked on the server. 
      */
     public static void add(EntityIronGolem golem)
     {
@@ -106,7 +142,7 @@ public class ServerInfoTracker
     }
     
     /**
-     * Adds golem informations that should be tracked on the server. 
+     * Adds golem information that should be tracked on the server. 
      */
     public static void add(EntitySnowman golem)
     {
@@ -176,6 +212,12 @@ public class ServerInfoTracker
                 ageTolerance = 5;       // Only 5 ticks tolerance to play safe, since "zombification" happens on the same tick 
                 
                 return seekValueOnList(ServerInfoTracker.villagerTracker, position, rangeLimit, ageTolerance);
+                
+            case ZOMBIE:
+                rangeLimit = 1;         // Seek at the exact spot (maybe should be zero?)
+                ageTolerance = 5;       // Only 3 ticks tolerance to play safe, since the cure should happen on the next 1 tick 
+                
+                return seekValueOnList(ServerInfoTracker.zombieTracker, position, rangeLimit, ageTolerance);
                 
             default:
                 return null;
@@ -312,6 +354,7 @@ public class ServerInfoTracker
         
         LogHelper.info("----------------------------------------------------------");
     }
+
 
 
     
