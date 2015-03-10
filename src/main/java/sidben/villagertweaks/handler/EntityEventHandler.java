@@ -331,9 +331,11 @@ public class EntityEventHandler
                 // Spawn smoke if he is damaged
                 if (pct < 0.3F) {
                     if (rand.nextInt(60) == 0) {
+                        EnumParticleTypes particle = rand.nextInt(10) < 4 ? EnumParticleTypes.SMOKE_LARGE : EnumParticleTypes.CLOUD;
+                        
                         for (int i = 0; i < 2; ++i)
                         {
-                            golem.worldObj.spawnParticle(EnumParticleTypes.CLOUD, golem.posX + (rand.nextDouble() - 0.5D) * (double)golem.width, golem.posY + rand.nextDouble() * (double)golem.height - 0.25D, golem.posZ + (rand.nextDouble() - 0.5D) * (double)golem.width, 0D, 0.1D, 0D, new int[0]);
+                            golem.worldObj.spawnParticle(particle, golem.posX + (rand.nextDouble() - 0.5D) * (double)golem.width, golem.posY + rand.nextDouble() * (double)golem.height - 0.25D, golem.posZ + (rand.nextDouble() - 0.5D) * (double)golem.width, 0D, 0.1D, 0D, new int[0]);
                         }
                     }
                 }

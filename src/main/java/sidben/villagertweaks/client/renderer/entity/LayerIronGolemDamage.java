@@ -14,8 +14,8 @@ import sidben.villagertweaks.reference.Reference;
 public class LayerIronGolemDamage implements LayerRenderer
 {
 
-    private static final ResourceLocation golemLittleDamage = new ResourceLocation(Reference.ModID + ":textures/entity/iron_golem_sample_overlay.png");
-    private static final ResourceLocation golemBigDamage    = new ResourceLocation(Reference.ModID + ":textures/entity/iron_golem_sample_overlay2.png");
+    private static final ResourceLocation golemLittleDamage = new ResourceLocation(Reference.ModID + ":textures/entity/iron_golem_damaged_stage_1.png");
+    private static final ResourceLocation golemBigDamage    = new ResourceLocation(Reference.ModID + ":textures/entity/iron_golem_damaged_stage_2.png");
     private final RenderCrackedIronGolem  golemRender;
 
 
