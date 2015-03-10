@@ -168,6 +168,7 @@ public class PlayerEventHandler
                     if (customName != "") {
                         // Applies the custom name to the golem
                         target.setCustomNameTag(customName);
+                        ((EntityLiving)target).enablePersistence();
                     }
 
                 }

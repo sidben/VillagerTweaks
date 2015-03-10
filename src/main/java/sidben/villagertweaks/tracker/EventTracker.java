@@ -131,6 +131,7 @@ public class EventTracker
         // Custom name
         if (this.getCustomName() != "") {
             zombie.setCustomNameTag(this.getCustomName());
+            zombie.enablePersistence();
         }
 
         // Adult or child
