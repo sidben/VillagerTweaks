@@ -1,17 +1,25 @@
 package sidben.villagertweaks.tracker;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.EntityIronGolem;
 import net.minecraft.entity.monster.EntitySnowman;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.passive.EntityVillager;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import sidben.villagertweaks.common.ExtendedVillagerZombie;
+import sidben.villagertweaks.handler.ConfigurationHandler;
 import sidben.villagertweaks.helper.LogHelper;
+import sidben.villagertweaks.init.MyAchievements;
+import sidben.villagertweaks.network.ZombieVillagerProfessionMessage;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.Vec3i;
+import net.minecraft.world.World;
 
 
 
@@ -90,9 +98,15 @@ public class ServerInfoTracker
         }
 
     
-    private static List<EventTracker> golemTracker = new ArrayList<EventTracker>();
-    private static List<EventTracker> zombieTracker = new ArrayList<EventTracker>();
-    private static List<EventTracker> villagerTracker = new ArrayList<EventTracker>();
+    private static List<EventTracker> GolemTracker = new ArrayList<EventTracker>();
+    private static List<EventTracker> ZombieTracker = new ArrayList<EventTracker>();
+    private static List<EventTracker> VillagerTracker = new ArrayList<EventTracker>();
+
+    private static HashMap<Integer, Integer> CuredZombies = new HashMap<Integer, Integer>();    // Tracks which players cured zombies
+    private static int CuredZombiesListLastChange = 0;  // Tracks when the list of cured zombies was last updated
+    private static HashMap<Integer, Integer> CuredVillagers = new HashMap<Integer, Integer>();    // Tracks a villager just cured by a player
+    private static int CuredVillagersListLastChange = 0;  // Tracks when the list of cured villagers was last updated
+    private static final int ListExpiration = 120000; // Number of ticks the list will stay alive after the last update, 12000 = 10 minutes
     
     private static boolean canStartTracking = false;
     
@@ -149,6 +163,37 @@ public class ServerInfoTracker
         ServerInfoTracker.add(EventType.GOLEM, new EventTracker(golem));
     }
     
+    /**
+     * Tracks that a certain player started to cure a zombie. Used for achievements.
+     */
+    public static void startedCuringZombie(int playerID, int zombieID)
+    {
+        if (zombieID > 0 && playerID > 0) {
+            LogHelper.info("> Player [" + playerID + "] started to cure zombie [" + zombieID + "]");
+            ServerInfoTracker.CuredZombies.put(zombieID, playerID);
+            ServerInfoTracker.CuredZombiesListLastChange = MinecraftServer.getServer().getTickCounter();  
+        }
+    }
+
+    /**
+     * Tracks that a villager was successfully cured by a player. Used for achievements.
+     * 
+     * @param oldZombieID ID of the zombie that was just cured.
+     * @param newVillagerID ID of the villager that just spawned.
+     */
+    public static void endedCuringZombie(int oldZombieID, int newVillagerID)
+    {
+        // checks if the zombie that was cured was one being tracked 
+        Integer playerID = ServerInfoTracker.CuredZombies.get(oldZombieID);
+        
+        if (newVillagerID > 0 && playerID > 0) {
+            LogHelper.info("> Player [" + playerID + "] cured villager [" + newVillagerID + "], formelly known as zombie [" + oldZombieID + "]");
+            ServerInfoTracker.CuredVillagers.put(newVillagerID, playerID);
+            ServerInfoTracker.CuredVillagersListLastChange = MinecraftServer.getServer().getTickCounter();  
+        }
+    }
+
+    
     
     
     /**
@@ -170,15 +215,15 @@ public class ServerInfoTracker
         // Adds the event to the specific list
         switch (type) {
             case GOLEM:
-                ServerInfoTracker.golemTracker.add(event);
+                ServerInfoTracker.GolemTracker.add(event);
                 break;
 
             case ZOMBIE:
-                ServerInfoTracker.zombieTracker.add(event);
+                ServerInfoTracker.ZombieTracker.add(event);
                 break;
             
             case VILLAGER: 
-                ServerInfoTracker.villagerTracker.add(event);
+                ServerInfoTracker.VillagerTracker.add(event);
                 break;
             
             default:
@@ -186,7 +231,6 @@ public class ServerInfoTracker
         }
 
     
-        //isEmpty = false;
     }
     
     
@@ -205,19 +249,19 @@ public class ServerInfoTracker
                 rangeLimit = 5;         // Crafted golem will always return 4, so 5 to play safe.
                 ageTolerance = 100;     // Arbitrary value, not really needed here
                 
-                return seekValueOnList(ServerInfoTracker.golemTracker, position, rangeLimit, ageTolerance);
+                return seekValueOnList(ServerInfoTracker.GolemTracker, position, rangeLimit, ageTolerance);
                 
             case VILLAGER:
                 rangeLimit = 1;         // Seek at the exact spot (maybe should be zero?)
                 ageTolerance = 5;       // Only 5 ticks tolerance to play safe, since "zombification" happens on the same tick 
                 
-                return seekValueOnList(ServerInfoTracker.villagerTracker, position, rangeLimit, ageTolerance);
+                return seekValueOnList(ServerInfoTracker.VillagerTracker, position, rangeLimit, ageTolerance);
                 
             case ZOMBIE:
                 rangeLimit = 1;         // Seek at the exact spot (maybe should be zero?)
                 ageTolerance = 5;       // Only 3 ticks tolerance to play safe, since the cure should happen on the next 1 tick 
                 
-                return seekValueOnList(ServerInfoTracker.zombieTracker, position, rangeLimit, ageTolerance);
+                return seekValueOnList(ServerInfoTracker.ZombieTracker, position, rangeLimit, ageTolerance);
                 
             default:
                 return null;
@@ -260,23 +304,92 @@ public class ServerInfoTracker
     
     
     
+    
+    /**
+     * Looks for the player that cured the zombie informed and give him/her the achievement.
+     * 
+     * @param zombieID Entity ID of the zombie that was cured (NOT villager)
+     */
+    public static void triggerZombieCuredAchievement(World world, int zombieID) {
+        Integer playerID = ServerInfoTracker.CuredZombies.get(zombieID);
+        
+        if (playerID != null && playerID > 0) {
+            
+            // Attempt to locate the player by the entity ID
+            Entity entity = world.getEntityByID(playerID);
+            if (entity != null && entity instanceof EntityPlayer) {
+                // If found the player, give the achievement
+                ((EntityPlayer)entity).addStat(MyAchievements.CureVillager, 1);
+            }
+
+            // Removes the tracking regardless of finding a player
+            ServerInfoTracker.CuredZombies.remove(zombieID);
+        }
+    }
+    
+    /**
+     * Looks if the infected villager was cured by a player recently to 
+     * give him/her the achievement.
+     * 
+     * @param villagerID Entity ID of the villager that was cured
+     */
+    public static void triggerVillagerInfectedAchievement(World world, int villagerID) {
+        Integer playerID = ServerInfoTracker.CuredVillagers.get(villagerID);
+        
+        if (playerID != null && playerID > 0) {
+            
+            // Attempt to locate the player by the entity ID
+            Entity entity = world.getEntityByID(playerID);
+            if (entity != null && entity instanceof EntityPlayer) {
+                // If found the player, give the achievement
+                ((EntityPlayer)entity).addStat(MyAchievements.InfectVillager, 1);
+            }
+
+            // Removes the tracking regardless of finding a player
+            ServerInfoTracker.CuredVillagers.remove(villagerID);
+        }
+    }
+    
+    
+    
+    
+    
+    
     /**
      * Remove all expired information from the tracked lists.
      */
     public static void cleanExpired() {
         if (!ServerInfoTracker.canStartTracking) return;
         
-        MinecraftServer server = MinecraftServer.getServer();
-        int expireAllUntil = server.getTickCounter() - 100;     // Maximmum amount of time an entry stays at the list
+        int thisTick = MinecraftServer.getServer().getTickCounter();
         
-        LogHelper.info("   -- Cleanup (" + expireAllUntil + ") --   ");
+        
+        // Clean expired from the events tracker
+        int expireAllUntil = thisTick - 100;     // Maximum amount of time an entry stays at the list
 
+        cleanExpiredList(ServerInfoTracker.GolemTracker, expireAllUntil);
+        cleanExpiredList(ServerInfoTracker.VillagerTracker, expireAllUntil);
+        cleanExpiredList(ServerInfoTracker.ZombieTracker, expireAllUntil);
         
-        cleanExpiredList(ServerInfoTracker.golemTracker, expireAllUntil);
-        cleanExpiredList(ServerInfoTracker.villagerTracker, expireAllUntil);
-        cleanExpiredList(ServerInfoTracker.zombieTracker, expireAllUntil);
         
-        ServerInfoTracker.debugMe();
+        // Debug
+        if (ConfigurationHandler.onDebug) LogHelper.info("-- ServerInfoTracker Cleanup [" + thisTick + "] --");
+
+
+        // Clear the cured zombie tracker
+        if (CuredZombiesListLastChange + ListExpiration < thisTick) {
+            if (ConfigurationHandler.onDebug) LogHelper.info("      reseting cured zombies list");
+            ServerInfoTracker.CuredZombies.clear();
+        }
+
+        if (CuredVillagersListLastChange + ListExpiration < thisTick) {
+            if (ConfigurationHandler.onDebug) LogHelper.info("      reseting cured villagers list");
+            ServerInfoTracker.CuredVillagers.clear();
+        }
+        
+
+        // Debug
+        if (ConfigurationHandler.onDebug) ServerInfoTracker.debugMe();
     }
     
     /**
@@ -317,41 +430,57 @@ public class ServerInfoTracker
         
         canStartTracking = true;
         
-        golemTracker.clear();
-        zombieTracker.clear();
-        villagerTracker.clear();
+        GolemTracker.clear();
+        ZombieTracker.clear();
+        VillagerTracker.clear();
+        
+        CuredZombies.clear();
+        CuredVillagers.clear();
     }
     
     
     
     private static void debugMe() {
         LogHelper.info("----------------------------------------------------------");
-        //LogHelper.info("isEmpty = " + SpecialEventsTracker.isEmpty);
 
-        LogHelper.info("Golem Tracker: " + ServerInfoTracker.golemTracker.size());
-        if (ServerInfoTracker.golemTracker.size() > 0) {
-            for(Iterator<EventTracker> i = ServerInfoTracker.golemTracker.iterator(); i.hasNext(); ) {
+        LogHelper.info("Golem Tracker: " + ServerInfoTracker.GolemTracker.size());
+        if (ServerInfoTracker.GolemTracker.size() > 0) {
+            for(Iterator<EventTracker> i = ServerInfoTracker.GolemTracker.iterator(); i.hasNext(); ) {
                 EventTracker e = i.next();
                 LogHelper.info("    [" + e.toString() + "]");                
             }
         }
         
-        LogHelper.info("Villager Tracker: " + ServerInfoTracker.villagerTracker.size());
-        if (ServerInfoTracker.villagerTracker.size() > 0) {
-            for(Iterator<EventTracker> i = ServerInfoTracker.villagerTracker.iterator(); i.hasNext(); ) {
+        LogHelper.info("Villager Tracker: " + ServerInfoTracker.VillagerTracker.size());
+        if (ServerInfoTracker.VillagerTracker.size() > 0) {
+            for(Iterator<EventTracker> i = ServerInfoTracker.VillagerTracker.iterator(); i.hasNext(); ) {
                 EventTracker e = i.next();
                 LogHelper.info("    [" + e.toString() + "]");                
             }
         }
 
-        LogHelper.info("Zombie Tracker: " + ServerInfoTracker.zombieTracker.size());
-        if (ServerInfoTracker.zombieTracker.size() > 0) {
-            for(Iterator<EventTracker> i = ServerInfoTracker.zombieTracker.iterator(); i.hasNext(); ) {
+        LogHelper.info("Zombie Tracker: " + ServerInfoTracker.ZombieTracker.size());
+        if (ServerInfoTracker.ZombieTracker.size() > 0) {
+            for(Iterator<EventTracker> i = ServerInfoTracker.ZombieTracker.iterator(); i.hasNext(); ) {
                 EventTracker e = i.next();
                 LogHelper.info("    [" + e.toString() + "]");                
             }
         }
-        
+
+        LogHelper.info("Cured Zombies Tracker: " + ServerInfoTracker.CuredZombies.size() + ", last updated in " + CuredZombiesListLastChange + ", will expire in " + (CuredZombiesListLastChange + ListExpiration));
+        if (ServerInfoTracker.CuredZombies.size() > 0) {
+            for(Entry<Integer, Integer> entry : ServerInfoTracker.CuredZombies.entrySet()) {
+                LogHelper.info("    Player [" + entry.getValue() + "] cured the zombie [" + entry.getKey() + "]");
+            }            
+        }
+
+        LogHelper.info("Cured Villagers Tracker: " + ServerInfoTracker.CuredVillagers.size() + ", last updated in " + CuredVillagersListLastChange + ", will expire in " + (CuredVillagersListLastChange + ListExpiration));
+        if (ServerInfoTracker.CuredVillagers.size() > 0) {
+            for(Entry<Integer, Integer> entry : ServerInfoTracker.CuredVillagers.entrySet()) {
+                LogHelper.info("    Zombie cured by Player [" + entry.getValue() + "] became villager [" + entry.getKey() + "]");
+            }            
+        }
+
         LogHelper.info("----------------------------------------------------------");
     }
 

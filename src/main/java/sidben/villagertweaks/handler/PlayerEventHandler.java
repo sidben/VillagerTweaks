@@ -5,6 +5,7 @@ import java.util.Map;
 import sidben.villagertweaks.ModVillagerTweaks;
 import sidben.villagertweaks.common.ExtendedVillagerZombie;
 import sidben.villagertweaks.helper.LogHelper;
+import sidben.villagertweaks.init.MyAchievements;
 import sidben.villagertweaks.network.ZombieVillagerProfessionMessage;
 import sidben.villagertweaks.tracker.EventTracker;
 import sidben.villagertweaks.tracker.ServerInfoTracker;
@@ -43,7 +44,7 @@ public class PlayerEventHandler
     @SubscribeEvent
     public void onEntityInteractEvent(EntityInteractEvent event)
     {
-
+        
         // check if the player right-clicked a villager
         if (event.target instanceof EntityVillager) {
 
@@ -64,6 +65,9 @@ public class PlayerEventHandler
                         if (!event.entityPlayer.capabilities.isCreativeMode) {
                             --item.stackSize;
                         }
+                        
+                        // Gives the achievement
+                        event.entityPlayer.addStat(MyAchievements.NameVillager, 1);
 
                         // Cancel the regular event (trade GUI)
                         event.setCanceled(true);
@@ -74,7 +78,40 @@ public class PlayerEventHandler
             }
 
         }
+
         
+        // check if the player right-clicked a zombie
+        else if (event.target instanceof EntityZombie) {
+            EntityZombie zombie = (EntityZombie)event.target;
+
+            LogHelper.info("Clicked on a zombie...");
+            LogHelper.info("    - Villager: " + zombie.isVillager());
+            LogHelper.info("    - Has weakness potion: " + zombie.isPotionActive(Potion.weakness));
+            LogHelper.info("    - World remore: " + zombie.worldObj.isRemote);
+            
+            
+            if (!zombie.worldObj.isRemote) {
+                
+                // Check if the player is holding a regular Golden Apple
+                final ItemStack item = event.entityPlayer.inventory.getCurrentItem();
+                if (item != null && item.getItem() == Items.golden_apple && item.getMetadata() == 0) {
+                    LogHelper.info("    ...with a golen apple in hand!");
+                    
+                    // Check if the target is a zombie villager with weakness potion active
+                    // Also check if the zombie isn't converting, I only want to track the
+                    // player that started the conversion.
+                    if (zombie.isVillager() && zombie.isPotionActive(Potion.weakness) && !zombie.isConverting()) {
+                        
+                        // Sends info to the special track list
+                        ServerInfoTracker.startedCuringZombie(event.entityPlayer.getEntityId(), zombie.getEntityId());
+                        
+                    }
+                }
+
+            }
+
+        }
+
  
     }
     

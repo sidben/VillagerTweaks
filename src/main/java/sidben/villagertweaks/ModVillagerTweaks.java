@@ -21,6 +21,7 @@ import sidben.villagertweaks.handler.EntityEventHandler;
 import sidben.villagertweaks.handler.PlayerEventHandler;
 import sidben.villagertweaks.handler.TickEventHandler;
 import sidben.villagertweaks.handler.WorldEventHandler;
+import sidben.villagertweaks.init.MyAchievements;
 import sidben.villagertweaks.init.MyBlocks;
 import sidben.villagertweaks.init.MyItems;
 import sidben.villagertweaks.init.MyRecipes;
@@ -75,6 +76,9 @@ public class ModVillagerTweaks
 
         // Recipes
         MyRecipes.register();
+
+        // Achievements
+        MyAchievements.register();
 
         // Event Handlers
         MinecraftForge.EVENT_BUS.register(new PlayerEventHandler());

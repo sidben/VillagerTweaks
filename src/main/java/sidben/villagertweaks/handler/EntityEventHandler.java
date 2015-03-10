@@ -220,7 +220,10 @@ public class EntityEventHandler
                     if (tracked != null) {
                         // If found, copy the data from the villager
                         tracked.updateZombie(zombie, properties);
-                        
+
+                        // Triggers the achievement
+                        ServerInfoTracker.triggerVillagerInfectedAchievement(event.world, tracked.getEntityID());
+
                     } else {
                         // If not, assign a random profession
                         properties.assignRandomProfessionIfNeeded();
@@ -252,6 +255,13 @@ public class EntityEventHandler
             if (tracked != null) {
                 // If found, copy the data from the zombie
                 tracked.updateVillager(villager);
+                
+                // Sends info to the special track list
+                ServerInfoTracker.endedCuringZombie(tracked.getEntityID(), villager.getEntityId());
+
+                // Triggers the achievement
+                ServerInfoTracker.triggerZombieCuredAchievement(event.world, tracked.getEntityID());
+                
             }
 
         }
@@ -298,7 +308,7 @@ public class EntityEventHandler
                 if (zombie.conversionTime > 1000) zombie.conversionTime = 1000;
                 
                 final int nextConversionTime = zombie.conversionTime - zombie.getConversionTimeBoost();
-                LogHelper.info("Zombie being cured in: [" + zombie.conversionTime + " -> " + nextConversionTime + "]");
+                LogHelper.info("Zombie [" + zombie.getEntityId() + "] being cured in: [" + zombie.conversionTime + " -> " + nextConversionTime + "]");
                
                 // NOTE: if [conversionTime] is zero, the zombie already converted and it's too late to track
                 if (nextConversionTime <= 0 && zombie.conversionTime > 0) {

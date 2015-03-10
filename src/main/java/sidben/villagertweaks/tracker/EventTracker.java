@@ -92,9 +92,7 @@ public class EventTracker {
     }
 
     public EventTracker(EntityVillager villager) {
-        this(0, villager.getPosition(), villager.getCustomNameTag(), new Object[] { villager.getProfession(), villager.isChild() });
-        // NOTE: This event tracks villagers that just died by zombies, so the EntityID is 
-        // not required, since the villager don't exist anymore.
+        this(villager.getEntityId(), villager.getPosition(), villager.getCustomNameTag(), new Object[] { villager.getProfession(), villager.isChild() });
     }
     
     public EventTracker(EntityZombie zombie, ExtendedVillagerZombie properties) {
