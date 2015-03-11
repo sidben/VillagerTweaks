@@ -170,7 +170,7 @@ public class ServerInfoTracker
         // checks if the zombie that was cured was one being tracked
         final Integer playerID = ServerInfoTracker.CuredZombies.get(oldZombieID);
 
-        if (newVillagerID > 0 && playerID > 0) {
+        if (newVillagerID > 0 && playerID != null && playerID > 0) {
             LogHelper.info("> Player [" + playerID + "] cured villager [" + newVillagerID + "], formelly known as zombie [" + oldZombieID + "]");
             ServerInfoTracker.CuredVillagers.put(newVillagerID, playerID);
             ServerInfoTracker.CuredVillagersListLastChange = MinecraftServer.getServer().getTickCounter();
@@ -469,28 +469,28 @@ public class ServerInfoTracker
     {
         LogHelper.info("----------------------------------------------------------");
 
-        LogHelper.info("Golem Tracker: " + ServerInfoTracker.GolemTracker.size());
+        LogHelper.info(" Golem Tracker: " + ServerInfoTracker.GolemTracker.size());
         if (ServerInfoTracker.GolemTracker.size() > 0) {
             for (final EventTracker e : ServerInfoTracker.GolemTracker) {
                 LogHelper.info("    [" + e.toString() + "]");
             }
         }
 
-        LogHelper.info("Villager Tracker: " + ServerInfoTracker.VillagerTracker.size());
+        LogHelper.info(" Villager Tracker: " + ServerInfoTracker.VillagerTracker.size());
         if (ServerInfoTracker.VillagerTracker.size() > 0) {
             for (final EventTracker e : ServerInfoTracker.VillagerTracker) {
                 LogHelper.info("    [" + e.toString() + "]");
             }
         }
 
-        LogHelper.info("Zombie Tracker: " + ServerInfoTracker.ZombieTracker.size());
+        LogHelper.info(" Zombie Tracker: " + ServerInfoTracker.ZombieTracker.size());
         if (ServerInfoTracker.ZombieTracker.size() > 0) {
             for (final EventTracker e : ServerInfoTracker.ZombieTracker) {
                 LogHelper.info("    [" + e.toString() + "]");
             }
         }
 
-        LogHelper.info("Cured Zombies Tracker: " + ServerInfoTracker.CuredZombies.size() + ", last updated in " + CuredZombiesListLastChange + ", will expire in "
+        LogHelper.info(" Cured Zombies Tracker: " + ServerInfoTracker.CuredZombies.size() + ", last updated in " + CuredZombiesListLastChange + ", will expire in "
                 + (CuredZombiesListLastChange + ListExpiration));
         if (ServerInfoTracker.CuredZombies.size() > 0) {
             for (final Entry<Integer, Integer> entry : ServerInfoTracker.CuredZombies.entrySet()) {
@@ -498,7 +498,7 @@ public class ServerInfoTracker
             }
         }
 
-        LogHelper.info("Cured Villagers Tracker: " + ServerInfoTracker.CuredVillagers.size() + ", last updated in " + CuredVillagersListLastChange + ", will expire in "
+        LogHelper.info(" Cured Villagers Tracker: " + ServerInfoTracker.CuredVillagers.size() + ", last updated in " + CuredVillagersListLastChange + ", will expire in "
                 + (CuredVillagersListLastChange + ListExpiration));
         if (ServerInfoTracker.CuredVillagers.size() > 0) {
             for (final Entry<Integer, Integer> entry : ServerInfoTracker.CuredVillagers.entrySet()) {
