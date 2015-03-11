@@ -151,7 +151,9 @@ public class ServerInfoTracker
     public static void startedCuringZombie(int playerID, int zombieID)
     {
         if (zombieID > 0 && playerID > 0) {
-            LogHelper.info("> Player [" + playerID + "] started to cure zombie [" + zombieID + "]");
+            if (ConfigurationHandler.onDebug) {
+                LogHelper.info("> Player [" + playerID + "] started to cure zombie [" + zombieID + "]");
+            }
             ServerInfoTracker.CuredZombies.put(zombieID, playerID);
             ServerInfoTracker.CuredZombiesListLastChange = MinecraftServer.getServer().getTickCounter();
         }
@@ -171,7 +173,9 @@ public class ServerInfoTracker
         final Integer playerID = ServerInfoTracker.CuredZombies.get(oldZombieID);
 
         if (newVillagerID > 0 && playerID != null && playerID > 0) {
-            LogHelper.info("> Player [" + playerID + "] cured villager [" + newVillagerID + "], formelly known as zombie [" + oldZombieID + "]");
+            if (ConfigurationHandler.onDebug) {
+                LogHelper.info("> Player [" + playerID + "] cured villager [" + newVillagerID + "], formelly known as zombie [" + oldZombieID + "]");
+            }
             ServerInfoTracker.CuredVillagers.put(newVillagerID, playerID);
             ServerInfoTracker.CuredVillagersListLastChange = MinecraftServer.getServer().getTickCounter();
         }
