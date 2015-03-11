@@ -2,7 +2,10 @@
 Special Thanks
 ==============
 
-Minecraft Forums: wailwail (Villager Consultant)
+Minecraft Forums: 
+	wailwail (Villager Consultant)
+	CursedGhast (zombie villagers with villager clothes idea)
+
 Thanks to those above for ideas, opinions and inspiration for some features of this mod.
 
 
