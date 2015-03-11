@@ -1,9 +1,17 @@
+v2.2 - MC 1.8 - 2015-03
+- Added achievements;
+- Iron golem skin display how damaged they are - 2 overlays added, applied over the regular skin
+- Named pumpkins creates named iron/snow golems;
+- Villager that gets zombified will keep custom name (and persistence);
+- Villager that gets zombified will keep keep profession - 5 new skins added;
+- Cured zombie villagers preserve custom name and profession;
+
+
 v2.1 - MC 1.8 - 2015-03
 - Fixed server crash
 
 
 v2.0 - MC 1.8 - 2015-03
-
 - Updated to Minecraft 1.8;
 - Current Features:
 	- Zombie Villagers may drop emeralds (15% chance + 5% per looting level);
