@@ -102,7 +102,7 @@ public class ServerInfoTracker
     private static int                       CuredZombiesListLastChange   = 0;                              // Tracks when the list of cured zombies was last updated
     private static HashMap<Integer, Integer> CuredVillagers               = new HashMap<Integer, Integer>();    // Tracks a villager just cured by a player
     private static int                       CuredVillagersListLastChange = 0;                              // Tracks when the list of cured villagers was last updated
-    private static final int                 ListExpiration               = 120000;                         // Number of ticks the list will stay alive after the last update, 12000 = 10 minutes
+    private static final int                 ListExpiration               = 12000;                          // Number of ticks the list will stay alive after the last update, 12000 = 10 minutes
 
     private static boolean                   canStartTracking             = false;
 
@@ -315,7 +315,7 @@ public class ServerInfoTracker
             final Entity entity = world.getEntityByID(playerID);
             if (entity != null && entity instanceof EntityPlayer) {
                 // If found the player, give the achievement
-                ((EntityPlayer) entity).addStat(MyAchievements.CureVillager, 1);
+                ((EntityPlayer) entity).triggerAchievement(MyAchievements.CureVillager);
             }
 
             // Removes the tracking regardless of finding a player
@@ -340,7 +340,7 @@ public class ServerInfoTracker
             final Entity entity = world.getEntityByID(playerID);
             if (entity != null && entity instanceof EntityPlayer) {
                 // If found the player, give the achievement
-                ((EntityPlayer) entity).addStat(MyAchievements.InfectVillager, 1);
+                ((EntityPlayer) entity).triggerAchievement(MyAchievements.InfectVillager);
             }
 
             // Removes the tracking regardless of finding a player

@@ -104,7 +104,17 @@ public class MyAchievements
 
         ModPage = new AchievementPage(Reference.ModName, NameVillager, CureVillager, InfectVillager, EnchantPumpkin, SnowGolem, SuperGolem);
         */
+        
+        /* 
+         * Need to register the stats or else the achievement won't be saved. Doing this also allow 
+         * the achievement to be given by the /achievement command.
+         * (thanks TinkersConstruct's GitHub repo!)
+         */
+        NameVillager.registerStat();
+        CureVillager.registerStat();
+        InfectVillager.registerStat();
 
+        
         ModPage = new AchievementPage(Reference.ModName, NameVillager, CureVillager, InfectVillager);
         AchievementPage.registerAchievementPage(ModPage);
     }

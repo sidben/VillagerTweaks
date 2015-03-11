@@ -26,14 +26,12 @@ import net.minecraftforge.event.entity.player.EntityInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.BlockEvent.MultiPlaceEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+
 
 
 public class PlayerEventHandler
 {
 
-    @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public void onEntityInteractEvent(EntityInteractEvent event)
     {
@@ -60,7 +58,7 @@ public class PlayerEventHandler
                         }
                         
                         // Gives the achievement
-                        event.entityPlayer.addStat(MyAchievements.NameVillager, 1);
+                        event.entityPlayer.triggerAchievement(MyAchievements.NameVillager);
 
                         // Cancel the regular event (trade GUI)
                         event.setCanceled(true);
