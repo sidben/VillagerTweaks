@@ -1,5 +1,6 @@
 # Blocks
-tile.villagertweaks:fake_block.name=Fake Villager Block
+tile.villagertweaks:fake_block.stone.name=Villager's Stone
+tile.villagertweaks:fake_block.iron.name=Villager's Block of Iron
 
 # Achievements
 achievement.name_villager=I Shall Call Him Squishy

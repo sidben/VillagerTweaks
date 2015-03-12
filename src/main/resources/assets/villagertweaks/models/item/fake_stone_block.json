@@ -1,5 +1,5 @@
 {
-    "parent": "block/cobblestone",
+    "parent": "block/stone",
     "display": {
         "thirdperson": {
             "rotation": [ 10, -45, 170 ],

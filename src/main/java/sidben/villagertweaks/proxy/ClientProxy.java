@@ -21,17 +21,18 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void initialize()
     {
+        super.initialize();
+        
+        
         ItemModelMesher itemMesher = Minecraft.getMinecraft().getRenderItem().getItemModelMesher();
         RenderManager renderManager = Minecraft.getMinecraft().getRenderManager();
         
 
-        // Block variants
-        //ModelBakery.addVariantName(Item.getItemFromBlock(MyBlocks.fakeBlock), Reference.ModID + ":" + "fake_stome_block");
-        //ModelBakery.addVariantName(Item.getItemFromBlock(MyBlocks.fakeBlock), Reference.ModID + ":" + "fake_iron_block");
-        
-        
         // Block item renderers (for display on inventory)
-        itemMesher.register(Item.getItemFromBlock(MyBlocks.fakeBlock), 0, new ModelResourceLocation(Reference.ModID + ":" + "fake_block", "inventory"));
+        ModelBakery.addVariantName(Item.getItemFromBlock(MyBlocks.fakeBlock), Reference.ModID + ":" + "fake_stone_block");
+        ModelBakery.addVariantName(Item.getItemFromBlock(MyBlocks.fakeBlock), Reference.ModID + ":" + "fake_iron_block");
+        
+        itemMesher.register(Item.getItemFromBlock(MyBlocks.fakeBlock), 0, new ModelResourceLocation(Reference.ModID + ":" + "fake_stone_block", "inventory"));
         itemMesher.register(Item.getItemFromBlock(MyBlocks.fakeBlock), 1, new ModelResourceLocation(Reference.ModID + ":" + "fake_iron_block", "inventory"));
 
         
