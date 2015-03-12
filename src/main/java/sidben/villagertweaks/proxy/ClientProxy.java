@@ -29,11 +29,11 @@ public class ClientProxy extends CommonProxy {
         
 
         // Block item renderers (for display on inventory)
-        ModelBakery.addVariantName(Item.getItemFromBlock(MyBlocks.fakeBlock), Reference.ModID + ":" + "fake_stone_block");
-        ModelBakery.addVariantName(Item.getItemFromBlock(MyBlocks.fakeBlock), Reference.ModID + ":" + "fake_iron_block");
+        ModelBakery.addVariantName(Item.getItemFromBlock(MyBlocks.fakeBlock), getResourceName("fake_stone_block"));
+        ModelBakery.addVariantName(Item.getItemFromBlock(MyBlocks.fakeBlock), getResourceName("fake_iron_block"));
         
-        itemMesher.register(Item.getItemFromBlock(MyBlocks.fakeBlock), 0, new ModelResourceLocation(Reference.ModID + ":" + "fake_stone_block", "inventory"));
-        itemMesher.register(Item.getItemFromBlock(MyBlocks.fakeBlock), 1, new ModelResourceLocation(Reference.ModID + ":" + "fake_iron_block", "inventory"));
+        itemMesher.register(Item.getItemFromBlock(MyBlocks.fakeBlock), 0, new ModelResourceLocation(getResourceName("fake_stone_block"), "inventory"));
+        itemMesher.register(Item.getItemFromBlock(MyBlocks.fakeBlock), 1, new ModelResourceLocation(getResourceName("fake_iron_block"), "inventory"));
 
         
         // Entity Renderers
@@ -43,6 +43,12 @@ public class ClientProxy extends CommonProxy {
         renderManager.entityRenderMap.remove(EntityZombie.class);
         renderManager.entityRenderMap.put(EntityZombie.class, new RenderZombieVillager(renderManager));
 
+    }
+    
+    
+    
+    private String getResourceName(String name) {
+        return Reference.ModID + ":" + name;
     }
 
 }

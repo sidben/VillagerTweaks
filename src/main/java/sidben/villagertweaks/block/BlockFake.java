@@ -8,9 +8,12 @@ import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.IStringSerializable;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -33,10 +36,35 @@ public class BlockFake extends BlockBasic
         this.setHardness(1.0F);
         this.setResistance(5.0F);
         this.setUnlocalizedName("fake_block");
+        this.setTickRandomly(true);
         
         this.setDefaultState(this.blockState.getBaseState().withProperty(VARIANT, BlockFake.EnumType.STONE));
     }
 
+    
+    
+    
+    //----------------------------------------------------
+    // Random block updates
+    //----------------------------------------------------
+    public int tickRate(World worldIn)
+    {
+        return 30;      // TODO: must be higher
+    }
+    
+    public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand)
+    {
+        if (this.canDespawn(worldIn, pos, state)) {
+            worldIn.setBlockState(pos, Blocks.gold_block.getDefaultState());        // TODO: set to air
+        }
+    }
+    
+    protected boolean canDespawn(World worldIn, BlockPos pos, IBlockState state) 
+    {
+        // Goal: Check if a required villager profession is nearby, so it can despawn
+        return true;
+    }
+    
     
     
     //----------------------------------------------------

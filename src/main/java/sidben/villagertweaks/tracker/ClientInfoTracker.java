@@ -56,8 +56,9 @@ public class ClientInfoTracker
     public static void SyncZombieMessage(int entityID) {
 
         // Seeks if the entity ID is loaded
+        Entity entity = null;
         WorldClient world = Minecraft.getMinecraft().theWorld;
-        Entity entity = world.getEntityByID(entityID);
+        if (world != null) entity = world.getEntityByID(entityID);
 
         // If found the entity, attempt to sync with info sent by the server 
         if (entity instanceof EntityZombie) {
