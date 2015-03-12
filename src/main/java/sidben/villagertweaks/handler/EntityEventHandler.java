@@ -17,6 +17,8 @@ import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import sidben.villagertweaks.common.ExtendedVillagerZombie;
+import sidben.villagertweaks.entity.ai.EntityAIUseBookshelf;
+import sidben.villagertweaks.entity.ai.EntityAIUseFurnace;
 import sidben.villagertweaks.helper.LogHelper;
 import sidben.villagertweaks.tracker.ClientInfoTracker;
 import sidben.villagertweaks.tracker.EventTracker;
@@ -223,6 +225,10 @@ public class EntityEventHandler
             }
 
 
+            //---------------------------------------------------------------------
+            // Assign correct info to cured villagers
+            //---------------------------------------------------------------------
+            
             // Looks on the event tracker for a zombie that was cured
             final EventTracker tracked = ServerInfoTracker.seek(EventType.ZOMBIE, villager.getPosition());
 
@@ -241,6 +247,20 @@ public class EntityEventHandler
                 ServerInfoTracker.triggerZombieCuredAchievement(event.world, tracked.getEntityID());
 
             }
+
+            
+            //---------------------------------------------------------------------
+            // Custom AI tasks
+            //---------------------------------------------------------------------
+            int priorityUseRandomBlock = 7;
+            
+            LogHelper.info("A villager joined world: [" + villager.toString() + "]");
+            LogHelper.info("    ID: [" + villager.getEntityId() + "], Profession: [" + villager.getProfession() + "]");
+            LogHelper.info("    --Adding custom AI--");
+            
+            villager.tasks.addTask(priorityUseRandomBlock, new EntityAIUseFurnace(villager, 0.6D));
+            //villager.tasks.addTask(priorityUseRandomBlock, new EntityAIUseBookshelf(villager, 0.6D));
+            
 
         }
 
