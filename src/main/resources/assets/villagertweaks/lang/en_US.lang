@@ -1,3 +1,6 @@
+# Blocks
+tile.villagertweaks:fake_block.name=Fake Villager Block
+
 # Achievements
 achievement.name_villager=I Shall Call Him Squishy
 achievement.name_villager.desc=Change a villager name

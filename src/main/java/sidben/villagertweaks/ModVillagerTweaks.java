@@ -1,9 +1,6 @@
 package sidben.villagertweaks;
 
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.monster.EntityIronGolem;
-import net.minecraft.entity.monster.EntityZombie;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
@@ -14,14 +11,13 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
-import sidben.villagertweaks.client.renderer.entity.RenderCrackedIronGolem;
-import sidben.villagertweaks.client.renderer.entity.RenderZombieVillager;
 import sidben.villagertweaks.handler.ConfigurationHandler;
 import sidben.villagertweaks.handler.EntityEventHandler;
 import sidben.villagertweaks.handler.PlayerEventHandler;
 import sidben.villagertweaks.handler.TickEventHandler;
 import sidben.villagertweaks.handler.WorldEventHandler;
 import sidben.villagertweaks.init.MyAchievements;
+import sidben.villagertweaks.init.MyBlocks;
 import sidben.villagertweaks.network.ZombieVillagerProfessionMessage;
 import sidben.villagertweaks.proxy.IProxy;
 import sidben.villagertweaks.reference.Reference;
@@ -39,8 +35,11 @@ public class ModVillagerTweaks
     @SidedProxy(clientSide = Reference.ClientProxyClass, serverSide = Reference.ServerProxyClass)
     public static IProxy            proxy;
     
-    
+    // Used to send information between client / server
     public static SimpleNetworkWrapper NetworkWrapper;
+    
+
+    
 
 
     @Mod.EventHandler
@@ -53,10 +52,12 @@ public class ModVillagerTweaks
         // Register network messages
         NetworkWrapper = NetworkRegistry.INSTANCE.newSimpleChannel(Reference.ModChannel);
         NetworkWrapper.registerMessage(ZombieVillagerProfessionMessage.Handler.class, ZombieVillagerProfessionMessage.class, 0, Side.CLIENT);
+        
+        // Register blocks
+        MyBlocks.register();
     }
 
 
-    @SuppressWarnings("unchecked")
     @Mod.EventHandler
     public void load(FMLInitializationEvent event)
     {
@@ -70,14 +71,8 @@ public class ModVillagerTweaks
 
         FMLCommonHandler.instance().bus().register(new TickEventHandler());
         
-        // Entity renderer
-        if (event.getSide() == Side.CLIENT) {
-            Minecraft.getMinecraft().getRenderManager().entityRenderMap.remove(EntityIronGolem.class);
-            Minecraft.getMinecraft().getRenderManager().entityRenderMap.put(EntityIronGolem.class, new RenderCrackedIronGolem(Minecraft.getMinecraft().getRenderManager()));
-
-            Minecraft.getMinecraft().getRenderManager().entityRenderMap.remove(EntityZombie.class);
-            Minecraft.getMinecraft().getRenderManager().entityRenderMap.put(EntityZombie.class, new RenderZombieVillager(Minecraft.getMinecraft().getRenderManager()));
-        }
+        // Sided initializations
+        proxy.initialize();
         
     }
 

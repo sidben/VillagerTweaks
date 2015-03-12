@@ -1,0 +1,6 @@
+{
+    "variants": {
+    	"variant=stone": { "model": "stone" },
+    	"variant=iron": { "model": "iron_block" }
+    }
+}
