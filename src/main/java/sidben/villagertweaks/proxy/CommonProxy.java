@@ -4,6 +4,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
+import sidben.villagertweaks.init.MyRecipes;
 import sidben.villagertweaks.ModVillagerTweaks;
 import sidben.villagertweaks.handler.EntityEventHandler;
 import sidben.villagertweaks.handler.PlayerEventHandler;
@@ -32,6 +33,9 @@ public abstract class CommonProxy implements IProxy {
     @Override
     public void initialize()
     {
+        // Recipes
+        MyRecipes.register();
+
         // Achievements
         MyAchievements.register();
 
