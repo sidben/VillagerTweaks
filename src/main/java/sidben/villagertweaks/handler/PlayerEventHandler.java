@@ -4,6 +4,8 @@ import java.util.Iterator;
 import java.util.Random;
 import sidben.villagertweaks.ModVillagerTweaks;
 import sidben.villagertweaks.client.particle.ParticleHelper;
+import sidben.villagertweaks.client.particle.ParticlePotionEffect;
+import sidben.villagertweaks.client.particle.ParticlePotionEffect.EffectType;
 import sidben.villagertweaks.common.ExtendedVillagerZombie;
 import sidben.villagertweaks.helper.LogHelper;
 import sidben.villagertweaks.init.MyAchievements;
@@ -54,7 +56,20 @@ public class PlayerEventHandler
                 
                 //worldIn.spawnParticle(EnumParticleTypes.NOTE, (double)pos.getX() + 0.5D, (double)pos.getY() + 1.2D, (double)pos.getZ() + 0.5D, (double)10 / 24.0D, 0.0D, 0.0D, new int[0]);
                 //golem.worldObj.spawnParticle(EnumParticleTypes.VILLAGER_HAPPY, golem.posX + (rand.nextDouble() - 0.5D) * golem.width, golem.posY + golem.height + 0.5D, golem.posZ + (rand.nextDouble() - 0.5D) * golem.width, 0D, 0.1D, 0D, new int[0]);
-                ParticleHelper.spawnParticle("", golem.posX, golem.posY + golem.height + 0.5D, golem.posZ, 0, 0.1D, 0);
+                
+                ParticlePotionEffect.EffectType[] pool = new ParticlePotionEffect.EffectType[7];
+                pool[0] = EffectType.FIRE_RESISTANCE;
+                pool[1] = EffectType.HEALTH_BOOST;
+                pool[2] = EffectType.JUMP_BOOST;
+                pool[3] = EffectType.REGENERATION;
+                pool[4] = EffectType.RESISTANCE;
+                pool[5] = EffectType.SPEED;
+                pool[6] = EffectType.STRENGTH;
+                
+                EffectType effect = pool[rand.nextInt(7)];
+                LogHelper.info(effect);
+                
+                ParticleHelper.spawnParticle(effect, golem.posX, golem.posY + golem.height, golem.posZ);
             }
             
         }        
