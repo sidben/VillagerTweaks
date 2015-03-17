@@ -1,5 +1,6 @@
 package sidben.villagertweaks.client.particle;
 
+import sidben.villagertweaks.helper.LogHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.EntityFX;
 import net.minecraft.client.renderer.GlStateManager;
@@ -18,7 +19,6 @@ import net.minecraftforge.fml.relauncher.*;
 public class ParticleTest extends EntityFX
 {
 
-    float particleScaleOverTime;
     
     
     public ParticleTest(World world, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn, double ySpeedIn, double zSpeedIn) {
@@ -28,12 +28,8 @@ public class ParticleTest extends EntityFX
         this.motionY *= 0.009999999776482582D;
         this.motionZ *= 0.009999999776482582D;
         this.motionY += 0.1D;
-        this.particleScale *= 0.75F;
-        this.particleScale *= 2.0F;
-        this.particleScaleOverTime = this.particleScale;
         this.particleMaxAge = 16;
         this.noClip = false;
-//        this.setParticleTextureIndex(80);
     }
 
     
@@ -81,12 +77,32 @@ public class ParticleTest extends EntityFX
     public void func_180434_a(WorldRenderer worldrenderer, Entity p_180434_2_, float p_180434_3_, float p_180434_4_, float p_180434_5_, float p_180434_6_, float p_180434_7_, float p_180434_8_)
     {
         TextureManager renderer = Minecraft.getMinecraft().getTextureManager(); 
-        final ResourceLocation field_110126_a = new ResourceLocation("textures/particle/footprint.png");
+        final ResourceLocation field_110126_a = new ResourceLocation("textures/gui/container/inventory.png");
         
-        float f6 = 0;
-        float f7 = 1;
-        float f8 = 0;
-        float f9 = 1;
+        // NOTE: effect icons are 18*18
+        // 36 / 198
+        /*        
+        
+        
+        int iconID = 225;
+
+        
+        this.particleTextureIndexX = iconID % 16;
+        this.particleTextureIndexY = iconID / 16;
+
+        float f6 = ((float)this.particleTextureIndexX / 16.0F) - 1/16F;
+        float f7 = f6 + 0.0624375F;
+        float f8 = ((float)this.particleTextureIndexY / 16.0F) - 1/16F;
+        float f9 = f8 + 0.0624375F;
+        LogHelper.info("  (A)   " + f6 + ", " + f7 + ", " + f8 + ", " + f9);
+*/
+
+        float f6 = 0.140625F;
+        float f7 = f6 + 0.0703125F;
+        float f8 = 0.7734375F;
+        float f9 = f8 + 0.0703125F;
+        LogHelper.info("  (B)   " + f6 + ", " + f7 + ", " + f8 + ", " + f9 + " scale " + this.particleScale);
+        
 
         float f10 = 0.1F * this.particleScale;
         float f11 = (float)(this.prevPosX + (this.posX - this.prevPosX) * (double)p_180434_3_ - interpPosX);
