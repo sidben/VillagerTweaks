@@ -1,7 +1,9 @@
 package sidben.villagertweaks.handler;
 
 import java.util.Iterator;
+import java.util.Random;
 import sidben.villagertweaks.ModVillagerTweaks;
+import sidben.villagertweaks.client.particle.ParticleHelper;
 import sidben.villagertweaks.common.ExtendedVillagerZombie;
 import sidben.villagertweaks.helper.LogHelper;
 import sidben.villagertweaks.init.MyAchievements;
@@ -21,6 +23,9 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.entity.player.EntityInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -35,6 +40,26 @@ public class PlayerEventHandler
     @SubscribeEvent
     public void onEntityInteractEvent(EntityInteractEvent event)
     {
+        
+        // TEMP CODE
+        // check if the player right-clicked a villager
+        if (event.target instanceof EntityIronGolem) {
+            
+            // Only on client
+            if (event.target.worldObj.isRemote) {
+                final EntityIronGolem golem = (EntityIronGolem) event.target;
+                World worldIn = event.target.worldObj;
+                BlockPos pos = event.target.getPosition();
+                final Random rand = golem.worldObj.rand;
+                
+                //worldIn.spawnParticle(EnumParticleTypes.NOTE, (double)pos.getX() + 0.5D, (double)pos.getY() + 1.2D, (double)pos.getZ() + 0.5D, (double)10 / 24.0D, 0.0D, 0.0D, new int[0]);
+                //golem.worldObj.spawnParticle(EnumParticleTypes.VILLAGER_HAPPY, golem.posX + (rand.nextDouble() - 0.5D) * golem.width, golem.posY + golem.height + 0.5D, golem.posZ + (rand.nextDouble() - 0.5D) * golem.width, 0D, 0.1D, 0D, new int[0]);
+                ParticleHelper.spawnParticle("", golem.posX, golem.posY + golem.height + 0.5D, golem.posZ, 0, 0.1D, 0);
+            }
+            
+        }        
+        
+        
         
         // check if the player right-clicked a villager
         if (event.target instanceof EntityVillager) {
