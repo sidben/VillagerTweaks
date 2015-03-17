@@ -1,6 +1,6 @@
 package sidben.villagertweaks.init;
 
-//import net.minecraft.init.Blocks;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.stats.Achievement;
 import net.minecraftforge.common.AchievementPage;
@@ -60,7 +60,9 @@ import sidben.villagertweaks.reference.Reference;
  * 
  * Enchant Pumpkin
  * ===================================================
- * Not implemented.
+ * In game: Combine a pumpkin with an enchanted book on an anvil.
+ * 
+ * In code: Intercept the [AnvilRepairEvent] to detect when a player enchant a pumpkin.
  * 
  * 
  * 
@@ -97,14 +99,11 @@ public class MyAchievements
         NameVillager = new Achievement(Reference.ModID + ".name_villager", "name_villager", 2, -3, Items.name_tag, null);
         CureVillager = new Achievement(Reference.ModID + ".cure_villager", "cure_villager", 1, 0, Items.golden_apple, null);
         InfectVillager = new Achievement(Reference.ModID + ".infect_villager", "infect_villager", 3, 0, Items.rotten_flesh, CureVillager);
-        /*
         EnchantPumpkin = new Achievement(Reference.ModID + ".enchant_pumpkin", "enchant_pumpkin", -3, -2, Blocks.pumpkin, null);
         SnowGolem = new Achievement(Reference.ModID + ".snowman", "snowman", -3, 2, Items.snowball, EnchantPumpkin);
         SuperGolem = new Achievement(Reference.ModID + ".super_golem", "super_golem", -5, 0, Blocks.iron_block, EnchantPumpkin).setSpecial();
 
-        ModPage = new AchievementPage(Reference.ModName, NameVillager, CureVillager, InfectVillager, EnchantPumpkin, SnowGolem, SuperGolem);
-        */
-        
+       
         /* 
          * Need to register the stats or else the achievement won't be saved. Doing this also allow 
          * the achievement to be given by the /achievement command.
@@ -113,9 +112,12 @@ public class MyAchievements
         NameVillager.registerStat();
         CureVillager.registerStat();
         InfectVillager.registerStat();
+        EnchantPumpkin.registerStat();
+        SnowGolem.registerStat();
+        SuperGolem.registerStat();
 
         
-        ModPage = new AchievementPage(Reference.ModName, NameVillager, CureVillager, InfectVillager);
+        ModPage = new AchievementPage(Reference.ModName, NameVillager, CureVillager, InfectVillager, EnchantPumpkin, SnowGolem, SuperGolem);
         AchievementPage.registerAchievementPage(ModPage);
     }
 
