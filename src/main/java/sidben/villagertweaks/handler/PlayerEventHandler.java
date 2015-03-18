@@ -43,7 +43,7 @@ public class PlayerEventHandler
     public void onEntityInteractEvent(EntityInteractEvent event)
     {
         
-        // TEMP CODE
+        // TEMP CODE - TODO: remove
         // check if the player right-clicked a villager
         if (event.target instanceof EntityIronGolem) {
             
@@ -57,7 +57,7 @@ public class PlayerEventHandler
                 //worldIn.spawnParticle(EnumParticleTypes.NOTE, (double)pos.getX() + 0.5D, (double)pos.getY() + 1.2D, (double)pos.getZ() + 0.5D, (double)10 / 24.0D, 0.0D, 0.0D, new int[0]);
                 //golem.worldObj.spawnParticle(EnumParticleTypes.VILLAGER_HAPPY, golem.posX + (rand.nextDouble() - 0.5D) * golem.width, golem.posY + golem.height + 0.5D, golem.posZ + (rand.nextDouble() - 0.5D) * golem.width, 0D, 0.1D, 0D, new int[0]);
                 
-                ParticlePotionEffect.EffectType[] pool = new ParticlePotionEffect.EffectType[7];
+                ParticlePotionEffect.EffectType[] pool = new ParticlePotionEffect.EffectType[12];
                 pool[0] = EffectType.FIRE_RESISTANCE;
                 pool[1] = EffectType.HEALTH_BOOST;
                 pool[2] = EffectType.JUMP_BOOST;
@@ -65,8 +65,13 @@ public class PlayerEventHandler
                 pool[4] = EffectType.RESISTANCE;
                 pool[5] = EffectType.SPEED;
                 pool[6] = EffectType.STRENGTH;
+                pool[7] = EffectType.PROJECTILE_PROTECTION;
+                pool[8] = EffectType.FIRE_PROTECTION;
+                pool[9] = EffectType.BLAST_PROTECTION;
+                pool[10] = EffectType.THORNS;
+                pool[11] = EffectType.KNOCKBACK;
                 
-                EffectType effect = pool[rand.nextInt(7)];
+                EffectType effect = pool[rand.nextInt(12)];
                 LogHelper.info(effect);
                 
                 ParticleHelper.spawnParticle(effect, golem.posX, golem.posY + golem.height, golem.posZ);

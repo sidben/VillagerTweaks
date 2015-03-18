@@ -1,6 +1,7 @@
 package sidben.villagertweaks.client.particle;
 
 import java.awt.geom.Point2D;
+import sidben.villagertweaks.reference.Reference;
 import net.minecraft.client.particle.EntityFX;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
@@ -15,6 +16,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  * Spawn particles with the potion effect icon.
+ * Mainly used to display enchanted golems buffs.
  *
  */
 @SideOnly(Side.CLIENT)
@@ -28,7 +30,12 @@ public class ParticlePotionEffect extends EntityFX
         REGENERATION(0.4921875F, 0.7734375F, 1),
         RESISTANCE(0.421875F, 0.84375F, 1),
         FIRE_RESISTANCE(0.4921875F, 0.84375F, 1),
-        HEALTH_BOOST(0.140625F, 0.9140625F, 1);
+        HEALTH_BOOST(0.140625F, 0.9140625F, 1),
+        PROJECTILE_PROTECTION(0.0F, 0.0F, 2),
+        FIRE_PROTECTION(unit * 1, 0.0F, 2),
+        BLAST_PROTECTION(unit * 2, 0.0F, 2),
+        THORNS(unit * 3, 0.0F, 2),
+        KNOCKBACK(unit * 4, 0.0F, 2);
                
         
         public final Point2D iconCoordinates;
@@ -48,6 +55,7 @@ public class ParticlePotionEffect extends EntityFX
     private final static float unit = 0.0703125F;       // Icons are 18x18 in a 256px page, so unit = 18/256
     private final EffectType type;
     private final ResourceLocation vanillaEffects = new ResourceLocation("textures/gui/container/inventory.png");
+    private final ResourceLocation modEffects = new ResourceLocation(Reference.ModID + ":textures/particles/particles.png");
     private final TextureManager renderer;
     
     
@@ -126,6 +134,9 @@ public class ParticlePotionEffect extends EntityFX
         GlStateManager.disableLighting();
         if (this.type.textureID == 1) {
             renderer.bindTexture(vanillaEffects);
+        }
+        else if (this.type.textureID == 2) {
+            renderer.bindTexture(modEffects);
         }
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(770, 771);
