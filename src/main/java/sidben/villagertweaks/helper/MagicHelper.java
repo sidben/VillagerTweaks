@@ -4,10 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import com.google.common.collect.Lists;
+import scala.actors.threadpool.Arrays;
+import sidben.villagertweaks.common.ExtendedGolem;
 import sidben.villagertweaks.helper.GolemEnchantment.EnchantmentType;
+import sidben.villagertweaks.network.NetworkHelper;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.monster.EntityIronGolem;
+import net.minecraft.entity.monster.EntitySnowman;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -28,7 +33,7 @@ public class MagicHelper
     public static String GolemEnchantmentsNBTKey = "golem_enchs";
     
     
-    
+    // TODO: allow an enchanted pumpkin to get more enchants - remember to apply the penalty
     
     /**
      * Check if a pumpkin can be enchanted, what enchantments it would get and how much it would cost.
@@ -165,6 +170,89 @@ public class MagicHelper
     
     
     
+    /**
+     * Applies the extra info (name, enchantments) in the pumpkin to the golem created with it.
+     * 
+     */
+    public static void applyPumpkinExtraInfo(EntityIronGolem golem, ItemStack pumpkin) {
+        if (golem == null || pumpkin == null) return;
+        
+        int[] pumpkinEnchants = getEnchantmentIds(pumpkin);
+        String customName = pumpkin.getDisplayName();
+        if (customName.equals(Blocks.pumpkin.getLocalizedName())) customName = "";
+        
+
+        // Check if a custom name exists
+        if (customName != "") {
+            // Applies the custom name to the golem
+            golem.setCustomNameTag(customName);
+        }
+        
+        // Check if it's an enchanted pumpkin
+        if (pumpkinEnchants != null && pumpkinEnchants.length > 0) {
+            final ExtendedGolem properties = ExtendedGolem.get(golem);
+            if (properties == null) {
+                LogHelper.warn("Could not load extened properties for Iron Golem ID " + golem.getEntityId() + ", enchantments won't be applied.");
+            } else {
+                properties.setEnchantments(pumpkinEnchants);
+                LogHelper.info("--> Applying enchantments on golem " + golem.getEntityId() + ": " + Arrays.toString(pumpkinEnchants));
+                
+                NetworkHelper.sendEnchantedGolemInfoMessage(golem, properties);
+            }
+        }
+
+    }
+    
+    
+    public static void applyPumpkinExtraInfo(EntitySnowman golem, ItemStack pumpkin) {
+        if (golem == null || pumpkin == null) return;
+     
+        String customName = pumpkin.getDisplayName();
+
+        
+        // Check if a custom name exists
+        if (customName != "") {
+            // Applies the custom name to the golem
+            golem.setCustomNameTag(customName);
+            golem.enablePersistence();
+        }
+        
+
+    }
+    
+    
+    
+    
+    
+    /**
+     * Returns all valid golem enchantments in the given pumpkin.
+     * 
+     */
+    public static int[] getEnchantmentIds(ItemStack itemStack) {
+        int[] enchants = null;
+        
+        if (itemStack.getItem() == Item.getItemFromBlock(Blocks.pumpkin)) {
+            // Get a tagList of type 3 (integers)
+            NBTTagList tag = itemStack.hasTagCompound() ? itemStack.getTagCompound().getTagList(MagicHelper.GolemEnchantmentsNBTKey, 3) : null;
+            
+            // Loads the enchantments
+            if (tag != null && !tag.hasNoTags()) {
+                enchants = new int[tag.tagCount()]; 
+                for (int i = 0; i < enchants.length; i++) {
+                    int enchId = ((NBTTagInt)tag.get(i)).getInt();
+                    enchants[i] = enchId;
+                }
+            }
+            
+        }
+        
+        return enchants;
+    }
+    
+    
+    
+    
+    
     public static List<String> getPumpkinToolip(ItemStack itemStack, List<String> originalTooltip) {
         ArrayList<String> toolTip = Lists.newArrayList(originalTooltip);
         GolemEnchantment[] enchants = null;
@@ -211,6 +299,8 @@ public class MagicHelper
 
         return toolTip;
     }
+    
+    
     
     
     

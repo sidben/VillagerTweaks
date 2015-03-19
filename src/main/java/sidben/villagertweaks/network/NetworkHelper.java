@@ -1,7 +1,9 @@
 package sidben.villagertweaks.network;
 
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -77,6 +79,21 @@ public class NetworkHelper
         }
     }
     
+
+
+    /**
+     * Send info about the golems (iron and snow) to all players around a certain radius of them.
+     * 
+     */
+    public static void sendEnchantedGolemInfoMessage(EntityLiving golem, ExtendedGolem properties) {
+        if (golem != null && properties != null) {
+            int[] ids = GolemEnchantment.convert(properties.getEnchantments());
+            // Sends a message to the player, with the golem extra info
+            ModVillagerTweaks.NetworkWrapper.sendToAllAround(
+                    new MessageGolemEnchantments(golem.getEntityId(), ids), 
+                    new TargetPoint(golem.dimension, golem.posX, golem.posY, golem.posZ, 64.0D));
+        }
+    }
 
     
     

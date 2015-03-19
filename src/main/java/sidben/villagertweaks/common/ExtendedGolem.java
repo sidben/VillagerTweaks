@@ -19,7 +19,8 @@ public class ExtendedGolem implements IExtendedEntityProperties
 {
 
     public final static String Identifier   = "GolemInfo";
-
+    protected World myWorld;
+    
 
 
     // ---------------------------------------------------------
@@ -33,6 +34,19 @@ public class ExtendedGolem implements IExtendedEntityProperties
         return this.enchantments;
     }
 
+    public GolemEnchantment getRandomEnchantment()
+    {
+        if (this.getEnchantments() != null && this.getEnchantments().length > 0) 
+        {
+            int raffle = this.myWorld.rand.nextInt(this.getEnchantments().length);
+            return this.getEnchantments()[raffle];
+        }
+        else 
+        {
+            return null;
+        }
+    }
+    
     public void setEnchantments(int[] enchantmentIds)
     {
         this.enchantments = GolemEnchantment.convert(enchantmentIds);
@@ -105,6 +119,7 @@ public class ExtendedGolem implements IExtendedEntityProperties
     @Override
     public void init(Entity entity, World world)
     {
+        myWorld = world;
     }
 
 

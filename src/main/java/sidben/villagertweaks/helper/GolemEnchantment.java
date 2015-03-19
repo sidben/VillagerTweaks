@@ -15,7 +15,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import sidben.villagertweaks.client.particle.ParticleHelper;
 import sidben.villagertweaks.client.particle.ParticlePotionEffect;
 import sidben.villagertweaks.client.particle.ParticlePotionEffect.EffectType;
-import sidben.villagertweaks.reference.Reference;
 
 
 /**
