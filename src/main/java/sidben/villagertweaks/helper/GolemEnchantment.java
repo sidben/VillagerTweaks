@@ -270,6 +270,9 @@ public class GolemEnchantment
         if (this.effect == null) {
             return;
         }
+        if (entity.isInvisible()) {
+            return;
+        }
         final Random rand = entity.getRNG();
         final double range = 0.15D;
         final double randomX = (rand.nextDouble() * (range * 2)) - range;

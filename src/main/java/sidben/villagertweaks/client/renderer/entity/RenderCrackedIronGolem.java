@@ -14,6 +14,7 @@ public class RenderCrackedIronGolem extends RenderIronGolem
     public RenderCrackedIronGolem(RenderManager render) {
         super(render);
         this.addLayer(new LayerIronGolemDamage(this));
+        this.addLayer(new LayerIronGolemGlint(this));
     }
 
 }
