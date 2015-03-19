@@ -34,30 +34,55 @@ public class GolemEnchantment
 - Thorns III = Golem gets the Thorns effect
 - Unbreaking III = Golem gets 50% more health
 - Power V - Snow golems snowballs do a little dmg
+- Efficiency = Speed
      */
+    
+/*
+ * TODO: re-implement the "can be combined" rule:
+ * 
+ * - Each golem can have up to 3 enchantments and only 1 of each type (Offense, Defense and Passive)
+ * - If the type is "Refresh", it must be alone and will override other effects on the list
+ * 
+ */
 
     
     private static final GolemEnchantment[] enchantmentsList = new GolemEnchantment[16];
 
-    public static final GolemEnchantment speed = new GolemEnchantment(0, EffectType.SPEED, "speed", 5, true);
-    public static final GolemEnchantment protection = new GolemEnchantment(1, EffectType.RESISTANCE, "protection", 5, true);
-    public static final GolemEnchantment fireProtection = new GolemEnchantment(2, EffectType.FIRE_RESISTANCE, "fire_protection", 5, true);
-    public static final GolemEnchantment projectileProtection = new GolemEnchantment(3, EffectType.PROJECTILE_PROTECTION, "projectile_protection", 5, true);
-    public static final GolemEnchantment blastProtection = new GolemEnchantment(4, EffectType.BLAST_PROTECTION, "blast_protection", 5, true);
-    public static final GolemEnchantment strength = new GolemEnchantment(5, EffectType.STRENGTH, "strength", 5, true);
-    public static final GolemEnchantment knockback = new GolemEnchantment(6, EffectType.KNOCKBACK, "knockback", 5, true);
-    public static final GolemEnchantment thorns = new GolemEnchantment(7, EffectType.THORNS, "thorns", 5, true);
-    public static final GolemEnchantment unbreaking = new GolemEnchantment(8, EffectType.HEALTH_BOOST, "unbreaking", 5, true);
-    public static final GolemEnchantment power = new GolemEnchantment(9, null, "power", 5, true);
-    public static final GolemEnchantment fire = new GolemEnchantment(10, null, "fire", 5, true);
-    public static final GolemEnchantment max = new GolemEnchantment(15, null, "max", 30, false);
+    public static final GolemEnchantment speed = new GolemEnchantment(0, EffectType.SPEED, EnchantmentType.PASSIVE, "speed", 5, true);
+    public static final GolemEnchantment protection = new GolemEnchantment(1, EffectType.RESISTANCE, EnchantmentType.DEFENSE, "protection", 5, true);
+    public static final GolemEnchantment fireProtection = new GolemEnchantment(2, EffectType.FIRE_PROTECTION, EnchantmentType.DEFENSE, "fire_protection", 5, true);
+    public static final GolemEnchantment projectileProtection = new GolemEnchantment(3, EffectType.PROJECTILE_PROTECTION, EnchantmentType.DEFENSE, "projectile_protection", 5, true);
+    public static final GolemEnchantment blastProtection = new GolemEnchantment(4, EffectType.BLAST_PROTECTION, EnchantmentType.DEFENSE, "blast_protection", 5, true);
+    public static final GolemEnchantment strength = new GolemEnchantment(5, EffectType.STRENGTH, EnchantmentType.PASSIVE, "strength", 5, true);
+    public static final GolemEnchantment knockback = new GolemEnchantment(6, EffectType.KNOCKBACK, EnchantmentType.OFFENSE, "knockback", 5, true);
+    public static final GolemEnchantment thorns = new GolemEnchantment(7, EffectType.THORNS, EnchantmentType.DEFENSE, "thorns", 5, true);
+    public static final GolemEnchantment unbreaking = new GolemEnchantment(8, EffectType.HEALTH_BOOST, EnchantmentType.PASSIVE, "unbreaking", 5, true);
+    public static final GolemEnchantment power = new GolemEnchantment(9, null, EnchantmentType.OFFENSE, "power", 5, true);
+    public static final GolemEnchantment fire = new GolemEnchantment(10, null, EnchantmentType.OFFENSE, "fire", 5, true);
+    public static final GolemEnchantment max = new GolemEnchantment(15, null, EnchantmentType.REFRESH, "max", 30, false);
 
+    
+    public static enum EnchantmentType {
+        /** Applied when the golem attacks something */
+        OFFENSE,
+        
+        /** Applied when the golem receives damage */
+        DEFENSE,
+        
+        /** Applied when the golem joins the world */
+        PASSIVE,
+
+        /** Applied periodically */
+        REFRESH
+    }
+    
     
     private final int id;
     private final ParticlePotionEffect.EffectType effect;
     private final String unlocalizedName;
     private final int xpBaseCost;
     private final boolean canBeCombined; 
+    private final EnchantmentType type;
     // TODO: affects iron or snow golem, use bit flag 1 = iron, 2 = snow, 3 = both
     
     
@@ -136,13 +161,55 @@ public class GolemEnchantment
         return list.toArray(new GolemEnchantment[list.size()]);
     }
 
+
+    /**
+     * Gets a list of all valid enchantments with the given IDs.
+     * 
+     */
+    public static GolemEnchantment[] convert(int[] ids) {
+        ArrayList<GolemEnchantment> list = new ArrayList<GolemEnchantment>();
+        
+
+        if (ids != null && ids.length > 0) 
+        {
+            for (int id : ids) {
+                GolemEnchantment golemEnchant = GolemEnchantment.getEnchantmentById(id);
+                if (golemEnchant != null) {
+                    list.add(golemEnchant);
+                }
+            }
+        }
+
+        
+        return list.toArray(new GolemEnchantment[list.size()]);
+    }
+    
+    
+    /**
+     * Gets a list of IDs from the given enchantments list.
+     * 
+     */
+    public static int[] convert(GolemEnchantment[] enchantments) {
+        if (enchantments == null || enchantments.length <= 0) return new int[0];
+        
+        int[] ids = new int[enchantments.length];
+        for (int i = 0; i < ids.length; i++) {
+            GolemEnchantment e = enchantments[i];
+            if (e != null) ids[i] = e.getId();
+        }        
+        
+        return ids;
+    }
     
     
     
     
-    public GolemEnchantment(int id, EffectType effect, String name, int xpCost, boolean canCombine) {
+    
+    
+    public GolemEnchantment(int id, EffectType effect, EnchantmentType type, String name, int xpCost, boolean canCombine) {
         this.id = id;
         this.effect = effect;
+        this.type = type;
         this.unlocalizedName = name;
         this.xpBaseCost = xpCost;
         this.canBeCombined = canCombine;
@@ -170,10 +237,14 @@ public class GolemEnchantment
         return this.xpBaseCost;
     }
     
+    // TODO: make this a function that returns if this enchantment can be adds to the given list
     public boolean getCanBeCombined() {
         return this.canBeCombined;
     }
     
+    public EnchantmentType getType() {
+        return this.type;
+    }    
 
     
         

@@ -1,13 +1,16 @@
 package sidben.villagertweaks.helper;
 
 import java.util.Map;
+import sidben.villagertweaks.helper.GolemEnchantment.EnchantmentType;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagInt;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.DamageSource;
 
 
 
@@ -24,7 +27,7 @@ public class MagicHelper
     
     
     /**
-     * Check if a pumpkin can be enchanted, what enchantments it would get and how much would cost.
+     * Check if a pumpkin can be enchanted, what enchantments it would get and how much it would cost.
      * 
      * @param pumpkin The pumpkin
      * @param magicItem The item being combined
@@ -37,7 +40,7 @@ public class MagicHelper
         
         // It's a pumpkin, check if can combine
         if (pumpkin.getItem() == Item.getItemFromBlock(Blocks.pumpkin) && pumpkin.stackSize == 1) {
-            ResultCanEnchant result = new ResultCanEnchant();
+            ResultCanEnchant result = new ResultCanEnchant(); 
             
             // Gets a list of possible golem enchantments
             GolemEnchantment[] golemEnchants = GolemEnchantment.convert(magicItem);
@@ -156,5 +159,36 @@ public class MagicHelper
         return null;
     }
     
+    
+    
+    
+    
+    public static void applyPassiveEffects(GolemEnchantment enchantment, Entity golem) {
+        if (enchantment.getType() != EnchantmentType.PASSIVE) return;
+        
+        // TODO: implement
+    }
+
+
+    public static void applyAttackEffects(GolemEnchantment enchantment, Entity golem, Entity target) {
+        if (enchantment.getType() != EnchantmentType.OFFENSE) return;
+        
+        // TODO: implement
+    }
+    
+    
+    public static void applyDefenseEffects(GolemEnchantment enchantment, Entity golem, DamageSource source) {
+        if (enchantment.getType() != EnchantmentType.DEFENSE) return;
+        
+        // TODO: implement
+    }
+
+    
+    public static void applyRefreshEffects(GolemEnchantment enchantment, Entity golem) {
+        if (enchantment.getType() != EnchantmentType.REFRESH) return;
+        
+        // TODO: implement
+    }
+
 
 }
