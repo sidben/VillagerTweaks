@@ -22,7 +22,9 @@ import sidben.villagertweaks.handler.PlayerEventHandler;
 import sidben.villagertweaks.handler.TickEventHandler;
 import sidben.villagertweaks.handler.WorldEventHandler;
 import sidben.villagertweaks.init.MyAchievements;
-import sidben.villagertweaks.network.ZombieVillagerProfessionMessage;
+import sidben.villagertweaks.network.MessageGolemEnchantments;
+import sidben.villagertweaks.network.NetworkHelper;
+import sidben.villagertweaks.network.MessageZombieVillagerProfession;
 import sidben.villagertweaks.proxy.IProxy;
 import sidben.villagertweaks.reference.Reference;
 
@@ -52,7 +54,8 @@ public class ModVillagerTweaks
         
         // Register network messages
         NetworkWrapper = NetworkRegistry.INSTANCE.newSimpleChannel(Reference.ModChannel);
-        NetworkWrapper.registerMessage(ZombieVillagerProfessionMessage.Handler.class, ZombieVillagerProfessionMessage.class, 0, Side.CLIENT);
+        NetworkWrapper.registerMessage(NetworkHelper.VillagerProfessionHandler.class, MessageZombieVillagerProfession.class, 0, Side.CLIENT);
+        NetworkWrapper.registerMessage(NetworkHelper.GolemEnchantmentHandler.class, MessageGolemEnchantments.class, 0, Side.CLIENT);
     }
 
 

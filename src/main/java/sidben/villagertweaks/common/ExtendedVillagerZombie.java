@@ -94,25 +94,25 @@ public class ExtendedVillagerZombie implements IExtendedEntityProperties
         }
         
         NBTTagCompound properties = new NBTTagCompound();
-        properties.setInteger(ExtendedVillagerZombie.ProfessionKey, this.profession);
-        properties.setBoolean(ExtendedVillagerZombie.InitializedKey, this.hasValidaData);
+        properties.setInteger(ProfessionKey, this.profession);
+        properties.setBoolean(InitializedKey, this.hasValidaData);
 
-        compound.setTag(ExtendedVillagerZombie.Identifier, properties); 
+        compound.setTag(Identifier, properties); 
     }
 
     
     @Override
     public void loadNBTData(NBTTagCompound compound)
     {
-        NBTTagCompound properties = (NBTTagCompound)compound.getTag(ExtendedVillagerZombie.Identifier);
+        NBTTagCompound properties = (NBTTagCompound)compound.getTag(Identifier);
 
         if (properties == null) {
             hasValidaData = false;
             profession = -1;
         } 
         else {
-            this.profession = properties.getInteger(ExtendedVillagerZombie.ProfessionKey);
-            this.hasValidaData = properties.getBoolean(ExtendedVillagerZombie.InitializedKey);
+            this.profession = properties.getInteger(ProfessionKey);
+            this.hasValidaData = properties.getBoolean(InitializedKey);
         }
 
     }

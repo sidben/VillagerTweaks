@@ -16,7 +16,10 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import scala.actors.threadpool.Arrays;
+import sidben.villagertweaks.common.ExtendedGolem;
 import sidben.villagertweaks.common.ExtendedVillagerZombie;
+import sidben.villagertweaks.helper.GolemEnchantment;
 import sidben.villagertweaks.helper.LogHelper;
 import sidben.villagertweaks.tracker.ClientInfoTracker;
 import sidben.villagertweaks.tracker.EventTracker;
@@ -169,7 +172,7 @@ public class EntityEventHandler
 
             if (event.world.isRemote) {
                 // Looks for info sent by the server that should be applied to the zombie (e.g. villager profession)
-                // NOTE: On the client I don't check [isVillager] because the client don't have that info (yet?)
+                // NOTE: On the client I don't check [isVillager] because the client don't have that info (yet? - TODO: revisit and more tests)
                 ClientInfoTracker.SyncZombieMessage(zombie);
 
             } else {
@@ -245,15 +248,51 @@ public class EntityEventHandler
         }
 
 
-        else if (event.entity instanceof EntityIronGolem && !event.world.isRemote) {
+        else if (event.entity instanceof EntityIronGolem) {
             final EntityIronGolem golem = (EntityIronGolem) event.entity;
 
-            if (golem.isPlayerCreated()) {
-                // Found an iron golem, adds to the tracker so pumpkin info can be applied later
-                if (ConfigurationHandler.onDebug) {
-                    LogHelper.info("A player created iron golem joined world: [" + golem.toString() + "]");
+            
+            if (event.world.isRemote) {
+                // Looks for info sent by the server that should be applied to the golem (e.g. enchantments)
+                ClientInfoTracker.SyncGolemMessage(golem);
+
+            } else {
+                if (golem.isPlayerCreated()) {
+                    // Found an iron golem, adds to the tracker so pumpkin info can be applied later
+                    if (ConfigurationHandler.onDebug) {
+                        LogHelper.info("A player created iron golem joined world: [" + golem.toString() + "]");
+                    }
+                    ServerInfoTracker.add(golem);
+                    
+                    
+                    // TEMP - TODO: remove
+                    // adds a random effect to the golem
+                    int[] pool = {0, 2, 5, 7, 8, 10};
+                    
+                    final ExtendedGolem properties = ExtendedGolem.get(golem);
+                    
+                    LogHelper.info("== Enchanted Golem ==");
+                    LogHelper.info("    prop " + properties);
+                    if (properties != null) {
+                        LogHelper.info("    prop.ench " + properties.getEnchantments());
+                        if (properties.getEnchantments() != null) {
+                            for(GolemEnchantment e : properties.getEnchantments()) {
+                                LogHelper.info("      > " + e);    
+                            }
+                        } else {
+                            int[] randomized = { pool[golem.getRNG().nextInt(pool.length)] };
+                            properties.setEnchantments(randomized);
+                            LogHelper.info("    changing to " + Arrays.toString(randomized));
+                            if (properties.getEnchantments() != null) {
+                                for(GolemEnchantment e : properties.getEnchantments()) {
+                                    LogHelper.info("      > " + e); 
+                                }
+                            }
+                        
+                        }
+                    }
                 }
-                ServerInfoTracker.add(golem);
+
             }
 
         }
@@ -340,6 +379,14 @@ public class EntityEventHandler
         // Adds the Extended Properties to zombies
         if (event.entity instanceof EntityZombie && ExtendedVillagerZombie.get((EntityZombie) event.entity) == null) {
             ExtendedVillagerZombie.register((EntityZombie) event.entity);
+        }
+
+        // Adds the Extended Properties to golems
+        else if (event.entity instanceof EntityIronGolem && ExtendedGolem.get((EntityIronGolem) event.entity) == null) {
+            ExtendedGolem.register((EntityIronGolem)event.entity);
+        }
+        else if (event.entity instanceof EntitySnowman && ExtendedGolem.get((EntitySnowman) event.entity) == null) {
+            ExtendedGolem.register((EntitySnowman)event.entity);
         }
 
     }

@@ -6,10 +6,13 @@ import sidben.villagertweaks.ModVillagerTweaks;
 import sidben.villagertweaks.client.particle.ParticleHelper;
 import sidben.villagertweaks.client.particle.ParticlePotionEffect;
 import sidben.villagertweaks.client.particle.ParticlePotionEffect.EffectType;
+import sidben.villagertweaks.common.ExtendedGolem;
 import sidben.villagertweaks.common.ExtendedVillagerZombie;
+import sidben.villagertweaks.helper.GolemEnchantment;
 import sidben.villagertweaks.helper.LogHelper;
 import sidben.villagertweaks.init.MyAchievements;
-import sidben.villagertweaks.network.ZombieVillagerProfessionMessage;
+import sidben.villagertweaks.network.NetworkHelper;
+import sidben.villagertweaks.network.MessageZombieVillagerProfession;
 import sidben.villagertweaks.tracker.EventTracker;
 import sidben.villagertweaks.tracker.ServerInfoTracker;
 import sidben.villagertweaks.tracker.ServerInfoTracker.EventType;
@@ -50,6 +53,7 @@ public class PlayerEventHandler
             // Only on client
             if (event.target.worldObj.isRemote) {
                 final EntityIronGolem golem = (EntityIronGolem) event.target;
+                /*
                 World worldIn = event.target.worldObj;
                 BlockPos pos = event.target.getPosition();
                 final Random rand = golem.worldObj.rand;
@@ -75,6 +79,40 @@ public class PlayerEventHandler
                 LogHelper.info(effect);
                 
                 ParticleHelper.spawnParticle(effect, golem.posX, golem.posY + golem.height, golem.posZ);
+                */
+                
+                final ExtendedGolem properties = ExtendedGolem.get(golem);
+                LogHelper.info("Properties " + properties);
+                if (properties !=  null) LogHelper.info("Enchs " + properties.getEnchantments());
+
+                if (properties !=  null && properties.getEnchantments() != null) {
+                    LogHelper.info("# " + properties.getEnchantments().length);
+                    if (properties.getEnchantments().length > 0) {
+                        GolemEnchantment e = properties.getEnchantments()[0];
+                        LogHelper.info("This golem has " + e);
+                        if (e != null) e.spawnParticles(golem);
+                    }
+                }
+                
+            }
+            
+            else 
+            {
+                // server
+                final EntityIronGolem golem = (EntityIronGolem) event.target;
+                final ExtendedGolem properties = ExtendedGolem.get(golem);
+                LogHelper.info("Properties " + properties);
+                if (properties !=  null) LogHelper.info("Enchs " + properties.getEnchantments());
+
+                if (properties !=  null && properties.getEnchantments() != null) {
+                    LogHelper.info("# " + properties.getEnchantments().length);
+                    if (properties.getEnchantments().length > 0) {
+                        GolemEnchantment e = properties.getEnchantments()[0];
+                        LogHelper.info("This golem has " + e);
+                    }
+                }
+                
+                
             }
             
         }        
@@ -302,8 +340,7 @@ public class PlayerEventHandler
     public void onPlayerStartTracking(PlayerEvent.StartTracking event) {
     
         /*
-         * Check if the player started tracking a zombie villager
-         * (happens on server-side). 
+         * Check if the player started tracking a zombie villager (happens on server-side). 
          */
         if (event.target instanceof EntityZombie && !event.entity.worldObj.isRemote) {
             final EntityZombie zombie = (EntityZombie) event.target;
@@ -312,17 +349,41 @@ public class PlayerEventHandler
    
                 // Check if the zombie has special properties
                 ExtendedVillagerZombie properties = ExtendedVillagerZombie.get(zombie);
-                
-                if (properties.getProfession() >= 0) {
-                    // Sends a message to the player, with the zombie extra info
-                    ModVillagerTweaks.NetworkWrapper.sendTo(
-                            new ZombieVillagerProfessionMessage(zombie.getEntityId(), properties.getProfession()), 
-                            (EntityPlayerMP) event.entityPlayer);
+                if (properties != null) {
+                    NetworkHelper.sendVillagerProfessionMessage(zombie.getEntityId(), properties, event.entityPlayer);
                 }
     
             }
         }
+
+        /*
+         * Check if the player started tracking a golem (happens on server-side). 
+         */
+        else if (event.target instanceof EntityIronGolem && !event.entity.worldObj.isRemote) {
+            final EntityIronGolem golem = (EntityIronGolem) event.target;
+
+            if (golem.isPlayerCreated()) {
+   
+                // Check if the golem has special properties
+                ExtendedGolem properties = ExtendedGolem.get(golem);
+                if (properties != null) {
+                    NetworkHelper.sendEnchantedGolemInfoMessage(golem.getEntityId(), properties, event.entityPlayer);
+                }
     
+            }
+        }
+        else if (event.target instanceof EntitySnowman && !event.entity.worldObj.isRemote) {
+            final EntitySnowman golem = (EntitySnowman) event.target;
+
+            // Check if the golem has special properties
+            ExtendedGolem properties = ExtendedGolem.get(golem);
+            if (properties != null) {
+                NetworkHelper.sendEnchantedGolemInfoMessage(golem.getEntityId(), properties, event.entityPlayer);
+            }
+
+        }
+
+        
     }
 
     
