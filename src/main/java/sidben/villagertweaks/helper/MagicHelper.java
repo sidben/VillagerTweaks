@@ -3,6 +3,7 @@ package sidben.villagertweaks.helper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import com.google.common.collect.Lists;
 import scala.actors.threadpool.Arrays;
 import sidben.villagertweaks.common.ExtendedGolem;
@@ -11,6 +12,11 @@ import sidben.villagertweaks.network.NetworkHelper;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.ai.attributes.IAttribute;
+import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.monster.EntityIronGolem;
 import net.minecraft.entity.monster.EntitySnowman;
 import net.minecraft.init.Blocks;
@@ -302,14 +308,103 @@ public class MagicHelper
     
     
     
+
+    /*
+     * - Protection IV book = Resistance I buff (reduces damage 20%)
+     * - Fire Protection IV = Fire Protection IV buff (reduces fire dmg by 60%)
+     * - Proj. Protection IV = Projectile Protection II buff (reduces proj. dmg by 30%)
+     * - Blast Protection IV = Blast Protection II buff (reduces explosion dmg by 30%)
+     * - Sharpness, Smite, Bane of Arth. IV (or V?) = Strength buff (adds 30% base dmg)
+     * - Fire Aspect II / Flame I = Golem sets attacked mobs on fire
+     * - Knockback II / Punch II = Iron Golems get knockback resistance, Snow Golems get punch effect on snowballs
+     * - Thorns III = Golem gets the Thorns effect
+     * - Unbreaking III = Golem gets 50% more health
+     * - Power V - Snow golems snowballs do a little dmg
+     * - Efficiency = Speed
+     */
+
+    
+    private static final double healthBoostAmount = 0.6D;
+    private static final double speedAmount = 0.25D;
+    private static final double strengthAmount = 1.3D;
+    
+    private static final AttributeModifier attReinforced = new AttributeModifier(UUID.fromString("179aa5d9-b25e-4f17-8bd5-44e6f39b8d5c"), "golem_reinforced", healthBoostAmount, 2);
+    private static final AttributeModifier attQuick = new AttributeModifier(UUID.fromString("2139955f-7a5d-4e69-9e44-fc8f9b214a77"), "golem_quick", speedAmount, 2);
+    private static final AttributeModifier attStrong = new AttributeModifier(UUID.fromString("5acca6a8-94ba-4505-9bfc-907297685d40"), "golem_strong", strengthAmount, 2);
     
     
     
-    
-    public static void applyPassiveEffects(GolemEnchantment enchantment, Entity golem) {
-        if (enchantment.getType() != EnchantmentType.PASSIVE) return;
+    public static void applyPassiveEffects(Entity golem) {
         
-        // TODO: implement
+        // Load the properties
+        ExtendedGolem properties = null;
+        if (golem instanceof EntityIronGolem) properties = ExtendedGolem.get((EntityIronGolem)golem);
+        if (golem instanceof EntitySnowman) properties = ExtendedGolem.get((EntitySnowman)golem);
+        
+        
+        if (properties != null && properties.getEnchantments() != null && properties.getEnchantments().length > 0) 
+        {
+            LogHelper.info("== applyPassiveEffects() - " + golem.getEntityId() + " ==");
+            
+            for (GolemEnchantment e : properties.getEnchantments()) {
+                if (e != null && e.getType() == EnchantmentType.PASSIVE) 
+                {
+
+                    /*---------------------------------------------------------------
+                     * Unbreaking / Reinforced
+                     * Adds health.  
+                     *---------------------------------------------------------------*/
+                    if (e == GolemEnchantment.unbreaking) {
+                        
+                        IAttributeInstance iattributeinstance = ((EntityLivingBase)golem).getAttributeMap().getAttributeInstance(SharedMonsterAttributes.maxHealth);
+                        if (iattributeinstance != null)
+                        {
+                            iattributeinstance.removeModifier(attReinforced);
+                            iattributeinstance.applyModifier(attReinforced);
+                        }
+                    
+                    }
+                    
+                    
+                    /*---------------------------------------------------------------
+                     * Speed / Quick
+                     * Makes faster.  
+                     *---------------------------------------------------------------*/
+                    if (e == GolemEnchantment.speed) {
+                        
+                        IAttributeInstance iattributeinstance = ((EntityLivingBase)golem).getAttributeMap().getAttributeInstance(SharedMonsterAttributes.movementSpeed);
+                        if (iattributeinstance != null)
+                        {
+                            iattributeinstance.removeModifier(attQuick);
+                            iattributeinstance.applyModifier(attQuick);
+                        }
+                    
+                    }
+
+                    
+                    /*---------------------------------------------------------------
+                     * Strength
+                     * Makes stronger.  
+                     *---------------------------------------------------------------*/
+                    // TODO: check code, looks like the damage is reaching a max cap. If that is the case, increase min damage
+                    if (e == GolemEnchantment.strength) {
+                        
+                        IAttributeInstance iattributeinstance = ((EntityLivingBase)golem).getAttributeMap().getAttributeInstance(SharedMonsterAttributes.attackDamage);
+                        if (iattributeinstance != null)
+                        {
+                            iattributeinstance.removeModifier(attStrong);
+                            iattributeinstance.applyModifier(attStrong);
+                        }
+                    
+                    }
+                    
+                }
+            }
+
+        
+        }
+
+        
     }
 
 

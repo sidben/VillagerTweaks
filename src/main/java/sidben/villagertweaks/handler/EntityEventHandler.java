@@ -21,6 +21,7 @@ import sidben.villagertweaks.common.ExtendedVillagerZombie;
 import sidben.villagertweaks.helper.EnumGolemHealth;
 import sidben.villagertweaks.helper.GolemEnchantment;
 import sidben.villagertweaks.helper.LogHelper;
+import sidben.villagertweaks.helper.MagicHelper;
 import sidben.villagertweaks.tracker.ClientInfoTracker;
 import sidben.villagertweaks.tracker.EventTracker;
 import sidben.villagertweaks.tracker.ServerInfoTracker;
@@ -43,7 +44,7 @@ public class EntityEventHandler
             ItemStack droppedItem;
             final EntityZombie zombie = (EntityZombie) event.entity;
 
-
+//TODO: fix bug where zombie pigman also drop feather
 
             // ----------------------------------------------------
             // Bonus Feather
@@ -265,6 +266,9 @@ public class EntityEventHandler
                     ServerInfoTracker.add(golem);
 
                 }
+                
+                // Apply the passive golem enchantments
+                MagicHelper.applyPassiveEffects(golem);
 
             }
 
