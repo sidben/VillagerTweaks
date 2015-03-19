@@ -1,6 +1,9 @@
 package sidben.villagertweaks.helper;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import com.google.common.collect.Lists;
 import sidben.villagertweaks.helper.GolemEnchantment.EnchantmentType;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -11,6 +14,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagInt;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumChatFormatting;
 
 
 
@@ -157,6 +161,55 @@ public class MagicHelper
         }
         
         return null;
+    }
+    
+    
+    
+    public static List<String> getPumpkinToolip(ItemStack itemStack, List<String> originalTooltip) {
+        ArrayList<String> toolTip = Lists.newArrayList(originalTooltip);
+        GolemEnchantment[] enchants = null;
+        boolean hasSuperRare = false;
+        
+        
+        if (itemStack.getItem() == Item.getItemFromBlock(Blocks.pumpkin)) {
+
+            // Get a tagList of type 3 (integers)
+            NBTTagList tag = itemStack.hasTagCompound() ? itemStack.getTagCompound().getTagList(MagicHelper.GolemEnchantmentsNBTKey, 3) : null;
+            
+            // Loads the enchantments
+            if (tag != null && !tag.hasNoTags()) {
+                enchants = new GolemEnchantment[tag.tagCount()]; 
+                for (int i = 0; i < enchants.length; i++) {
+                    int enchId = ((NBTTagInt)tag.get(i)).getInt();
+                    GolemEnchantment e = GolemEnchantment.getEnchantmentById(enchId);
+                    enchants[i] = e;
+                    
+                    if (e != null && e == GolemEnchantment.max) {
+                        hasSuperRare = true;
+                    }
+                }
+            }
+            
+            // Customize the tooltip
+            if (enchants != null && enchants.length > 0) {
+                if (hasSuperRare) {
+                    toolTip.set(0, EnumChatFormatting.LIGHT_PURPLE + toolTip.get(0));
+                } else {
+                    toolTip.set(0, EnumChatFormatting.YELLOW + toolTip.get(0));
+                }
+
+                // adds the names in reverse order so they are displayed in the correct order
+                for (int i = enchants.length - 1; i >= 0; i--) {
+                    if (enchants[i] != null) {
+                        toolTip.add(1, enchants[i].getLocalizedName());
+                    }
+                }
+            }
+
+            
+        }
+
+        return toolTip;
     }
     
     

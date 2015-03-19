@@ -49,17 +49,17 @@ public class GolemEnchantment
 
     private static final GolemEnchantment[] enchantmentsList     = new GolemEnchantment[16];
 
-    public static final GolemEnchantment    speed                = new GolemEnchantment(0, EffectType.SPEED, EnchantmentType.PASSIVE, "speed", 5, true);
-    public static final GolemEnchantment    protection           = new GolemEnchantment(1, EffectType.RESISTANCE, EnchantmentType.DEFENSE, "protection", 5, true);
-    public static final GolemEnchantment    fireProtection       = new GolemEnchantment(2, EffectType.FIRE_PROTECTION, EnchantmentType.DEFENSE, "fire_protection", 5, true);
-    public static final GolemEnchantment    projectileProtection = new GolemEnchantment(3, EffectType.PROJECTILE_PROTECTION, EnchantmentType.DEFENSE, "projectile_protection", 5, true);
-    public static final GolemEnchantment    blastProtection      = new GolemEnchantment(4, EffectType.BLAST_PROTECTION, EnchantmentType.DEFENSE, "blast_protection", 5, true);
-    public static final GolemEnchantment    strength             = new GolemEnchantment(5, EffectType.STRENGTH, EnchantmentType.PASSIVE, "strength", 5, true);
-    public static final GolemEnchantment    knockback            = new GolemEnchantment(6, EffectType.KNOCKBACK, EnchantmentType.OFFENSE, "knockback", 5, true);
-    public static final GolemEnchantment    thorns               = new GolemEnchantment(7, EffectType.THORNS, EnchantmentType.DEFENSE, "thorns", 5, true);
-    public static final GolemEnchantment    unbreaking           = new GolemEnchantment(8, EffectType.HEALTH_BOOST, EnchantmentType.PASSIVE, "unbreaking", 5, true);
-    public static final GolemEnchantment    fire                 = new GolemEnchantment(9, null, EnchantmentType.OFFENSE, "fire", 5, true);
-    public static final GolemEnchantment    max                  = new GolemEnchantment(15, null, EnchantmentType.REFRESH, "max", 30, false);
+    public static final GolemEnchantment    speed                = new GolemEnchantment(0, EffectType.SPEED, EnchantmentType.PASSIVE, "g_speed", 5, true);
+    public static final GolemEnchantment    protection           = new GolemEnchantment(1, EffectType.RESISTANCE, EnchantmentType.DEFENSE, "g_armor", 5, true);
+    public static final GolemEnchantment    fireProtection       = new GolemEnchantment(2, EffectType.FIRE_PROTECTION, EnchantmentType.DEFENSE, "g_fire_armor", 5, true);
+    public static final GolemEnchantment    projectileProtection = new GolemEnchantment(3, EffectType.PROJECTILE_PROTECTION, EnchantmentType.DEFENSE, "g_projectile_armor", 5, true);
+    public static final GolemEnchantment    blastProtection      = new GolemEnchantment(4, EffectType.BLAST_PROTECTION, EnchantmentType.DEFENSE, "g_blast_armor", 5, true);
+    public static final GolemEnchantment    strength             = new GolemEnchantment(5, EffectType.STRENGTH, EnchantmentType.PASSIVE, "g_strength", 5, true);
+    public static final GolemEnchantment    knockback            = new GolemEnchantment(6, EffectType.KNOCKBACK, EnchantmentType.OFFENSE, "g_repulsor", 5, true);
+    public static final GolemEnchantment    thorns               = new GolemEnchantment(7, EffectType.THORNS, EnchantmentType.DEFENSE, "g_spike", 5, true);
+    public static final GolemEnchantment    unbreaking           = new GolemEnchantment(8, EffectType.HEALTH_BOOST, EnchantmentType.PASSIVE, "g_reinforced", 5, true);
+    public static final GolemEnchantment    fire                 = new GolemEnchantment(9, null, EnchantmentType.OFFENSE, "g_flaming", 5, true);
+    public static final GolemEnchantment    max                  = new GolemEnchantment(15, null, EnchantmentType.REFRESH, "g_max", 30, false);
 
 
     public static enum EnchantmentType {
@@ -235,7 +235,7 @@ public class GolemEnchantment
 
     public String getLocalizedName()
     {
-        return StatCollector.translateToLocal(Reference.ModID + ":enchantment." + this.unlocalizedName);
+        return StatCollector.translateToLocal("enchantment." + this.unlocalizedName);
     }
 
     public int getId()

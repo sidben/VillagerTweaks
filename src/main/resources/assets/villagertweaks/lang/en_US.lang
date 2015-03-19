@@ -13,14 +13,14 @@ achievement.snowman=Do You Want To Build a Snowman?
 achievement.snowman.desc=Create an enchanted Snow Golem
  
 # Enchantments
-	#enchantment.speed=Quick
-	#enchantment.protection=Armored
-	#enchantment.fire_protection=Fire Resistant
-	#enchantment.projectile_protection=Projectle Resistant
-	#enchantment.blast_protection=Blast Resistant
-	#enchantment.strength=Strong
-	#enchantment.knockback=Repulsor
-	#enchantment.thorns=Spiked
-	#enchantment.unbreaking=Reinforced
-	#enchantment.fire=Flaming
-	#enchantment.max=Mighty  
+enchantment.g_speed=Quick
+enchantment.g_armor=Armored
+enchantment.g_fire_armor=Fire Resistant
+enchantment.g_projectile_armor=Projectile Resistant
+enchantment.g_blast_armor=Blast Resistant
+enchantment.g_strength=Strong
+enchantment.g_repulsor=Repulsor
+enchantment.g_spike=Spiked
+enchantment.g_reinforced=Reinforced
+enchantment.g_flaming=Flaming
+enchantment.g_max=Mighty  

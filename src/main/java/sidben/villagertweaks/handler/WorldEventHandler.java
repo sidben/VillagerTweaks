@@ -1,5 +1,6 @@
 package sidben.villagertweaks.handler;
 
+import java.util.List;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -77,14 +78,13 @@ public class WorldEventHandler
     @SubscribeEvent
     public void onItemTooltip(ItemTooltipEvent event)
     {
-        /*
-        if (event.itemStack.getItem() == Item.getItemFromBlock(Blocks.pumpkin)) {
-            LogHelper.info("onItemTooltip()");
-            LogHelper.info("    tooltip " + event.toolTip.size());
-            LogHelper.info("    tooltip " + event.toolTip);
+        // Look for enchanted pumpkins
+        if (event.itemStack.getItem() == Item.getItemFromBlock(Blocks.pumpkin) && event.itemStack.hasEffect()) {
+            List<String> newToolTip = MagicHelper.getPumpkinToolip(event.itemStack, event.toolTip);
+
+            event.toolTip.clear();
+            event.toolTip.addAll(newToolTip);
         }
-        */
-        // TODO: change rarity of golden pumpkin (can be done?)
     }
 
 
