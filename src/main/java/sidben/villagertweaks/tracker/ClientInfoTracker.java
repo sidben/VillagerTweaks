@@ -73,6 +73,7 @@ public class ClientInfoTracker
 
         // Seeks if the entity ID is loaded
         WorldClient world = Minecraft.getMinecraft().theWorld;
+        if (world == null) return;
         Entity entity = world.getEntityByID(entityID);
 
         // If found the entity, attempt to sync with info sent by the server 
@@ -129,6 +130,7 @@ public class ClientInfoTracker
 
         // Seeks if the entity ID is loaded
         WorldClient world = Minecraft.getMinecraft().theWorld;
+        if (world == null) return;
         Entity entity = world.getEntityByID(entityID);
 
         // If found the entity, attempt to sync with info sent by the server 
