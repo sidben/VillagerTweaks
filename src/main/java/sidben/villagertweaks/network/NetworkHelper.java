@@ -1,8 +1,5 @@
 package sidben.villagertweaks.network;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -12,7 +9,6 @@ import sidben.villagertweaks.ModVillagerTweaks;
 import sidben.villagertweaks.common.ExtendedGolem;
 import sidben.villagertweaks.common.ExtendedVillagerZombie;
 import sidben.villagertweaks.helper.GolemEnchantment;
-import sidben.villagertweaks.helper.LogHelper;
 import sidben.villagertweaks.tracker.ClientInfoTracker;
 
 
@@ -118,14 +114,15 @@ public class NetworkHelper
         @Override
         public IMessage onMessage(MessageGolemEnchantments message, MessageContext ctx)
         {
-            // Saves the info to be used later, when the entity actually loads
-            ClientInfoTracker.addGolemMessage(message);
-            
-            // Attempts to sync the entity. Most of the times the entity won't be found 
-            // when this code execute, but on some cases the entity can join the world
-            // before the packet is received (e.g. villager gets zombified).
-            ClientInfoTracker.SyncGolemMessage(message.getEntityID());
-            
+            if (message.getEntityID() > 0) {
+                // Saves the info to be used later, when the entity actually loads
+                ClientInfoTracker.addGolemMessage(message);
+                
+                // Attempts to sync the entity. Most of the times the entity won't be found 
+                // when this code execute, but on some cases the entity can join the world
+                // before the packet is received (e.g. villager gets zombified).
+                ClientInfoTracker.SyncGolemMessage(message.getEntityID());
+            }
             
             return null;
         }

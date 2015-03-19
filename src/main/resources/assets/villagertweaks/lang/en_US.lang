@@ -12,3 +12,15 @@ achievement.super_golem.desc=Create the most powerful Iron Golem
 achievement.snowman=Do You Want To Build a Snowman?
 achievement.snowman.desc=Create an enchanted Snow Golem
  
+# Enchantments
+	#enchantment.speed=Quick
+	#enchantment.protection=Armored
+	#enchantment.fire_protection=Fire Resistant
+	#enchantment.projectile_protection=Projectle Resistant
+	#enchantment.blast_protection=Blast Resistant
+	#enchantment.strength=Strong
+	#enchantment.knockback=Repulsor
+	#enchantment.thorns=Spiked
+	#enchantment.unbreaking=Reinforced
+	#enchantment.fire=Flaming
+	#enchantment.max=Mighty  
