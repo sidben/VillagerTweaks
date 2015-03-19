@@ -267,7 +267,7 @@ public class EntityEventHandler
                     
                     // TEMP - TODO: remove
                     // adds a random effect to the golem
-                    int[] pool = {0, 2, 5, 7, 8, 10};
+                    int[] pool = {0, 2, 5, 7, 8, 9};
                     
                     final ExtendedGolem properties = ExtendedGolem.get(golem);
                     
