@@ -334,6 +334,8 @@ public class MagicHelper
     
     
     
+    
+    
     public static void applyPassiveEffects(Entity golem) {
         
         // Load the properties
@@ -408,19 +410,29 @@ public class MagicHelper
     }
 
 
-    public static void applyAttackEffects(GolemEnchantment enchantment, Entity golem, Entity target) {
-        if (enchantment.getType() != EnchantmentType.OFFENSE) return;
+    
+    
+    public static float applyAttackEffects(Entity golem, Entity target, float ammount) {
+        float realDamage = ammount;
         
         // TODO: implement
+
+        return realDamage;
     }
     
     
-    public static void applyDefenseEffects(GolemEnchantment enchantment, Entity golem, DamageSource source) {
-        if (enchantment.getType() != EnchantmentType.DEFENSE) return;
+    
+    
+    public static float applyDefenseEffects(Entity golem, DamageSource source, float ammount) {
+        float realDamage = ammount;
         
         // TODO: implement
+
+        return realDamage;
     }
 
+    
+    
     
     public static void applyRefreshEffects(GolemEnchantment enchantment, Entity golem) {
         if (enchantment.getType() != EnchantmentType.REFRESH) return;

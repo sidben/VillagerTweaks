@@ -1,6 +1,7 @@
 package sidben.villagertweaks.handler;
 
 import java.util.Random;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntityIronGolem;
 import net.minecraft.entity.monster.EntitySnowman;
@@ -12,9 +13,11 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraftforge.event.entity.EntityEvent.EntityConstructing;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import sidben.villagertweaks.common.ExtendedGolem;
 import sidben.villagertweaks.common.ExtendedVillagerZombie;
@@ -362,6 +365,41 @@ public class EntityEventHandler
 
 
 
+
+
+    
+    
+    @SubscribeEvent
+    public void onLivingHurt(LivingHurtEvent event)
+    {
+        LogHelper.info("== onLivingHurt() ==");
+        LogHelper.info("    " + event.entity);
+        LogHelper.info("    source: " + event.source.getDamageType());
+        LogHelper.info("    source: " + event.source.getSourceOfDamage());
+        LogHelper.info("    damage: " + event.ammount);
+        
+        
+        Entity target = event.entity;
+        
+        // A golem was attacked, apply the defensive enchantments
+        if (target instanceof EntityIronGolem) {
+            event.ammount = MagicHelper.applyDefenseEffects(target, event.source, event.ammount);
+        }
+        
+        
+        // A golem attacked a target, apply the offensive enchantments
+        else if (event.source.getDamageType() == "mob") {
+            if (event.source.getSourceOfDamage() instanceof EntityIronGolem) {
+                event.ammount = MagicHelper.applyAttackEffects(event.source.getSourceOfDamage(), target, event.ammount);
+            }
+        }
+        
+        
+    }
+
+    
+    
+    
     @SubscribeEvent
     public void onEntityConstructing(EntityConstructing event)
     {
@@ -379,7 +417,5 @@ public class EntityEventHandler
         }
 
     }
-
-
 
 }
