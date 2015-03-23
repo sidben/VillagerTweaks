@@ -365,7 +365,25 @@ public class EntityEventHandler
 
 
 
+    @SubscribeEvent
+    public void onLivingAttack(LivingAttackEvent event)
+    {
+        LogHelper.info("== onLivingAttack() ==");
 
+        // NOTE: since the offensive enchantments apply special effect and don't just add more damage, 
+        // I can intercept this event. If I were to do any damage modifier, the correct event is LivingHurtEvent.
+        // NOTE 2: This code also works on LivingHurtEvent, but I feel it's more appropriate here.
+
+        Entity target = event.entity;
+        
+        // A golem attacked a target, apply the offensive enchantments
+        if (event.source.getDamageType() == "mob") {
+            if (event.source.getSourceOfDamage() instanceof EntityIronGolem) {
+                MagicHelper.applyAttackEffects(event.source.getSourceOfDamage(), target);
+            }
+        }
+
+    }
 
     
     
@@ -385,15 +403,6 @@ public class EntityEventHandler
         if (target instanceof EntityIronGolem) {
             event.ammount = MagicHelper.applyDefenseEffects(target, event.source, event.ammount);
         }
-        
-        
-        // A golem attacked a target, apply the offensive enchantments
-        else if (event.source.getDamageType() == "mob") {
-            if (event.source.getSourceOfDamage() instanceof EntityIronGolem) {
-                event.ammount = MagicHelper.applyAttackEffects(event.source.getSourceOfDamage(), target, event.ammount);
-            }
-        }
-        
         
     }
 

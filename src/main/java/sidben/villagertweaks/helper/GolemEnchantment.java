@@ -44,7 +44,7 @@ public class GolemEnchantment
     public static final GolemEnchantment    knockback            = new GolemEnchantment(6, EffectType.KNOCKBACK, EnchantmentType.OFFENSE, "g_repulsor", 5, true);
     public static final GolemEnchantment    thorns               = new GolemEnchantment(7, EffectType.THORNS, EnchantmentType.DEFENSE, "g_spike", 5, true);
     public static final GolemEnchantment    unbreaking           = new GolemEnchantment(8, EffectType.HEALTH_BOOST, EnchantmentType.PASSIVE, "g_reinforced", 5, true);
-    public static final GolemEnchantment    fire                 = new GolemEnchantment(9, null, EnchantmentType.OFFENSE, "g_flaming", 5, true);
+    public static final GolemEnchantment    fire                 = new GolemEnchantment(9, EffectType.FIRE_RESISTANCE, EnchantmentType.OFFENSE, "g_flaming", 5, true);
     public static final GolemEnchantment    max                  = new GolemEnchantment(15, null, EnchantmentType.REFRESH, "g_max", 30, false);
 
 

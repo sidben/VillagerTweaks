@@ -26,6 +26,7 @@ import net.minecraft.nbt.NBTTagInt;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.MathHelper;
 
 
 
@@ -412,12 +413,56 @@ public class MagicHelper
 
     
     
-    public static float applyAttackEffects(Entity golem, Entity target, float ammount) {
-        float realDamage = ammount;
-        
-        // TODO: implement
+    public static void applyAttackEffects(Entity golem, Entity target) {
 
-        return realDamage;
+        // Load the properties
+        ExtendedGolem properties = null;
+        if (golem instanceof EntityIronGolem) properties = ExtendedGolem.get((EntityIronGolem)golem);
+        if (golem instanceof EntitySnowman) properties = ExtendedGolem.get((EntitySnowman)golem);
+        
+        // Must have a target
+        if (target == null) return;
+        
+        
+        if (properties != null && properties.getEnchantments() != null && properties.getEnchantments().length > 0) 
+        {
+            LogHelper.info("== applyAttackEffects() - " + golem.getEntityId() + " ==");
+            
+            for (GolemEnchantment e : properties.getEnchantments()) {
+                if (e != null && e.getType() == EnchantmentType.OFFENSE) 
+                {
+
+                    /*---------------------------------------------------------------
+                     * Knockback
+                     * Pushes mobs (higher and/or back)  
+                     *---------------------------------------------------------------*/
+                    if (e == GolemEnchantment.knockback) {
+                        
+                        // code ref: EntityMob.attackEntityAsMob and EntityIronGolem.attackEntityAsMob
+                        target.motionX += (-MathHelper.sin(golem.rotationYaw * (float)Math.PI / 180.0F) * 1.5F);
+                        target.motionY += 0.2D;
+                        target.motionZ += (MathHelper.cos(golem.rotationYaw * (float)Math.PI / 180.0F) * 1.5F);
+                    
+                    }
+
+                    
+                    /*---------------------------------------------------------------
+                     * Flaming
+                     * Sets mobs on fire  
+                     *---------------------------------------------------------------*/
+                    if (e == GolemEnchantment.fire) {
+                        
+                        target.setFire(6);  // Fire aspect I = 4
+                    
+                    }
+                    
+                    
+                } //if (e is attack enchantment)
+
+            } // for
+
+        }
+        
     }
     
     
