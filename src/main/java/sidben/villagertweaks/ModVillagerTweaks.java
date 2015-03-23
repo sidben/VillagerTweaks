@@ -55,7 +55,7 @@ public class ModVillagerTweaks
         // Register network messages
         NetworkWrapper = NetworkRegistry.INSTANCE.newSimpleChannel(Reference.ModChannel);
         NetworkWrapper.registerMessage(NetworkHelper.VillagerProfessionHandler.class, MessageZombieVillagerProfession.class, 0, Side.CLIENT);
-        NetworkWrapper.registerMessage(NetworkHelper.GolemEnchantmentHandler.class, MessageGolemEnchantments.class, 0, Side.CLIENT);
+        NetworkWrapper.registerMessage(NetworkHelper.GolemEnchantmentHandler.class, MessageGolemEnchantments.class, 1, Side.CLIENT);
     }
 
 

@@ -11,6 +11,7 @@ import sidben.villagertweaks.ModVillagerTweaks;
 import sidben.villagertweaks.common.ExtendedGolem;
 import sidben.villagertweaks.common.ExtendedVillagerZombie;
 import sidben.villagertweaks.helper.GolemEnchantment;
+import sidben.villagertweaks.helper.LogHelper;
 import sidben.villagertweaks.tracker.ClientInfoTracker;
 
 
@@ -53,10 +54,15 @@ public class NetworkHelper
     public static void sendVillagerProfessionMessage(int zombieId, ExtendedVillagerZombie properties, EntityPlayer target) {
         if (zombieId > 0 && properties != null && properties.getProfession() >= 0) 
         {
+            MessageZombieVillagerProfession message = new MessageZombieVillagerProfession(zombieId, properties.getProfession());
+            
+            // Debug
+            LogHelper.info("~~Sending Message - Zombie Profession~~");
+            LogHelper.info("    target: " + target);
+            LogHelper.info("    " + message.toString());
+            
             // Sends a message to the player, with the zombie extra info
-            ModVillagerTweaks.NetworkWrapper.sendTo(
-                    new MessageZombieVillagerProfession(zombieId, properties.getProfession()), 
-                    (EntityPlayerMP) target);
+            ModVillagerTweaks.NetworkWrapper.sendTo(message, (EntityPlayerMP)target);
         }
     }
     
@@ -72,10 +78,15 @@ public class NetworkHelper
     public static void sendEnchantedGolemInfoMessage(int golemId, ExtendedGolem properties, EntityPlayer target) {
         if (golemId > 0 && properties != null) {
             int[] ids = GolemEnchantment.convert(properties.getEnchantments());
+            MessageGolemEnchantments message = new MessageGolemEnchantments(golemId, ids);
+            
+            // Debug
+            LogHelper.info("~~Sending Message - Enchanted Iron Golem info~~");
+            LogHelper.info("    target: " + target);
+            LogHelper.info("    " + message.toString());
+
             // Sends a message to the player, with the golem extra info
-            ModVillagerTweaks.NetworkWrapper.sendTo(
-                    new MessageGolemEnchantments(golemId, ids), 
-                    (EntityPlayerMP) target);
+            ModVillagerTweaks.NetworkWrapper.sendTo(message, (EntityPlayerMP)target);
         }
     }
     
@@ -84,14 +95,22 @@ public class NetworkHelper
     /**
      * Send info about the golems (iron and snow) to all players around a certain radius of them.
      * 
+     * Server -> Client
+     * 
      */
     public static void sendEnchantedGolemInfoMessage(EntityLiving golem, ExtendedGolem properties) {
         if (golem != null && properties != null) {
             int[] ids = GolemEnchantment.convert(properties.getEnchantments());
+            MessageGolemEnchantments message = new MessageGolemEnchantments(golem.getEntityId(), ids);
+            TargetPoint target = new TargetPoint(golem.dimension, golem.posX, golem.posY, golem.posZ, 64.0D);
+            
+            // Debug
+            LogHelper.info("~~Sending Message - Enchanted Iron Golem info~~");
+            LogHelper.info("    target: " + target);
+            LogHelper.info("    " + message.toString());
+
             // Sends a message to the player, with the golem extra info
-            ModVillagerTweaks.NetworkWrapper.sendToAllAround(
-                    new MessageGolemEnchantments(golem.getEntityId(), ids), 
-                    new TargetPoint(golem.dimension, golem.posX, golem.posY, golem.posZ, 64.0D));
+            ModVillagerTweaks.NetworkWrapper.sendToAllAround(message, target);
         }
     }
 
@@ -109,6 +128,10 @@ public class NetworkHelper
         @Override
         public IMessage onMessage(MessageZombieVillagerProfession message, MessageContext ctx) {
             
+            // Debug
+            LogHelper.info("~~Receiving Message - Zombie Profession~~");
+            LogHelper.info("    " + message.toString());
+
             if (message.getEntityID() > 0 && message.getProfession() >= 0) {
                 // Saves the info to be used later, when the entity actually loads
                 ClientInfoTracker.addZombieMessage(message);
@@ -131,6 +154,10 @@ public class NetworkHelper
         @Override
         public IMessage onMessage(MessageGolemEnchantments message, MessageContext ctx)
         {
+            // Debug
+            LogHelper.info("~~Receiving Message - Enchanted Iron Golem info~~");
+            LogHelper.info("    " + message.toString());
+
             if (message.getEntityID() > 0) {
                 // Saves the info to be used later, when the entity actually loads
                 ClientInfoTracker.addGolemMessage(message);
