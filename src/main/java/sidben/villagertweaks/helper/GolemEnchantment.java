@@ -47,6 +47,8 @@ public class GolemEnchantment
     public static final GolemEnchantment    fire                 = new GolemEnchantment(9, EffectType.FIRE_RESISTANCE, EnchantmentType.OFFENSE, "g_flaming", 5, true);
     public static final GolemEnchantment    max                  = new GolemEnchantment(15, null, EnchantmentType.REFRESH, "g_max", 30, false);
 
+    // TODO: Fire icon
+    
 
     public static enum EnchantmentType {
         /** Applied when the golem attacks something */

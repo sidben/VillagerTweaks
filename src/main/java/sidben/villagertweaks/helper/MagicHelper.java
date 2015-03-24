@@ -373,7 +373,7 @@ public class MagicHelper
                      * Speed / Quick
                      * Makes faster.  
                      *---------------------------------------------------------------*/
-                    if (e == GolemEnchantment.speed) {
+                    else if (e == GolemEnchantment.speed) {
                         
                         IAttributeInstance iattributeinstance = ((EntityLivingBase)golem).getAttributeMap().getAttributeInstance(SharedMonsterAttributes.movementSpeed);
                         if (iattributeinstance != null)
@@ -390,7 +390,7 @@ public class MagicHelper
                      * Makes stronger.  
                      *---------------------------------------------------------------*/
                     // TODO: check code, looks like the damage is reaching a max cap. If that is the case, increase min damage
-                    if (e == GolemEnchantment.strength) {
+                    else if (e == GolemEnchantment.strength) {
                         
                         IAttributeInstance iattributeinstance = ((EntityLivingBase)golem).getAttributeMap().getAttributeInstance(SharedMonsterAttributes.attackDamage);
                         if (iattributeinstance != null)
@@ -401,12 +401,11 @@ public class MagicHelper
                     
                     }
                     
-                }
-            }
+                } //if (e is passive enchantment)
 
-        
-        }
+            } // for
 
+        } // if (properties are valid)
         
     }
 
@@ -450,7 +449,7 @@ public class MagicHelper
                      * Flaming
                      * Sets mobs on fire  
                      *---------------------------------------------------------------*/
-                    if (e == GolemEnchantment.fire) {
+                    else if (e == GolemEnchantment.fire) {
                         
                         target.setFire(6);  // Fire aspect I = 4
                     
@@ -461,7 +460,7 @@ public class MagicHelper
 
             } // for
 
-        }
+        } // if (properties are valid)
         
     }
     
@@ -470,10 +469,140 @@ public class MagicHelper
     
     public static float applyDefenseEffects(Entity golem, DamageSource source, float ammount) {
         float realDamage = ammount;
+        float damageModifier = 0F;
         
-        // TODO: implement
+        
+        // Load the properties
+        ExtendedGolem properties = null;
+        if (golem instanceof EntityIronGolem) properties = ExtendedGolem.get((EntityIronGolem)golem);
+        if (golem instanceof EntitySnowman) properties = ExtendedGolem.get((EntitySnowman)golem);
+        
 
-        return realDamage;
+        if (properties != null && properties.getEnchantments() != null && properties.getEnchantments().length > 0) 
+        {
+            LogHelper.info("== applyAttackEffects() - " + golem.getEntityId() + " ==");
+            
+            // Ref for armor enchants: http://minecraft.gamepedia.com/Armor#Enchantments
+            
+            for (GolemEnchantment e : properties.getEnchantments()) {
+                if (e != null && e.getType() == EnchantmentType.DEFENSE) 
+                {
+
+                    /*---------------------------------------------------------------
+                     * Protection
+                     * Generic protection against all types of damage.  
+                     *---------------------------------------------------------------*/
+                    if (e == GolemEnchantment.protection) {
+                        
+                        /*
+                         * As a reference, 1 piece of armor with Protection IV reduces damage by 20%.
+                         * 4 pieces of armor reduces damage by 80%, the max cap.
+                         * 
+                         * Since the golem uses 1 Protection IV book, but cannot "equip" multiple
+                         * pieces or armor, I hard-coded the reduction at 30%.   
+                         */
+                        
+                        damageModifier = 0.3F;
+                    
+                    }
+
+                    
+                    /*---------------------------------------------------------------
+                     * Blast Protection
+                     * Protection against explosions.  
+                     *---------------------------------------------------------------*/
+                    else if (e == GolemEnchantment.blastProtection && source.isExplosion()) {
+                        
+                        /*
+                         * As a reference, 1 piece of armor with Blast Protection IV would
+                         * reduce damage by 44%, but it's capped at 20%.
+                         * 
+                         * To make it simple I set the reduction to 50%.   
+                         */
+                        
+                        damageModifier = 0.5F;
+                    
+                    }
+
+                    
+                    /*---------------------------------------------------------------
+                     * Fire Protection
+                     * Protection against fire/lava.  
+                     *---------------------------------------------------------------*/
+                    else if (e == GolemEnchantment.fireProtection && source.isFireDamage()) {
+                        
+                        /*
+                         * As a reference, 1 piece of armor with Fire Protection IV would
+                         * reduce damage by 36%, but it's capped at 20%.
+                         * 
+                         * I decided on 35%, a little more than regular protection, but
+                         * since I can't reduce the fire timer I added a 30% chance to 
+                         * instantly extinguish the golem.
+                         */
+                        
+                        damageModifier = 0.35F;
+                        if (golem.worldObj.rand.nextInt(10) < 3) golem.extinguish();
+                    
+                    }
+
+                    
+                    /*---------------------------------------------------------------
+                     * Projectile Protection
+                     * Protection against ranged attacks.  
+                     *---------------------------------------------------------------*/
+                    else if (e == GolemEnchantment.projectileProtection && source.isProjectile()) {
+                        
+                        /*
+                         * The rules for projectile protection are the same as the ones
+                         * for blast protection, but I feel that arrow are a much higher
+                         * menace for golems, since the knockback can make them take many
+                         * shots before reaching the target.
+                         * 
+                         * For that reason I set the reduction to 60%.   
+                         */
+                        
+                        damageModifier = 0.6F;
+                    
+                    }
+
+                    
+                    /*---------------------------------------------------------------
+                     * Thorns
+                     * Damages attacker.  
+                     *---------------------------------------------------------------*/
+                    else if (e == GolemEnchantment.thorns && source.damageType == "mob") {
+                        
+                        /*
+                         * Note: Default Thorns damage is 1 to 4, with 15% chance per level.
+                         * 
+                         * On the enchantment, the penalty is the armor loses more durability, so 
+                         * I made the golem loses 10% more health. The chance is of 45%.
+                         */
+                        
+                        Entity attacker = source.getSourceOfDamage();
+                        
+                        if (attacker != null && golem.worldObj.rand.nextInt(20) < 9)
+                        {
+                            int thornsDamage = 2 + golem.worldObj.rand.nextInt(4);
+                            attacker.attackEntityFrom(DamageSource.causeThornsDamage(golem), thornsDamage);
+                            attacker.playSound("damage.thorns", 0.5F, 1.0F);
+                            
+                            damageModifier = -0.1F;
+                        }
+                        
+                    
+                    }
+                    
+                    
+                } //if (e is attack enchantment)
+
+            } // for
+
+        } // if (properties are valid)
+
+        
+        
+        return realDamage * (1.0F - damageModifier);
     }
 
     
