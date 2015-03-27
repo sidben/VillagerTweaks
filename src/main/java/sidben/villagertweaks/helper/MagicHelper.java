@@ -576,18 +576,23 @@ public class MagicHelper
                          * Note: Default Thorns damage is 1 to 4, with 15% chance per level.
                          * 
                          * On the enchantment, the penalty is the armor loses more durability, so 
-                         * I made the golem loses 10% more health. The chance is of 45%.
+                         * I made the golem loses 15% more health. The chance is of 60%.
                          */
                         
                         Entity attacker = source.getSourceOfDamage();
                         
-                        if (attacker != null && golem.worldObj.rand.nextInt(20) < 9)
+                        LogHelper.info("  Thorns!");
+                        
+                        if (attacker != null && golem.worldObj.rand.nextInt(20) < 12)
                         {
                             int thornsDamage = 2 + golem.worldObj.rand.nextInt(4);
+                            
+                            LogHelper.info("  Causing " + thornsDamage + " thorns damage");
+                            
                             attacker.attackEntityFrom(DamageSource.causeThornsDamage(golem), thornsDamage);
                             attacker.playSound("damage.thorns", 0.5F, 1.0F);
                             
-                            damageModifier = -0.1F;
+                            damageModifier = -0.15F;
                         }
                         
                     

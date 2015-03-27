@@ -108,10 +108,13 @@ public class PlayerEventHandler
                     final EntityIronGolem golem = (EntityIronGolem) event.target;
                     final ExtendedGolem properties = ExtendedGolem.get(golem);
 
+                    LogHelper.info("Clicked on a golem with empty hand");
+                    
                     // Gets the golem custom enchantments
                     if (properties != null) {
                         final GolemEnchantment e = properties.getRandomEnchantment();
                         if (e != null) {
+                            LogHelper.info("Spawning particle for " + e);
                             e.spawnParticles(golem);
                         }
                     }
