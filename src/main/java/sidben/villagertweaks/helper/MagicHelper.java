@@ -25,6 +25,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagInt;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.EntityDamageSourceIndirect;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
 
@@ -570,7 +571,7 @@ public class MagicHelper
                      * Thorns
                      * Damages attacker.  
                      *---------------------------------------------------------------*/
-                    else if (e == GolemEnchantment.thorns && source.damageType == "mob") {
+                    else if (e == GolemEnchantment.thorns) {
                         
                         /*
                          * Note: Default Thorns damage is 1 to 4, with 15% chance per level.
@@ -578,16 +579,22 @@ public class MagicHelper
                          * On the enchantment, the penalty is the armor loses more durability, so 
                          * I made the golem loses 15% more health. The chance is of 60%.
                          */
+
+                        Entity attacker = null;
+
+                        // Finds the attacker
+                        if (source.damageType == "mob") {
+                            attacker = source.getSourceOfDamage();
+                        }
+                        else if (source instanceof EntityDamageSourceIndirect) {     // e.g. projectile attack
+                            attacker = ((EntityDamageSourceIndirect)source).getEntity();
+                        }
                         
-                        Entity attacker = source.getSourceOfDamage();
                         
-                        LogHelper.info("  Thorns!");
-                        
-                        if (attacker != null && golem.worldObj.rand.nextInt(20) < 12)
+                        // Causes damage (with a chance, and only if the golem was in fact damaged)
+                        if (attacker != null && golem.worldObj.rand.nextInt(20) < 12 && ammount >= 1)
                         {
                             int thornsDamage = 2 + golem.worldObj.rand.nextInt(4);
-                            
-                            LogHelper.info("  Causing " + thornsDamage + " thorns damage");
                             
                             attacker.attackEntityFrom(DamageSource.causeThornsDamage(golem), thornsDamage);
                             attacker.playSound("damage.thorns", 0.5F, 1.0F);
