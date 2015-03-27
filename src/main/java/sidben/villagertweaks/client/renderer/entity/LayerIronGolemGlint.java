@@ -53,8 +53,31 @@ public class LayerIronGolemGlint implements LayerRenderer
         final ExtendedGolem properties = ExtendedGolem.get(entity);
         boolean showGlint = false;
         boolean superGolem = false;
-
-
+        
+        
+        /*
+        sidben.villagertweaks.helper.LogHelper.info("doRenderGlintLayer()");
+        sidben.villagertweaks.helper.LogHelper.info("    pos: " + entity.getPosition());
+        sidben.villagertweaks.helper.LogHelper.info("    swingProgress (main model): " + this.golemRender.getMainModel().swingProgress);
+        sidben.villagertweaks.helper.LogHelper.info("    ironGolemRightArm.rotateAngleX (main model): " + ((ModelIronGolem)this.golemRender.getMainModel()).ironGolemRightArm.rotateAngleX);
+        sidben.villagertweaks.helper.LogHelper.info("    ironGolemLeftArm.rotateAngleX (main model): " + ((ModelIronGolem)this.golemRender.getMainModel()).ironGolemLeftArm.rotateAngleX);
+        sidben.villagertweaks.helper.LogHelper.info("    isSwingInProgress (entity): " + entity.isSwingInProgress);
+        sidben.villagertweaks.helper.LogHelper.info("    swingProgress (entity): " + entity.swingProgress);
+        sidben.villagertweaks.helper.LogHelper.info("    limbSwing (entity): " + entity.limbSwing);
+        sidben.villagertweaks.helper.LogHelper.info("    limbSwingAmount (entity): " + entity.limbSwingAmount);
+        sidben.villagertweaks.helper.LogHelper.info("    getAttackTimer (entity): " + entity.getAttackTimer());
+        sidben.villagertweaks.helper.LogHelper.info("    par1: " + par1);
+        sidben.villagertweaks.helper.LogHelper.info("    par2: " + par2);
+        sidben.villagertweaks.helper.LogHelper.info("    par3: " + par3);
+        sidben.villagertweaks.helper.LogHelper.info("    par4: " + par4);
+        sidben.villagertweaks.helper.LogHelper.info("    par5: " + par5);
+        sidben.villagertweaks.helper.LogHelper.info("    par6: " + par6);
+        sidben.villagertweaks.helper.LogHelper.info("    par7: " + par7);
+        
+        // NOTE: par1 matches entity.limbSwing, but looks like it's updated 1 tick later
+         */
+        
+        
         if (properties != null) {
 
             // check if the golem has a unique enchant. This one can only be
@@ -109,6 +132,11 @@ public class LayerIronGolemGlint implements LayerRenderer
             GlStateManager.scale(size, size, size);
 
             this.golemModel.setModelAttributes(this.golemRender.getMainModel());
+
+            // copies the arm swing
+            this.golemModel.ironGolemRightArm.rotateAngleX = ((ModelIronGolem)this.golemRender.getMainModel()).ironGolemRightArm.rotateAngleX; 
+            this.golemModel.ironGolemLeftArm.rotateAngleX = ((ModelIronGolem)this.golemRender.getMainModel()).ironGolemLeftArm.rotateAngleX;
+            
             this.golemModel.render(entity, par1, par2, par4, par5, par6, par7);
 
             GlStateManager.matrixMode(5890);
