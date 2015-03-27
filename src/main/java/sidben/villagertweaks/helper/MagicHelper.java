@@ -43,8 +43,6 @@ public class MagicHelper
     public static String GolemEnchantmentsNBTKey = "golem_enchs";
     
     
-    // TODO: allow an enchanted pumpkin to get more enchants - remember to apply the penalty
-    
     /**
      * Check if a pumpkin can be enchanted, what enchantments it would get and how much it would cost.
      * 
@@ -62,40 +60,57 @@ public class MagicHelper
             ResultCanEnchant result = new ResultCanEnchant(); 
             
             // Gets a list of possible golem enchantments
-            GolemEnchantment[] golemEnchants = GolemEnchantment.convert(magicItem);
+            GolemEnchantment[] enchantCandidates = GolemEnchantment.convert(magicItem);
+            GolemEnchantment[] currentEnchantments = GolemEnchantment.convert(pumpkin);
+            ArrayList<GolemEnchantment> newEnchantments = new ArrayList<GolemEnchantment>();
             
-            if (golemEnchants.length > 0) 
+            
+            if (enchantCandidates.length > 0) 
             {
                 result.item = new ItemStack(Item.getItemFromBlock(Blocks.pumpkin), 1);
                 result.cost = 0;
                 
                 
-                LogHelper.info("    Golem Enchants " + golemEnchants.length);
+                LogHelper.info("    Golem Enchants candidates " + enchantCandidates.length);
+                LogHelper.info("        " + Arrays.toString(enchantCandidates));
+                LogHelper.info("    Current enchants " + currentEnchantments.length);
+                LogHelper.info("        " + Arrays.toString(currentEnchantments));
                 
                 
-                // Adds the first enchantments of the list to a NBT group
+                // Chooses what enchantments can be combined
+                for (int i = 0; i < enchantCandidates.length; i++) {
+                    GolemEnchantment auxEnchant = enchantCandidates[i];
+                    
+                    if (auxEnchant.getCanBeCombined(currentEnchantments)) {
+                        newEnchantments.add(auxEnchant);
+                    }
+                }
+                
+                
+                LogHelper.info("    New enchants to be added " + newEnchantments.size());
+
+                
+                // Prepares the NBT tag with custom enchantments
                 NBTTagList geTagList = new NBTTagList();
 
-                for (int i = 0; i < golemEnchants.length; i++) {
-                    if (i >= MagicHelper.MaxEnchants) break;
+                // Adds the current enchantments
+                if (currentEnchantments.length > 0) {
+                    for (GolemEnchantment e : currentEnchantments) {
+                        geTagList.appendTag(new NBTTagInt(e.getId()));
+                    }
+                }
+                
+                // Adds the new enchantments
+                if (newEnchantments.size() > 0) {
+                    for (int i = 0; i < newEnchantments.size(); i++) {
+                        if (geTagList.tagCount() >= MagicHelper.MaxEnchants) break;
 
-                    GolemEnchantment auxEnchant = golemEnchants[i];
-                    
-                    LogHelper.info("    - " + i + ": " + auxEnchant);
-                    
-                    if (auxEnchant.getCanBeCombined()) 
-                    {
-                        // Enchantment can be combined, adds to the list
+                        GolemEnchantment auxEnchant = enchantCandidates[i];
+                        
+                        LogHelper.info("    - " + i + ": " + auxEnchant);
+
                         geTagList.appendTag(new NBTTagInt(auxEnchant.getId()));
                         result.cost += auxEnchant.getXpBaseCost();
-                    } 
-                    else 
-                    {
-                        // Enchantment can't be combined, override the loop so it only return 1 enchantment
-                        geTagList = new NBTTagList();
-                        geTagList.appendTag(new NBTTagInt(auxEnchant.getId()));
-                        result.cost = auxEnchant.getXpBaseCost();
-                        break;
                     }
                 }
                 
@@ -123,7 +138,7 @@ public class MagicHelper
                 LogHelper.info("    output " + result.item);
                 
                 
-                result.isValid = true;
+                result.isValid = (newEnchantments.size() > 0);
                 
                 return result;
                 
