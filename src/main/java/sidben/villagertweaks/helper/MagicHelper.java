@@ -328,16 +328,17 @@ public class MagicHelper
     
     private static final double healthBoostAmount = 0.6D;
     private static final double speedAmount = 0.25D;
-    private static final double strengthAmount = 1.3D;
     
     private static final AttributeModifier attReinforced = new AttributeModifier(UUID.fromString("179aa5d9-b25e-4f17-8bd5-44e6f39b8d5c"), "golem_reinforced", healthBoostAmount, 2);
     private static final AttributeModifier attQuick = new AttributeModifier(UUID.fromString("2139955f-7a5d-4e69-9e44-fc8f9b214a77"), "golem_quick", speedAmount, 2);
-    private static final AttributeModifier attStrong = new AttributeModifier(UUID.fromString("5acca6a8-94ba-4505-9bfc-907297685d40"), "golem_strong", strengthAmount, 2);
     
     
     
     
-    
+    /**
+     * Apply passive enchantments, that modifies base stats permanently.
+     * 
+     */
     public static void applyPassiveEffects(Entity golem) {
         
         // Load the properties
@@ -390,15 +391,10 @@ public class MagicHelper
                      * Strength
                      * Makes stronger.  
                      *---------------------------------------------------------------*/
-                    // TODO: check code, looks like the damage is reaching a max cap. If that is the case, increase min damage
                     else if (e == GolemEnchantment.strength) {
-                        
-                        IAttributeInstance iattributeinstance = ((EntityLivingBase)golem).getAttributeMap().getAttributeInstance(SharedMonsterAttributes.attackDamage);
-                        if (iattributeinstance != null)
-                        {
-                            iattributeinstance.removeModifier(attStrong);
-                            iattributeinstance.applyModifier(attStrong);
-                        }
+
+                        // Special Note: The irom golems DO NOT do damage based on strength,
+                        // they use a hard-coded formula and do between 7 to 21 damage
                     
                     }
                     
@@ -413,6 +409,11 @@ public class MagicHelper
 
     
     
+    /**
+     * Apply offensive enchantments, that adds some special effect to the attack without
+     * directly adding damage.
+     * 
+     */
     public static void applyAttackEffects(Entity golem, Entity target) {
 
         // Load the properties
@@ -465,9 +466,56 @@ public class MagicHelper
         
     }
     
+
+    
+    /**
+     * Apply enchantments that modifies damage dealt in each attack.
+     * 
+     */
+    public static float applyDamagingEffects(Entity golem, Entity target, float ammount) {
+        float realDamage = ammount;
+        
+        
+        // Load the properties
+        ExtendedGolem properties = null;
+        if (golem instanceof EntityIronGolem) properties = ExtendedGolem.get((EntityIronGolem)golem);
+        if (golem instanceof EntitySnowman) properties = ExtendedGolem.get((EntitySnowman)golem);
+        
+       
+        
+        if (properties != null && properties.getEnchantmentsAmount() > 0) 
+        {
+            for (GolemEnchantment e : properties.getEnchantments()) {
+                if (e != null) 
+                {
+
+                    /*---------------------------------------------------------------
+                     * Strength (special case)
+                     * Do more damage.  
+                     *---------------------------------------------------------------*/
+                    if (e == GolemEnchantment.strength) {
+
+                        // original damage = 7 to 22, my version does 16 to 28
+                        realDamage = (float)(16 + golem.worldObj.rand.nextInt(12));
+                    
+                    }
+                    
+                } //if (e is attack enchantment)
+
+            } // for
+
+        } // if (properties are valid)
+        
+        
+        return realDamage;
+    }
     
     
     
+    /**
+     * Apply defensive enchantments that modifies damage received.
+     * 
+     */
     public static float applyDefenseEffects(Entity golem, DamageSource source, float ammount) {
         float realDamage = ammount;
         float damageModifier = 0F;
@@ -542,7 +590,10 @@ public class MagicHelper
                          */
                         
                         damageModifier = 0.35F;
-                        if (golem.worldObj.rand.nextInt(10) < 3) golem.extinguish();
+                        if (golem.isBurning()) {
+                            int raffle = golem.worldObj.rand.nextInt(10);
+                            if (raffle < 3) golem.extinguish();
+                        }
                     
                     }
 
@@ -617,9 +668,13 @@ public class MagicHelper
         return realDamage * (1.0F - damageModifier);
     }
 
+
     
     
-    
+    /**
+     * Apply enchantments that are refreshed after a certain time.
+     * 
+     */
     public static void applyRefreshEffects(GolemEnchantment enchantment, Entity golem) {
         if (enchantment.getType() != EnchantmentType.REFRESH) return;
         
