@@ -177,20 +177,19 @@ public class EventTracker
     {
         final StringBuilder r = new StringBuilder();
 
-        r.append("Entity ID = " + this.getEntityID());
-        r.append(", ");
-        r.append("Position = ");
+        r.append("Entity ID = ");
+        r.append(this.getEntityID());
+        r.append(", Position = ");
         if (this.getPosition() == null) {
             r.append("NULL");
         } else {
             r.append(this.getPosition().toString());
         }
-        r.append(", ");
-        r.append("Tick of Birth = " + this.getTOB());
-        r.append(", ");
-        r.append("Custom Name = " + this.getCustomName());
-        r.append(", ");
-        r.append("Extra Info = ");
+        r.append(", Tick of Birth = ");
+        r.append(this.getTOB());
+        r.append(", Custom Name = ");
+        r.append(this.getCustomName());
+        r.append(", Extra Info = ");
         if (this.getObject() == null) {
             r.append("NULL");
         } else {

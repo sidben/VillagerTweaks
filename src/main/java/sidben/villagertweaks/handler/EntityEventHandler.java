@@ -1,6 +1,7 @@
 package sidben.villagertweaks.handler;
 
 import java.util.Random;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntityIronGolem;
 import net.minecraft.entity.monster.EntitySnowman;
@@ -12,12 +13,18 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraftforge.event.entity.EntityEvent.EntityConstructing;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import sidben.villagertweaks.common.ExtendedGolem;
 import sidben.villagertweaks.common.ExtendedVillagerZombie;
+import sidben.villagertweaks.helper.EnumGolemHealth;
+import sidben.villagertweaks.helper.GolemEnchantment;
 import sidben.villagertweaks.helper.LogHelper;
+import sidben.villagertweaks.helper.MagicHelper;
 import sidben.villagertweaks.tracker.ClientInfoTracker;
 import sidben.villagertweaks.tracker.EventTracker;
 import sidben.villagertweaks.tracker.ServerInfoTracker;
@@ -40,7 +47,7 @@ public class EntityEventHandler
             ItemStack droppedItem;
             final EntityZombie zombie = (EntityZombie) event.entity;
 
-
+//TODO: fix bug where zombie pigman also drop feather
 
             // ----------------------------------------------------
             // Bonus Feather
@@ -169,7 +176,7 @@ public class EntityEventHandler
 
             if (event.world.isRemote) {
                 // Looks for info sent by the server that should be applied to the zombie (e.g. villager profession)
-                // NOTE: On the client I don't check [isVillager] because the client don't have that info (yet?)
+                // NOTE: On the client I don't check [isVillager] because the client don't have that info (yet? - TODO: revisit and more tests)
                 ClientInfoTracker.SyncZombieMessage(zombie);
 
             } else {
@@ -245,15 +252,27 @@ public class EntityEventHandler
         }
 
 
-        else if (event.entity instanceof EntityIronGolem && !event.world.isRemote) {
+        else if (event.entity instanceof EntityIronGolem) {
             final EntityIronGolem golem = (EntityIronGolem) event.entity;
 
-            if (golem.isPlayerCreated()) {
-                // Found an iron golem, adds to the tracker so pumpkin info can be applied later
-                if (ConfigurationHandler.onDebug) {
-                    LogHelper.info("A player created iron golem joined world: [" + golem.toString() + "]");
+
+            if (event.world.isRemote) {
+                // Looks for info sent by the server that should be applied to the golem (e.g. enchantments)
+                ClientInfoTracker.SyncGolemMessage(golem);
+
+            } else {
+                if (golem.isPlayerCreated()) {
+                    // Found an iron golem, adds to the tracker so pumpkin info can be applied later
+                    if (ConfigurationHandler.onDebug) {
+                        LogHelper.info("A player created iron golem joined world: [" + golem.toString() + "]");
+                    }
+                    ServerInfoTracker.add(golem);
+
                 }
-                ServerInfoTracker.add(golem);
+                
+                // Apply the passive golem enchantments
+                MagicHelper.applyPassiveEffects(golem);
+
             }
 
         }
@@ -304,24 +323,37 @@ public class EntityEventHandler
 
         }
 
-        // Spawns smoke effects on damaged iron golems
+        // Iron golems special effects
         else if (event.entity instanceof EntityIronGolem) {
             final EntityIronGolem golem = (EntityIronGolem) event.entity;
-            final Random rand = golem.worldObj.rand;
 
             if (golem.worldObj.isRemote) {
+                final Random rand = golem.worldObj.rand;
+                final int particleRatio = (golem.getEntityId() % 50) + 100;
 
-                float pct = 0;
-                if (golem.getHealth() > 0) {
-                    pct = golem.getHealth() / golem.getMaxHealth();
+                if (rand.nextInt(60) == 0) {
+                    // Check the golem health
+                    final EnumGolemHealth golemStatus = EnumGolemHealth.getGolemHealth(golem);
+
+                    // Spawn smoke if he is highly damaged
+                    if (golemStatus == EnumGolemHealth.HIGHLY_DAMAGED) {
+                        final EnumParticleTypes particle = rand.nextInt(10) < 4 ? EnumParticleTypes.SMOKE_LARGE : EnumParticleTypes.CLOUD;
+
+                        for (int i = 0; i < 2; ++i) {
+                            golem.worldObj.spawnParticle(particle, golem.posX + (rand.nextDouble() - 0.5D) * golem.width, golem.posY + rand.nextDouble() * golem.height - 0.25D, golem.posZ + (rand.nextDouble() - 0.5D) * golem.width, 0D, 0.1D, 0D, new int[0]);
+                        }
+                    }
                 }
 
-                // Spawn smoke if he is highly damaged
-                if (pct < 0.3F && rand.nextInt(60) == 0) {
-                    final EnumParticleTypes particle = rand.nextInt(10) < 4 ? EnumParticleTypes.SMOKE_LARGE : EnumParticleTypes.CLOUD;
 
-                    for (int i = 0; i < 2; ++i) {
-                        golem.worldObj.spawnParticle(particle, golem.posX + (rand.nextDouble() - 0.5D) * golem.width, golem.posY + rand.nextDouble() * golem.height - 0.25D, golem.posZ + (rand.nextDouble() - 0.5D) * golem.width, 0D, 0.1D, 0D, new int[0]);
+                if (golem.ticksExisted % particleRatio == 0 && rand.nextInt(3) == 0) {
+                    // Spawn random particles of this golem enchantments
+                    final ExtendedGolem properties = ExtendedGolem.get(golem);
+                    if (properties != null) {
+                        final GolemEnchantment e = properties.getRandomEnchantment();
+                        if (e != null) {
+                            e.spawnParticles(golem);
+                        }
                     }
                 }
 
@@ -334,6 +366,50 @@ public class EntityEventHandler
 
 
     @SubscribeEvent
+    public void onLivingAttack(LivingAttackEvent event)
+    {
+        LogHelper.info("== onLivingAttack() ==");
+
+        // NOTE: since the offensive enchantments apply special effect and don't just add more damage, 
+        // I can intercept this event. If I were to do any damage modifier, the correct event is LivingHurtEvent.
+        // NOTE 2: This code also works on LivingHurtEvent, but I feel it's more appropriate here.
+
+        Entity target = event.entity;
+        
+        // A golem attacked a target, apply the offensive enchantments
+        if (event.source.getDamageType() == "mob") {
+            if (event.source.getSourceOfDamage() instanceof EntityIronGolem) {
+                MagicHelper.applyAttackEffects(event.source.getSourceOfDamage(), target);
+            }
+        }
+
+    }
+
+    
+    
+    @SubscribeEvent
+    public void onLivingHurt(LivingHurtEvent event)
+    {
+        LogHelper.info("== onLivingHurt() ==");
+        LogHelper.info("    " + event.entity);
+        LogHelper.info("    source: " + event.source.getDamageType());
+        LogHelper.info("    source: " + event.source.getSourceOfDamage());
+        LogHelper.info("    damage: " + event.ammount);
+        
+        
+        Entity target = event.entity;
+        
+        // A golem was attacked, apply the defensive enchantments
+        if (target instanceof EntityIronGolem) {
+            event.ammount = MagicHelper.applyDefenseEffects(target, event.source, event.ammount);
+        }
+        
+    }
+
+    
+    
+    
+    @SubscribeEvent
     public void onEntityConstructing(EntityConstructing event)
     {
 
@@ -342,8 +418,13 @@ public class EntityEventHandler
             ExtendedVillagerZombie.register((EntityZombie) event.entity);
         }
 
+        // Adds the Extended Properties to golems
+        else if (event.entity instanceof EntityIronGolem && ExtendedGolem.get((EntityIronGolem) event.entity) == null) {
+            ExtendedGolem.register((EntityIronGolem) event.entity);
+        } else if (event.entity instanceof EntitySnowman && ExtendedGolem.get((EntitySnowman) event.entity) == null) {
+            ExtendedGolem.register((EntitySnowman) event.entity);
+        }
+
     }
-
-
 
 }

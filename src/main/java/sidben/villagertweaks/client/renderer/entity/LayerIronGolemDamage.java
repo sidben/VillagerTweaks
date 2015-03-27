@@ -6,6 +6,7 @@ import net.minecraft.entity.monster.EntityIronGolem;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import sidben.villagertweaks.helper.EnumGolemHealth;
 import sidben.villagertweaks.reference.Reference;
 
 
@@ -44,19 +45,14 @@ public class LayerIronGolemDamage implements LayerRenderer
     {
         if (!entity.isInvisible()) {
             // Gets the golem percentage life left
-            float pct = 0;
-            if (entity.getHealth() > 0) {
-                pct = entity.getHealth() / entity.getMaxHealth();
-            }
+            EnumGolemHealth healthStatus = EnumGolemHealth.getGolemHealth(entity);  
+            
 
-
-            if (pct >= 0.3F && pct < 0.6F) {
-                // 30% to 60% = Golem a bit damaged
+            if (healthStatus == EnumGolemHealth.DAMAGED) {
                 this.golemRender.bindTexture(golemLittleDamage);
                 this.golemRender.getMainModel().render(entity, p_177145_2_, p_177145_3_, p_177145_5_, p_177145_6_, p_177145_7_, p_177145_8_);
 
-            } else if (pct < 0.3F) {
-                // Below 30% = Golem very damaged
+            } else if (healthStatus == EnumGolemHealth.HIGHLY_DAMAGED) {
                 this.golemRender.bindTexture(golemBigDamage);
                 this.golemRender.getMainModel().render(entity, p_177145_2_, p_177145_3_, p_177145_5_, p_177145_6_, p_177145_7_, p_177145_8_);
 

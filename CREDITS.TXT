@@ -5,6 +5,9 @@ Special Thanks
 Minecraft Forums: 
 	wailwail (Villager Consultant)
 	CursedGhast (zombie villagers with villager clothes idea)
+	
+Reddit:
+	Raduloket (Iron golem shows craks when damaged idea)
 
 Thanks to those above for ideas, opinions and inspiration for some features of this mod.
 
@@ -43,3 +46,6 @@ Modding help and tutorials
 	
 - robothacker (mob skin templates)
 	minecraftforum.net/forums/mapping-and-modding/resource-packs/resource-pack-discussion/1256183-mob-skin-templates-wither-bat-and-witch-added
+	
+- CaveJohnson212 (custom particles tutorial)
+	www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/modification-development/1436136-1-6-4-custom-particles-tutorial
