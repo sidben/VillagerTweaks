@@ -11,6 +11,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import sidben.villagertweaks.common.ExtendedGolem;
 import sidben.villagertweaks.common.ExtendedVillagerZombie;
+import sidben.villagertweaks.helper.GenericHelper;
 import sidben.villagertweaks.network.MessageGolemEnchantments;
 import sidben.villagertweaks.network.MessageZombieVillagerProfession;
 
@@ -77,7 +78,7 @@ public class ClientInfoTracker
         Entity entity = world.getEntityByID(entityID);
 
         // If found the entity, attempt to sync with info sent by the server 
-        if (entity instanceof EntityZombie) {
+        if (GenericHelper.isVanillaZombie(entity) ) {
             ClientInfoTracker.SyncZombieMessage((EntityZombie)entity);
         }
         

@@ -18,6 +18,7 @@ import net.minecraftforge.event.world.BlockEvent.MultiPlaceEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import sidben.villagertweaks.common.ExtendedGolem;
 import sidben.villagertweaks.common.ExtendedVillagerZombie;
+import sidben.villagertweaks.helper.GenericHelper;
 import sidben.villagertweaks.helper.GolemEnchantment;
 import sidben.villagertweaks.helper.LogHelper;
 import sidben.villagertweaks.helper.MagicHelper;
@@ -72,7 +73,7 @@ public class PlayerEventHandler
 
 
         // check if the player right-clicked a zombie
-        else if (event.target instanceof EntityZombie) {
+        else if (GenericHelper.isVanillaZombie(event.target) ) {
             final EntityZombie zombie = (EntityZombie) event.target;
 
             if (!zombie.worldObj.isRemote) {
@@ -245,7 +246,7 @@ public class PlayerEventHandler
         /*
          * Check if the player started tracking a zombie villager (happens on server-side).
          */
-        if (event.target instanceof EntityZombie && !event.entity.worldObj.isRemote) {
+        if (GenericHelper.isVanillaZombie(event.target)  && !event.entity.worldObj.isRemote) {
             final EntityZombie zombie = (EntityZombie) event.target;
 
             if (zombie.isVillager()) {

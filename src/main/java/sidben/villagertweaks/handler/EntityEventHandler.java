@@ -4,6 +4,7 @@ import java.util.Random;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntityIronGolem;
+import net.minecraft.entity.monster.EntityPigZombie;
 import net.minecraft.entity.monster.EntitySnowman;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.passive.EntityVillager;
@@ -22,6 +23,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import sidben.villagertweaks.common.ExtendedGolem;
 import sidben.villagertweaks.common.ExtendedVillagerZombie;
 import sidben.villagertweaks.helper.EnumGolemHealth;
+import sidben.villagertweaks.helper.GenericHelper;
 import sidben.villagertweaks.helper.GolemEnchantment;
 import sidben.villagertweaks.helper.LogHelper;
 import sidben.villagertweaks.helper.MagicHelper;
@@ -39,7 +41,7 @@ public class EntityEventHandler
     {
 
         // Look for a zombie
-        if (event.entity instanceof EntityZombie && !event.entity.worldObj.isRemote) {
+        if (GenericHelper.isVanillaZombie(event.entity) && !event.entity.worldObj.isRemote) {
             final int targetEmeraldChance = 15 + 5 * event.lootingLevel;
             final int targetFeatherChance = 5;
             boolean haveIngot = false;
@@ -47,7 +49,6 @@ public class EntityEventHandler
             ItemStack droppedItem;
             final EntityZombie zombie = (EntityZombie) event.entity;
 
-//TODO: fix bug where zombie pigman also drop feather
 
             // ----------------------------------------------------
             // Bonus Feather
@@ -141,7 +142,7 @@ public class EntityEventHandler
     public void onLivingDeath(LivingDeathEvent event)
     {
         if (event.entity instanceof EntityVillager) {
-            if (event.source.getEntity() != null && event.source.getEntity() instanceof EntityZombie) {
+            if (GenericHelper.isVanillaZombie(event.source.getEntity())) {
 
                 // A villager was killed by a zombie and may be zombified. Adds to the tracker for future check.
                 final EntityVillager villager = (EntityVillager) event.entity;
@@ -165,7 +166,7 @@ public class EntityEventHandler
     public void onEntityJoinWorld(EntityJoinWorldEvent event)
     {
 
-        if (event.entity instanceof EntityZombie) {
+        if (GenericHelper.isVanillaZombie(event.entity)) {
             final EntityZombie zombie = (EntityZombie) event.entity;
 
             if (ConfigurationHandler.onDebug) {
@@ -303,7 +304,7 @@ public class EntityEventHandler
     {
 
         // Check if a zombie is about to convert to villager
-        if (event.entity instanceof EntityZombie) {
+        if (GenericHelper.isVanillaZombie(event.entity)) {
             final EntityZombie zombie = (EntityZombie) event.entity;
 
 
@@ -438,7 +439,7 @@ public class EntityEventHandler
     {
 
         // Adds the Extended Properties to zombies
-        if (event.entity instanceof EntityZombie && ExtendedVillagerZombie.get((EntityZombie) event.entity) == null) {
+        if (GenericHelper.isVanillaZombie(event.entity)  && ExtendedVillagerZombie.get((EntityZombie) event.entity) == null) {
             ExtendedVillagerZombie.register((EntityZombie) event.entity);
         }
 
