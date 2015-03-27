@@ -63,7 +63,7 @@ public class LayerIronGolemGlint implements LayerRenderer
             if (e == GolemEnchantment.max) {
                 showGlint = true;  // always shine
                 superGolem = true;
-            } else if (properties.getEnchantments().length > 0) {
+            } else if (properties.getEnchantmentsAmount() > 0) {
                 this.displayTimer++;
                 showGlint = this.displayTimer > 0;
 

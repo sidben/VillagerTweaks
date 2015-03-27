@@ -345,7 +345,7 @@ public class MagicHelper
         if (golem instanceof EntitySnowman) properties = ExtendedGolem.get((EntitySnowman)golem);
         
         
-        if (properties != null && properties.getEnchantments() != null && properties.getEnchantments().length > 0) 
+        if (properties != null && properties.getEnchantmentsAmount() > 0) 
         {
             LogHelper.info("== applyPassiveEffects() - " + golem.getEntityId() + " ==");
             
@@ -423,7 +423,7 @@ public class MagicHelper
         if (target == null) return;
         
         
-        if (properties != null && properties.getEnchantments() != null && properties.getEnchantments().length > 0) 
+        if (properties != null && properties.getEnchantmentsAmount() > 0) 
         {
             LogHelper.info("== applyAttackEffects() - " + golem.getEntityId() + " ==");
             
@@ -478,7 +478,7 @@ public class MagicHelper
         if (golem instanceof EntitySnowman) properties = ExtendedGolem.get((EntitySnowman)golem);
         
 
-        if (properties != null && properties.getEnchantments() != null && properties.getEnchantments().length > 0) 
+        if (properties != null && properties.getEnchantmentsAmount() > 0) 
         {
             LogHelper.info("== applyAttackEffects() - " + golem.getEntityId() + " ==");
             

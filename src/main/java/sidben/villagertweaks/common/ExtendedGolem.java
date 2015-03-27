@@ -29,6 +29,11 @@ public class ExtendedGolem implements IExtendedEntityProperties
     private GolemEnchantment[] enchantments = null;
 
 
+    public int getEnchantmentsAmount()
+    {
+        return this.enchantments == null ? 0 : this.enchantments.length;
+    }
+
     public GolemEnchantment[] getEnchantments()
     {
         return this.enchantments;
@@ -36,13 +41,22 @@ public class ExtendedGolem implements IExtendedEntityProperties
 
     public GolemEnchantment getRandomEnchantment()
     {
-        if (this.getEnchantments() != null && this.getEnchantments().length > 0) 
+        int auxAmount = getEnchantmentsAmount();
+        
+        if (auxAmount == 1) 
         {
-            int raffle = this.myWorld.rand.nextInt(this.getEnchantments().length);
+            // Just 1 enchantment, returns the first
+            return this.getEnchantments()[0];
+        }
+        if (auxAmount > 1) 
+        {
+            // More than 1 enchantment, returns a random one
+            int raffle = this.myWorld.rand.nextInt(auxAmount);
             return this.getEnchantments()[raffle];
         }
         else 
         {
+            // No enchantments, returns nothing
             return null;
         }
     }
