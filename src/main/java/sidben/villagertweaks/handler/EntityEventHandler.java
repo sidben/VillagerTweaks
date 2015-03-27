@@ -357,7 +357,17 @@ public class EntityEventHandler
                     }
                 }
 
+            } // if (golem.worldObj.isRemote)
+            
+            
+            // Apply refresh enchants (every 20 seconds)
+            if (!golem.worldObj.isRemote) {
+                if ((golem.ticksExisted + golem.getEntityId()) % 400 == 0) {
+                    MagicHelper.applyRefreshEffects(golem);
+                }
             }
+            
+            
         }
 
 
@@ -381,6 +391,12 @@ public class EntityEventHandler
             if (event.source.getSourceOfDamage() instanceof EntityIronGolem) {
                 MagicHelper.applyAttackEffects(event.source.getSourceOfDamage(), target);
             }
+        }
+        
+        // A golem was attacked by a target, check if should cancel the event
+        if (target instanceof EntityIronGolem) {
+            boolean ignoreDamage = MagicHelper.applyDamageCancelEffects(target, event.source);
+            if (ignoreDamage) event.setCanceled(true);
         }
 
     }

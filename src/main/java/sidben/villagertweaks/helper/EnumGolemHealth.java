@@ -1,6 +1,6 @@
 package sidben.villagertweaks.helper;
 
-import net.minecraft.entity.monster.EntityIronGolem;
+import net.minecraft.entity.EntityLivingBase;
 
 
 
@@ -25,7 +25,7 @@ public enum EnumGolemHealth
     }
     
     
-    public static EnumGolemHealth getGolemHealth(EntityIronGolem entity) {
+    public static EnumGolemHealth getGolemHealth(EntityLivingBase entity) {
         float pct = 0;
         if (entity.getHealth() > 0) {
             pct = entity.getHealth() / entity.getMaxHealth();

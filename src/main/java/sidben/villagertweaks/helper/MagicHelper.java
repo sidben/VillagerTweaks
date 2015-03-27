@@ -24,6 +24,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagInt;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSourceIndirect;
 import net.minecraft.util.EnumChatFormatting;
@@ -490,10 +492,19 @@ public class MagicHelper
                 {
 
                     /*---------------------------------------------------------------
+                     * Mighty
+                     * do more damage (simulate strength potion).
+                     *---------------------------------------------------------------*/
+                    if (e == GolemEnchantment.max) {
+                        ammount *= 1.3F;
+                    }
+                    
+                    
+                    /*---------------------------------------------------------------
                      * Strength (special case)
                      * Do more damage.  
                      *---------------------------------------------------------------*/
-                    if (e == GolemEnchantment.strength) {
+                    else if (e == GolemEnchantment.strength) {
 
                         // original damage = 7 to 22, my version does 16 to 28
                         realDamage = (float)(16 + golem.worldObj.rand.nextInt(12));
@@ -508,6 +519,60 @@ public class MagicHelper
         
         
         return realDamage;
+    }
+    
+
+    
+    
+    /**
+     * Check effects that can cancel a source of damage.
+     * 
+     */
+    public static boolean applyDamageCancelEffects(Entity golem, DamageSource source) {
+        boolean shouldCancel = false;
+        
+        
+        // Load the properties
+        ExtendedGolem properties = null;
+        if (golem instanceof EntityIronGolem) properties = ExtendedGolem.get((EntityIronGolem)golem);
+        if (golem instanceof EntitySnowman) properties = ExtendedGolem.get((EntitySnowman)golem);
+
+        
+        if (properties != null && properties.getEnchantmentsAmount() > 0) 
+        {
+            LogHelper.info("== applyDamageCancelEffects() - " + golem.getEntityId() + " ==");            
+            
+            for (GolemEnchantment e : properties.getEnchantments()) {
+
+                /*---------------------------------------------------------------
+                 * Mighty
+                 * Super golem, has a chance to ignore projectile.
+                 *---------------------------------------------------------------*/
+                if (e == GolemEnchantment.max) {
+                    
+                    if (!golem.worldObj.isDaytime() && source.isProjectile()) {
+
+                        if (EnumGolemHealth.getGolemHealth((EntityLivingBase)golem) == EnumGolemHealth.HIGHLY_DAMAGED) {
+                            // high damage, chance of 60%
+                            shouldCancel = (golem.worldObj.rand.nextInt(10) < 6);
+                            
+                        } 
+                        else if (EnumGolemHealth.getGolemHealth((EntityLivingBase)golem) == EnumGolemHealth.DAMAGED) {
+                            // some damage, chance of 20%
+                            shouldCancel = (golem.worldObj.rand.nextInt(10) < 2);
+                            
+                        }
+                        
+                    }
+                        
+                }
+
+            } // for
+
+        } // if (properties are valid)
+
+        
+        return shouldCancel;
     }
     
     
@@ -675,10 +740,67 @@ public class MagicHelper
      * Apply enchantments that are refreshed after a certain time.
      * 
      */
-    public static void applyRefreshEffects(GolemEnchantment enchantment, Entity golem) {
-        if (enchantment.getType() != EnchantmentType.REFRESH) return;
+    public static void applyRefreshEffects(EntityLivingBase golem) {
+
+        // Load the properties
+        ExtendedGolem properties = null;
+        if (golem instanceof EntityIronGolem) properties = ExtendedGolem.get((EntityIronGolem)golem);
+        if (golem instanceof EntitySnowman) properties = ExtendedGolem.get((EntitySnowman)golem);
         
-        // TODO: implement
+
+        if (properties != null && properties.getEnchantmentsAmount() > 0) 
+        {
+            LogHelper.info("== applyRefreshEffects() - " + golem.getEntityId() + " ==");            
+            
+            for (GolemEnchantment e : properties.getEnchantments()) {
+                if (e != null && e.getType() == EnchantmentType.REFRESH) 
+                {
+
+                    /*---------------------------------------------------------------
+                     * Mighty
+                     * Super golem, has speed, resistance and absorption by night,
+                     * regeneration by day.
+                     *---------------------------------------------------------------*/
+                    if (e == GolemEnchantment.max) {
+                        
+                        if (golem.worldObj.isDaytime()) {
+                            if (EnumGolemHealth.getGolemHealth(golem) == EnumGolemHealth.HIGHLY_DAMAGED) {
+                                refreshPotionEffect(golem, Potion.regeneration, 1);
+                            } else {
+                                refreshPotionEffect(golem, Potion.regeneration, 0);
+                            }
+                            
+                        }
+                        else {
+                            refreshPotionEffect(golem, Potion.moveSpeed, 1);
+                            refreshPotionEffect(golem, Potion.resistance, 1);
+                            refreshPotionEffect(golem, Potion.absorption, 4);
+                            
+                        }
+                    
+                    }
+
+                    
+                } //if (e is attack enchantment)
+
+            } // for
+
+        } // if (properties are valid)
+
+    }
+    
+    
+    
+    
+    /**
+     * Adds a potion to the given entity for 30 seconds or
+     * refresh the effect if the time is lower than 20 seconds.
+     * 
+     */
+    private static void refreshPotionEffect(EntityLivingBase entity, Potion potion, int amplifier) {
+        if (!entity.isPotionActive(potion) || entity.getActivePotionEffect(potion).getDuration() < 400) {
+            entity.addPotionEffect(new PotionEffect(potion.id, 600, amplifier));
+        }
     }
 
 
