@@ -210,15 +210,23 @@ public class PlayerEventHandler
             final EventTracker tracked = ServerInfoTracker.seek(EventType.GOLEM, event.pos);
             if (tracked != null) {
 
-                // Check if the entity is alive and a snowman
+                // Check if the entity is alive and a iron golem
                 final Entity target = event.world.getEntityByID(tracked.getEntityID());
                 if (target instanceof EntityIronGolem) {
+                    EntityIronGolem auxGolem = (EntityIronGolem) target;
 
                     if (ConfigurationHandler.onDebug) {
                         LogHelper.info("    Iron Golem found, applying extra info");
                     }
-                    MagicHelper.applyPumpkinExtraInfo((EntityIronGolem) target, pumpkin);
-
+                    MagicHelper.applyPumpkinExtraInfo(auxGolem, pumpkin);
+                    MagicHelper.applyPassiveEffects(auxGolem);
+                    MagicHelper.applyRefreshEffects(auxGolem);
+                    
+                    // Heals the golem, if needed (so enchantments that raise health actually work)
+                    if (auxGolem.getHealth() < auxGolem.getMaxHealth()) {
+                        auxGolem.heal(auxGolem.getMaxHealth());
+                    }
+                    
                 }
 
             }

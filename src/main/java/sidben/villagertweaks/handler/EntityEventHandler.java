@@ -272,6 +272,9 @@ public class EntityEventHandler
                 
                 // Apply the passive golem enchantments
                 MagicHelper.applyPassiveEffects(golem);
+                
+                // Apply the refresh enchants for the first time
+                MagicHelper.applyRefreshEffects(golem);
 
             }
 

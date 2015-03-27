@@ -120,9 +120,9 @@ public class LayerIronGolemGlint implements LayerRenderer
             // GlStateManager.color(0.5F, 0.25F, 0.8F, 1.0F); // Vanilla enchanted color (128, 64, 204)
             // GlStateManager.color(0.1F, 0.234F, 0.7F, 1.0F); // Blue color
             if (superGolem) {
-                GlStateManager.color(0.5F, 0.25F, 0.8F, 1.0F);
-            } else {
                 GlStateManager.color(0.6F, 0.6F, 0.6F, 1.0F);
+            } else {
+                GlStateManager.color(0.5F, 0.25F, 0.8F, 1.0F);
             }
             GlStateManager.disableLighting();
 

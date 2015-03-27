@@ -326,21 +326,6 @@ public class MagicHelper
     }
     
     
-    
-
-    /*
-     * - Protection IV book = Resistance I buff (reduces damage 20%)
-     * - Fire Protection IV = Fire Protection IV buff (reduces fire dmg by 60%)
-     * - Proj. Protection IV = Projectile Protection II buff (reduces proj. dmg by 30%)
-     * - Blast Protection IV = Blast Protection II buff (reduces explosion dmg by 30%)
-     * - Sharpness, Smite, Bane of Arth. IV (or V?) = Strength buff (adds 30% base dmg)
-     * - Fire Aspect II / Flame I = Golem sets attacked mobs on fire
-     * - Knockback II / Punch II = Iron Golems get knockback resistance, Snow Golems get punch effect on snowballs
-     * - Thorns III = Golem gets the Thorns effect
-     * - Unbreaking III = Golem gets 50% more health
-     * - Power V - Snow golems snowballs do a little dmg
-     * - Efficiency = Speed
-     */
 
     
     private static final double healthBoostAmount = 0.6D;
@@ -379,6 +364,7 @@ public class MagicHelper
                     if (e == GolemEnchantment.unbreaking) {
                         
                         IAttributeInstance iattributeinstance = ((EntityLivingBase)golem).getAttributeMap().getAttributeInstance(SharedMonsterAttributes.maxHealth);
+                        
                         if (iattributeinstance != null)
                         {
                             iattributeinstance.removeModifier(attReinforced);
@@ -395,6 +381,7 @@ public class MagicHelper
                     else if (e == GolemEnchantment.speed) {
                         
                         IAttributeInstance iattributeinstance = ((EntityLivingBase)golem).getAttributeMap().getAttributeInstance(SharedMonsterAttributes.movementSpeed);
+
                         if (iattributeinstance != null)
                         {
                             iattributeinstance.removeModifier(attQuick);
