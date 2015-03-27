@@ -50,7 +50,7 @@ public class MessageGolemEnchantments implements IMessage
         {
             this._enchantIds = new int[size];
             for (int i = 0; i < size; i++) {
-                if (buf.readableBytes() > 4) { // avoids IndexOutOfBoundsException
+                if (buf.readableBytes() >= 4) { // avoids IndexOutOfBoundsException
                     this._enchantIds[i] = buf.readInt();
                 }
                 else {
