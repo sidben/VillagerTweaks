@@ -3,6 +3,7 @@ package sidben.villagertweaks.handler;
 import java.util.Random;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.monster.EntityGolem;
 import net.minecraft.entity.monster.EntityIronGolem;
 import net.minecraft.entity.monster.EntityPigZombie;
 import net.minecraft.entity.monster.EntitySnowman;
@@ -444,10 +445,8 @@ public class EntityEventHandler
         }
 
         // Adds the Extended Properties to golems
-        else if (event.entity instanceof EntityIronGolem && ExtendedGolem.get((EntityIronGolem) event.entity) == null) {
-            ExtendedGolem.register((EntityIronGolem) event.entity);
-        } else if (event.entity instanceof EntitySnowman && ExtendedGolem.get((EntitySnowman) event.entity) == null) {
-            ExtendedGolem.register((EntitySnowman) event.entity);
+        else if (event.entity instanceof EntityGolem && ExtendedGolem.get((EntityGolem)event.entity) == null) {
+            ExtendedGolem.register((EntityGolem) event.entity);
         }
 
     }

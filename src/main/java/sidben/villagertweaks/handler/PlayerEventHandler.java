@@ -2,6 +2,7 @@ package sidben.villagertweaks.handler;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.monster.EntityGolem;
 import net.minecraft.entity.monster.EntityIronGolem;
 import net.minecraft.entity.monster.EntitySnowman;
 import net.minecraft.entity.monster.EntityZombie;
@@ -99,14 +100,14 @@ public class PlayerEventHandler
         }
 
 
-        // check if the player right-clicked a Iron Golem
-        else if (event.target instanceof EntityIronGolem) {
+        // check if the player right-clicked a Golem
+        else if (event.target instanceof EntityGolem) {
 
             if (event.target.worldObj.isRemote) {
 
                 // Check if the player has an empty hand
                 if (event.entityPlayer.inventory.getCurrentItem() == null) {
-                    final EntityIronGolem golem = (EntityIronGolem) event.target;
+                    final EntityGolem golem = (EntityGolem) event.target;
                     final ExtendedGolem properties = ExtendedGolem.get(golem);
 
                     LogHelper.info("Clicked on a golem with empty hand");
@@ -172,11 +173,12 @@ public class PlayerEventHandler
 
 
         // ----------------------------------------------------
-        // Snowman pattern found
+        // Snowman / Iron Golem pattern found
         // ----------------------------------------------------
-        if (pumpkinAmount == 1 && snowAmount == 2) {
+        if (pumpkinAmount == 1 && (snowAmount == 2 || ironAmount == 4)) {
             if (ConfigurationHandler.onDebug) {
-                LogHelper.info("    This player wanted to build a snowman at " + event.pos.toString());
+                LogHelper.info("    This player wanted to build a golem at " + event.pos.toString());
+                LogHelper.info("    snow = " + snowAmount + ", iron = " + ironAmount);
             }
 
             // Seek for a golem at that region
@@ -186,38 +188,10 @@ public class PlayerEventHandler
                 // Check if the entity is alive and a snowman
                 final Entity target = event.world.getEntityByID(tracked.getEntityID());
                 if (target instanceof EntitySnowman) {
-
+                    EntityGolem auxGolem = (EntityGolem) target;
+                    
                     if (ConfigurationHandler.onDebug) {
                         LogHelper.info("    Snowman found, applying extra info");
-                    }
-                    MagicHelper.applyPumpkinExtraInfo((EntitySnowman) target, pumpkin);
-
-                }
-
-            }
-
-        }
-
-
-        // ----------------------------------------------------
-        // Iron Golem pattern found
-        // ----------------------------------------------------
-        else if (pumpkinAmount == 1 && ironAmount == 4) {
-            if (ConfigurationHandler.onDebug) {
-                LogHelper.info("    This player built an iron golem at " + event.pos.toString());
-            }
-
-            // Seek for a golem at that region
-            final EventTracker tracked = ServerInfoTracker.seek(EventType.GOLEM, event.pos);
-            if (tracked != null) {
-
-                // Check if the entity is alive and a iron golem
-                final Entity target = event.world.getEntityByID(tracked.getEntityID());
-                if (target instanceof EntityIronGolem) {
-                    EntityIronGolem auxGolem = (EntityIronGolem) target;
-
-                    if (ConfigurationHandler.onDebug) {
-                        LogHelper.info("    Iron Golem found, applying extra info");
                     }
                     MagicHelper.applyPumpkinExtraInfo(auxGolem, pumpkin);
                     MagicHelper.applyPassiveEffects(auxGolem);
@@ -227,7 +201,7 @@ public class PlayerEventHandler
                     if (auxGolem.getHealth() < auxGolem.getMaxHealth()) {
                         auxGolem.heal(auxGolem.getMaxHealth());
                     }
-                    
+
                 }
 
             }

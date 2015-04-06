@@ -1,6 +1,7 @@
 package sidben.villagertweaks.common;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.monster.EntityGolem;
 import net.minecraft.entity.monster.EntityIronGolem;
 import net.minecraft.entity.monster.EntitySnowman;
 import net.minecraft.nbt.NBTTagCompound;
@@ -80,25 +81,16 @@ public class ExtendedGolem implements IExtendedEntityProperties
     // Methods
     // ---------------------------------------------------------
 
-    public static final void register(EntityIronGolem golem)
+    public static final void register(EntityGolem golem)
     {
         golem.registerExtendedProperties(MagicHelper.GolemEnchantmentsNBTKey, new ExtendedGolem());
     }
 
-    public static final void register(EntitySnowman golem)
-    {
-        golem.registerExtendedProperties(MagicHelper.GolemEnchantmentsNBTKey, new ExtendedGolem());
-    }
-
-    public static final ExtendedGolem get(EntityIronGolem golem)
+    public static final ExtendedGolem get(EntityGolem golem)
     {
         return (ExtendedGolem) golem.getExtendedProperties(MagicHelper.GolemEnchantmentsNBTKey);
     }
 
-    public static final ExtendedGolem get(EntitySnowman golem)
-    {
-        return (ExtendedGolem) golem.getExtendedProperties(MagicHelper.GolemEnchantmentsNBTKey);
-    }
 
 
 
