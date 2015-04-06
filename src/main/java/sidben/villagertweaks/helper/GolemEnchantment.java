@@ -26,28 +26,19 @@ import sidben.villagertweaks.client.particle.ParticlePotionEffect.EffectType;
 public class GolemEnchantment
 {
 
-    /*
-     * TODO: re-implement the "can be combined" rule:
-     * 
-     * - Each golem can have up to 3 enchantments and only 1 of each type (Offense, Defense and Passive)
-     * - If the type is "Refresh", it must be alone and will override other effects on the list
-     */
-    
-
-
     private static final GolemEnchantment[] enchantmentsList     = new GolemEnchantment[16];
 
-    public static final GolemEnchantment    speed                = new GolemEnchantment(0, EffectType.SPEED, EnchantmentType.PASSIVE, "g_speed", 5, false);
-    public static final GolemEnchantment    protection           = new GolemEnchantment(1, EffectType.RESISTANCE, EnchantmentType.DEFENSE, "g_armor", 5, false);
-    public static final GolemEnchantment    fireProtection       = new GolemEnchantment(2, EffectType.FIRE_PROTECTION, EnchantmentType.DEFENSE, "g_fire_armor", 5, false);
-    public static final GolemEnchantment    projectileProtection = new GolemEnchantment(3, EffectType.PROJECTILE_PROTECTION, EnchantmentType.DEFENSE, "g_projectile_armor", 5, false);
-    public static final GolemEnchantment    blastProtection      = new GolemEnchantment(4, EffectType.BLAST_PROTECTION, EnchantmentType.DEFENSE, "g_blast_armor", 5, false);
-    public static final GolemEnchantment    strength             = new GolemEnchantment(5, EffectType.STRENGTH, EnchantmentType.PASSIVE, "g_strength", 5, false);
-    public static final GolemEnchantment    knockback            = new GolemEnchantment(6, EffectType.KNOCKBACK, EnchantmentType.OFFENSE, "g_repulsor", 5, false);
-    public static final GolemEnchantment    thorns               = new GolemEnchantment(7, EffectType.THORNS, EnchantmentType.DEFENSE, "g_spike", 5, false);
-    public static final GolemEnchantment    unbreaking           = new GolemEnchantment(8, EffectType.HEALTH_BOOST, EnchantmentType.PASSIVE, "g_reinforced", 5, false);
-    public static final GolemEnchantment    fire                 = new GolemEnchantment(9, EffectType.FIRE_RESISTANCE, EnchantmentType.OFFENSE, "g_flaming", 5, false);
-    public static final GolemEnchantment    max                  = new GolemEnchantment(15, null, EnchantmentType.REFRESH, "g_max", 30, true);
+    public static final GolemEnchantment    max                  = new GolemEnchantment(0, null, EnchantmentType.REFRESH, "g_max", 30, true);
+    public static final GolemEnchantment    speed                = new GolemEnchantment(1, EffectType.SPEED, EnchantmentType.PASSIVE, "g_speed", 5, false);
+    public static final GolemEnchantment    protection           = new GolemEnchantment(2, EffectType.RESISTANCE, EnchantmentType.DEFENSE, "g_armor", 7, false);
+    public static final GolemEnchantment    fireProtection       = new GolemEnchantment(3, EffectType.FIRE_PROTECTION, EnchantmentType.DEFENSE, "g_fire_armor", 6, false);
+    public static final GolemEnchantment    projectileProtection = new GolemEnchantment(4, EffectType.PROJECTILE_PROTECTION, EnchantmentType.DEFENSE, "g_projectile_armor", 6, false);
+    public static final GolemEnchantment    blastProtection      = new GolemEnchantment(5, EffectType.BLAST_PROTECTION, EnchantmentType.DEFENSE, "g_blast_armor", 5, false);
+    public static final GolemEnchantment    strength             = new GolemEnchantment(6, EffectType.STRENGTH, EnchantmentType.PASSIVE, "g_strength", 6, false);
+    public static final GolemEnchantment    knockback            = new GolemEnchantment(7, EffectType.KNOCKBACK, EnchantmentType.OFFENSE, "g_repulsor", 5, false);
+    public static final GolemEnchantment    thorns               = new GolemEnchantment(8, EffectType.THORNS, EnchantmentType.DEFENSE, "g_spike", 5, false);
+    public static final GolemEnchantment    unbreaking           = new GolemEnchantment(9, EffectType.HEALTH_BOOST, EnchantmentType.PASSIVE, "g_reinforced", 7, false);
+    public static final GolemEnchantment    fire                 = new GolemEnchantment(10, EffectType.FIRE_RESISTANCE, EnchantmentType.OFFENSE, "g_flaming", 6, false);
 
     // TODO: Fire icon
     
@@ -74,7 +65,6 @@ public class GolemEnchantment
     private final boolean                         isUnique;
     private final EnchantmentType                 type;
 
-    // TODO: affects iron or snow golem, use bit flag 1 = iron, 2 = snow, 3 = both
 
 
     public static GolemEnchantment getEnchantmentById(int id)
