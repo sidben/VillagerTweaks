@@ -24,3 +24,6 @@ enchantment.g_spike=Spiked
 enchantment.g_reinforced=Reinforced
 enchantment.g_flaming=Flaming
 enchantment.g_max=Mighty  
+
+# Creative Tabs
+itemGroup.tabVillagerTweaks=Villager Tweaks

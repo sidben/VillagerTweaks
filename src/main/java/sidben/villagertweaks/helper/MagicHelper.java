@@ -17,6 +17,7 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttribute;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
+import net.minecraft.entity.monster.EntityGolem;
 import net.minecraft.entity.monster.EntityIronGolem;
 import net.minecraft.entity.monster.EntitySnowman;
 import net.minecraft.init.Blocks;
@@ -67,7 +68,6 @@ public class MagicHelper
             
             if (enchantCandidates.length > 0) 
             {
-                result.item = new ItemStack(Item.getItemFromBlock(Blocks.pumpkin), 1);
                 result.cost = 0;
                 
                 
@@ -77,60 +77,35 @@ public class MagicHelper
                 LogHelper.info("        " + Arrays.toString(currentEnchantments));
                 
                 
-                // Chooses what enchantments can be combined
-                for (int i = 0; i < enchantCandidates.length; i++) {
+                // Adds the "old" enchantments
+                for (int i = 0; i < currentEnchantments.length; i++) {
+                    if (newEnchantments.size() > MagicHelper.MaxEnchants) break;
                     GolemEnchantment auxEnchant = enchantCandidates[i];
                     
-                    if (auxEnchant.getCanBeCombined(currentEnchantments)) {
+                    newEnchantments.add(auxEnchant);
+                }                
+                
+                // Chooses what new enchantments can be combined
+                for (int i = 0; i < enchantCandidates.length; i++) {
+                    if (newEnchantments.size() > MagicHelper.MaxEnchants) break;
+                    GolemEnchantment auxEnchant = enchantCandidates[i];
+                    
+                    if (auxEnchant.getCanBeCombined(newEnchantments)) {
                         newEnchantments.add(auxEnchant);
+                        result.cost += auxEnchant.getXpBaseCost();
                     }
                 }
                 
                 
                 LogHelper.info("    New enchants to be added " + newEnchantments.size());
-
-                
-                // Prepares the NBT tag with custom enchantments
-                NBTTagList geTagList = new NBTTagList();
-
-                // Adds the current enchantments
-                if (currentEnchantments.length > 0) {
-                    for (GolemEnchantment e : currentEnchantments) {
-                        geTagList.appendTag(new NBTTagInt(e.getId()));
-                    }
-                }
-                
-                // Adds the new enchantments
-                if (newEnchantments.size() > 0) {
-                    for (int i = 0; i < newEnchantments.size(); i++) {
-                        if (geTagList.tagCount() >= MagicHelper.MaxEnchants) break;
-
-                        GolemEnchantment auxEnchant = enchantCandidates[i];
-                        
-                        LogHelper.info("    - " + i + ": " + auxEnchant);
-
-                        geTagList.appendTag(new NBTTagInt(auxEnchant.getId()));
-                        result.cost += auxEnchant.getXpBaseCost();
-                    }
-                }
-                
-                result.item.setTagInfo(MagicHelper.GolemEnchantmentsNBTKey, geTagList);
-                LogHelper.info("    -> " + geTagList);
-                LogHelper.info("    -> # " + geTagList.tagCount());
                 
 
                 
-                // NBT tag to remove the "Enchantments" from tooltip
-                result.item.setTagInfo("HideFlags", new NBTTagInt(1));       
+                // creates the item
+                result.item = getEnchantedPumpkin(newEnchantments);
 
-                // Adds a "fake" enchantment to make the pumpkin have an effect
-                final Map pumpkinEnchants = EnchantmentHelper.getEnchantments(pumpkin);            
-                pumpkinEnchants.put(Enchantment.infinity.effectId, 1);
-                EnchantmentHelper.setEnchantments(pumpkinEnchants, result.item);
-
-                
                 // calculates extra penalties on the cost
-                result.cost += ((geTagList.tagCount() - 1) * 3);
+                result.cost += ((newEnchantments.size() - 1) * 3);
                 
                 
                 LogHelper.info("-- Magic Helper --");
@@ -153,10 +128,66 @@ public class MagicHelper
     
     
     /**
+     * Returns a pumpkin with the enchantments defined.
+     * 
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public static ItemStack getEnchantedPumpkin(ArrayList<GolemEnchantment> newEnchantments) 
+    {
+        ItemStack item = new ItemStack(Item.getItemFromBlock(Blocks.pumpkin), 1);
+        
+        
+        // Prepares the NBT tag with custom enchantments
+        NBTTagList geTagList = new NBTTagList();
+
+        // Adds the enchantments
+        if (newEnchantments.size() > 0) {
+            for (int i = 0; i < newEnchantments.size(); i++) {
+                GolemEnchantment auxEnchant = newEnchantments.get(i);
+                LogHelper.info("    - " + i + ": " + auxEnchant);
+
+                geTagList.appendTag(new NBTTagInt(auxEnchant.getId()));
+            }
+        }
+        
+        item.setTagInfo(MagicHelper.GolemEnchantmentsNBTKey, geTagList);
+        LogHelper.info("    -> " + geTagList);
+        LogHelper.info("    -> # " + geTagList.tagCount());
+       
+
+        
+        // NBT tag to remove the "Enchantments" from tooltip
+        item.setTagInfo("HideFlags", new NBTTagInt(1));
+
+        // Adds a "fake" enchantment to make the pumpkin have an effect
+        final Map pumpkinEnchants = EnchantmentHelper.getEnchantments(item);
+        pumpkinEnchants.put(Enchantment.infinity.effectId, 1);
+        EnchantmentHelper.setEnchantments(pumpkinEnchants, item);
+
+        
+        return item;
+    }
+    
+
+    /**
+     * Returns a pumpkin with the enchantment defined.
+     * 
+     */
+    public static ItemStack getEnchantedPumpkin(GolemEnchantment newEnchantment) 
+    {
+        ArrayList<GolemEnchantment> list = new ArrayList<GolemEnchantment>();
+        list.add(newEnchantment);
+        return getEnchantedPumpkin(list);
+    }
+    
+    
+    
+    
+    /**
      * Applies the extra info (name, enchantments) in the pumpkin to the golem created with it.
      * 
      */
-    public static void applyPumpkinExtraInfo(EntityIronGolem golem, ItemStack pumpkin) {
+    public static void applyPumpkinExtraInfo(EntityGolem golem, ItemStack pumpkin) {
         if (golem == null || pumpkin == null) return;
         
         int[] pumpkinEnchants = getEnchantmentIds(pumpkin);
@@ -184,23 +215,7 @@ public class MagicHelper
         }
 
     }
-    
-    
-    public static void applyPumpkinExtraInfo(EntitySnowman golem, ItemStack pumpkin) {
-        if (golem == null || pumpkin == null) return;
-     
-        String customName = pumpkin.getDisplayName();
 
-        
-        // Check if a custom name exists
-        if (customName != "") {
-            // Applies the custom name to the golem
-            golem.setCustomNameTag(customName);
-            golem.enablePersistence();
-        }
-        
-
-    }
     
     
     
@@ -298,7 +313,7 @@ public class MagicHelper
      * Apply passive enchantments, that modifies base stats permanently.
      * 
      */
-    public static void applyPassiveEffects(Entity golem) {
+    public static void applyPassiveEffects(EntityGolem golem) {
         
         // Load the properties
         ExtendedGolem properties = null;
@@ -703,12 +718,10 @@ public class MagicHelper
      * Apply enchantments that are refreshed after a certain time.
      * 
      */
-    public static void applyRefreshEffects(EntityLivingBase golem) {
+    public static void applyRefreshEffects(EntityGolem golem) {
 
         // Load the properties
-        ExtendedGolem properties = null;
-        if (golem instanceof EntityIronGolem) properties = ExtendedGolem.get((EntityIronGolem)golem);
-        if (golem instanceof EntitySnowman) properties = ExtendedGolem.get((EntitySnowman)golem);
+        ExtendedGolem properties = ExtendedGolem.get(golem);
         
 
         if (properties != null && properties.getEnchantmentsAmount() > 0) 

@@ -2,6 +2,7 @@ package sidben.villagertweaks.helper;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import net.minecraft.enchantment.Enchantment;
@@ -238,6 +239,35 @@ public class GolemEnchantment
             }
         }
     }
+
+    /**
+     * Checks if this enchantment can be added to the given list.
+     * 
+     */
+    public boolean getCanBeCombined(List<GolemEnchantment> currentEnchantments)
+    {
+        if (currentEnchantments == null || currentEnchantments.size() <= 0) 
+        {
+            return true;
+        }
+        else
+        {
+            if (this.isUnique) {
+                return false;
+            }
+            else {
+                // Only allows 1 enchantment of each type
+                for (GolemEnchantment e : currentEnchantments) {
+                    if (e.type == this.type) return false;
+                    if (e.isUnique) return false;
+                }
+                return true;
+            }
+        }
+    }
+
+    
+
 
     
 

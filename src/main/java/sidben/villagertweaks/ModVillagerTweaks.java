@@ -2,6 +2,7 @@ package sidben.villagertweaks;
 
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.monster.EntityIronGolem;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraftforge.common.MinecraftForge;
@@ -16,6 +17,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 import sidben.villagertweaks.client.renderer.entity.RenderCrackedIronGolem;
 import sidben.villagertweaks.client.renderer.entity.RenderZombieVillager;
+import sidben.villagertweaks.creativetab.ModCreativeTabs;
 import sidben.villagertweaks.handler.ConfigurationHandler;
 import sidben.villagertweaks.handler.EntityEventHandler;
 import sidben.villagertweaks.handler.PlayerEventHandler;
@@ -43,7 +45,12 @@ public class ModVillagerTweaks
     
     
     public static SimpleNetworkWrapper NetworkWrapper;
+    
+    
+    public static CreativeTabs tabMod = new ModCreativeTabs("tabVillagerTweaks");
 
+    
+    
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event)
