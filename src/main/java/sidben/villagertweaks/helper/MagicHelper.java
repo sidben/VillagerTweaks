@@ -714,6 +714,8 @@ public class MagicHelper
         if (properties != null && properties.getEnchantmentsAmount() > 0) 
         {
             LogHelper.info("== applyRefreshEffects() - " + golem.getEntityId() + " ==");            
+            LogHelper.info("    Day: " + golem.worldObj.isDaytime());
+            LogHelper.info("    Dimension: " + golem.dimension);
             
             for (GolemEnchantment e : properties.getEnchantments()) {
                 if (e != null && e.getType() == EnchantmentType.REFRESH) 
@@ -723,20 +725,26 @@ public class MagicHelper
                      * Mighty
                      * Super golem, has speed, resistance and absorption by night,
                      * regeneration by day.
+                     * 
+                     * NOTE: End = day, Nether = night.
                      *---------------------------------------------------------------*/
                     if (e == GolemEnchantment.max) {
                         
                         if (golem.worldObj.isDaytime()) {
                             if (EnumGolemHealth.getGolemHealth(golem) == EnumGolemHealth.HIGHLY_DAMAGED) {
-                                refreshPotionEffect(golem, Potion.regeneration, 1);
+                                refreshPotionEffect(golem, Potion.regeneration, 2);
                             } else {
-                                refreshPotionEffect(golem, Potion.regeneration, 0);
+                                refreshPotionEffect(golem, Potion.regeneration, 1);
                             }
                             
                         }
                         else {
+                            if (EnumGolemHealth.getGolemHealth(golem) == EnumGolemHealth.HIGHLY_DAMAGED) {
+                                refreshPotionEffect(golem, Potion.resistance, 2);
+                            } else {
+                                refreshPotionEffect(golem, Potion.resistance, 1);
+                            }
                             refreshPotionEffect(golem, Potion.moveSpeed, 1);
-                            refreshPotionEffect(golem, Potion.resistance, 1);
                             refreshPotionEffect(golem, Potion.absorption, 4);
                             
                         }
