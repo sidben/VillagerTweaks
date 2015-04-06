@@ -78,15 +78,17 @@ public class NetworkHelper
     public static void sendEnchantedGolemInfoMessage(int golemId, ExtendedGolem properties, EntityPlayer target) {
         if (golemId > 0 && properties != null) {
             int[] ids = GolemEnchantment.convert(properties.getEnchantments());
-            MessageGolemEnchantments message = new MessageGolemEnchantments(golemId, ids);
-            
-            // Debug
-            LogHelper.info("~~Sending Message - Enchanted Iron Golem info~~");
-            LogHelper.info("    target: " + target);
-            LogHelper.info("    " + message.toString());
-
-            // Sends a message to the player, with the golem extra info
-            ModVillagerTweaks.NetworkWrapper.sendTo(message, (EntityPlayerMP)target);
+            if (ids.length > 0) {
+                MessageGolemEnchantments message = new MessageGolemEnchantments(golemId, ids);
+                
+                // Debug
+                LogHelper.info("~~Sending Message - Enchanted Iron Golem info~~");
+                LogHelper.info("    target: " + target);
+                LogHelper.info("    " + message.toString());
+    
+                // Sends a message to the player, with the golem extra info
+                ModVillagerTweaks.NetworkWrapper.sendTo(message, (EntityPlayerMP)target);
+            }
         }
     }
     
@@ -101,16 +103,19 @@ public class NetworkHelper
     public static void sendEnchantedGolemInfoMessage(EntityLiving golem, ExtendedGolem properties) {
         if (golem != null && properties != null) {
             int[] ids = GolemEnchantment.convert(properties.getEnchantments());
-            MessageGolemEnchantments message = new MessageGolemEnchantments(golem.getEntityId(), ids);
-            TargetPoint target = new TargetPoint(golem.dimension, golem.posX, golem.posY, golem.posZ, 64.0D);
             
-            // Debug
-            LogHelper.info("~~Sending Message - Enchanted Iron Golem info~~");
-            LogHelper.info("    target: " + target);
-            LogHelper.info("    " + message.toString());
-
-            // Sends a message to the player, with the golem extra info
-            ModVillagerTweaks.NetworkWrapper.sendToAllAround(message, target);
+            if (ids.length > 0) {
+                MessageGolemEnchantments message = new MessageGolemEnchantments(golem.getEntityId(), ids);
+                TargetPoint target = new TargetPoint(golem.dimension, golem.posX, golem.posY, golem.posZ, 64.0D);
+                
+                // Debug
+                LogHelper.info("~~Sending Message - Enchanted Iron Golem info~~");
+                LogHelper.info("    target: " + target);
+                LogHelper.info("    " + message.toString());
+    
+                // Sends a message to the player, with the golem extra info
+                ModVillagerTweaks.NetworkWrapper.sendToAllAround(message, target);
+            }
         }
     }
 
