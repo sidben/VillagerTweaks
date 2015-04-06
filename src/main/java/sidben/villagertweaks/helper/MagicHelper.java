@@ -144,49 +144,6 @@ public class MagicHelper
                 
             } 
             
-            
-            
-            
-            
-
-                
-               
-                /*
-
-                // calculates the cost
-                event.cost = 0;
-                multipleEnchantPenalty = 0;
-
-                if (isHarder) {
-                    event.cost += 6;
-                    multipleEnchantPenalty += 1;
-                }
-                if (isBetter) {
-                    event.cost += 8;
-                    multipleEnchantPenalty += 1;
-                }
-                if (isFaster) {
-                    event.cost += 5;
-                    multipleEnchantPenalty += 1;
-                }
-                if (isStronger) {
-                    event.cost += 6;
-                    multipleEnchantPenalty += 1;
-                }
-
-                if (event.cost > 0 && multipleEnchantPenalty > 0) {
-                    event.cost += (multipleEnchantPenalty * 3) + 1;       // Adds a maximum of 13
-                }
-
-                if (event.name != "") {
-                    event.cost += 1;
-                }
-
-                // if (event.left.stackSize > 1) event.cost = event.cost * event.left.stackSize;
-
-                
-                */
-
 
         }
         
@@ -397,7 +354,7 @@ public class MagicHelper
                      *---------------------------------------------------------------*/
                     else if (e == GolemEnchantment.strength) {
 
-                        // Special Note: The irom golems DO NOT do damage based on strength,
+                        // Special Note: The iron golems DO NOT do damage based on strength,
                         // they use a hard-coded formula and do between 7 to 21 damage
                     
                     }
@@ -485,6 +442,7 @@ public class MagicHelper
         if (golem instanceof EntityIronGolem) properties = ExtendedGolem.get((EntityIronGolem)golem);
         if (golem instanceof EntitySnowman) properties = ExtendedGolem.get((EntitySnowman)golem);
         
+        LogHelper.info("== applyDamagingEffects() - " + golem.getEntityId() + " ==");
        
         
         if (properties != null && properties.getEnchantmentsAmount() > 0) 
@@ -518,6 +476,9 @@ public class MagicHelper
             } // for
 
         } // if (properties are valid)
+        
+        
+        LogHelper.info("    real damage: " + realDamage);
         
         
         return realDamage;

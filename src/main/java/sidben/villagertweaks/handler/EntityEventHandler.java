@@ -425,7 +425,7 @@ public class EntityEventHandler
         }
 
         // A golem caused damage, apply damage modifiers
-        else if (event.source.getSourceOfDamage() instanceof EntityIronGolem) {
+        else if (event.source.getDamageType() == "mob" && event.source.getSourceOfDamage() instanceof EntityIronGolem) {
             event.ammount = MagicHelper.applyDamagingEffects(event.source.getSourceOfDamage(), target, event.ammount);
         }
         
