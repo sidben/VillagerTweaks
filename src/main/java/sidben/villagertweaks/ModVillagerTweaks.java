@@ -1,10 +1,13 @@
 package sidben.villagertweaks;
 
 
+import net.minecraft.block.BlockDispenser;
 import net.minecraft.client.Minecraft;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.monster.EntityIronGolem;
 import net.minecraft.entity.monster.EntityZombie;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
@@ -18,11 +21,13 @@ import net.minecraftforge.fml.relauncher.Side;
 import sidben.villagertweaks.client.renderer.entity.RenderCrackedIronGolem;
 import sidben.villagertweaks.client.renderer.entity.RenderZombieVillager;
 import sidben.villagertweaks.creativetab.ModCreativeTabs;
+import sidben.villagertweaks.dispenser.BehaviorMagicPumpkinDispense;
 import sidben.villagertweaks.handler.ConfigurationHandler;
 import sidben.villagertweaks.handler.EntityEventHandler;
 import sidben.villagertweaks.handler.PlayerEventHandler;
 import sidben.villagertweaks.handler.TickEventHandler;
 import sidben.villagertweaks.handler.WorldEventHandler;
+import sidben.villagertweaks.helper.LogHelper;
 import sidben.villagertweaks.init.MyAchievements;
 import sidben.villagertweaks.network.MessageGolemEnchantments;
 import sidben.villagertweaks.network.NetworkHelper;
@@ -63,6 +68,7 @@ public class ModVillagerTweaks
         NetworkWrapper = NetworkRegistry.INSTANCE.newSimpleChannel(Reference.ModChannel);
         NetworkWrapper.registerMessage(NetworkHelper.VillagerProfessionHandler.class, MessageZombieVillagerProfession.class, 0, Side.CLIENT);
         NetworkWrapper.registerMessage(NetworkHelper.GolemEnchantmentHandler.class, MessageGolemEnchantments.class, 1, Side.CLIENT);
+        
     }
 
 
@@ -89,6 +95,10 @@ public class ModVillagerTweaks
             Minecraft.getMinecraft().getRenderManager().entityRenderMap.put(EntityZombie.class, new RenderZombieVillager(Minecraft.getMinecraft().getRenderManager()));
         }
         
+        // Custom dispenser behavior
+        LogHelper.debug("Overriding pumpkin dispenser behaviour");
+        BlockDispenser.dispenseBehaviorRegistry.putObject(Item.getItemFromBlock(Blocks.pumpkin), new BehaviorMagicPumpkinDispense());
+
     }
 
 
