@@ -4,8 +4,7 @@ import java.util.HashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.monster.EntityIronGolem;
-import net.minecraft.entity.monster.EntitySnowman;
+import net.minecraft.entity.monster.EntityGolem;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -135,11 +134,8 @@ public class ClientInfoTracker
         Entity entity = world.getEntityByID(entityID);
 
         // If found the entity, attempt to sync with info sent by the server 
-        if (entity instanceof EntityIronGolem) {
-            ClientInfoTracker.SyncGolemMessage((EntityIronGolem)entity);
-        }
-        else if (entity instanceof EntitySnowman) {
-            ClientInfoTracker.SyncGolemMessage((EntitySnowman)entity);
+        if (entity instanceof EntityGolem) {
+            ClientInfoTracker.SyncGolemMessage((EntityGolem)entity);
         }
         
     }
@@ -148,7 +144,7 @@ public class ClientInfoTracker
      * Attempts to locate a message with Extended Properties and apply to the golem. 
      */
     @SideOnly(Side.CLIENT)
-    public static void SyncGolemMessage(EntityIronGolem golem) {
+    public static void SyncGolemMessage(EntityGolem golem) {
         
         // Try to locate messages sent by the server, containing special zombie info
         MessageGolemEnchantments msg = ClientInfoTracker.getGolemMessage(golem.getEntityId());
@@ -159,23 +155,6 @@ public class ClientInfoTracker
             properties.setEnchantments(msg.getEnchantments());
         } 
         
-    }
-
-    /**
-     * Attempts to locate a message with Extended Properties and apply to the golem. 
-     */
-    @SideOnly(Side.CLIENT)
-    public static void SyncGolemMessage(EntitySnowman golem) {
-        
-        // Try to locate messages sent by the server, containing special zombie info
-        MessageGolemEnchantments msg = ClientInfoTracker.getGolemMessage(golem.getEntityId());
-        
-        // If a message was found, update the local zombie with that info
-        if (msg != null) {
-            ExtendedGolem properties = ExtendedGolem.get(golem);
-            properties.setEnchantments(msg.getEnchantments());
-        } 
-
     }
     
     

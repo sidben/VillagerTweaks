@@ -7,6 +7,7 @@ import java.util.UUID;
 import com.google.common.collect.Lists;
 import scala.actors.threadpool.Arrays;
 import sidben.villagertweaks.common.ExtendedGolem;
+import sidben.villagertweaks.handler.ConfigurationHandler;
 import sidben.villagertweaks.helper.GolemEnchantment.EnchantmentType;
 import sidben.villagertweaks.network.NetworkHelper;
 import net.minecraft.enchantment.Enchantment;
@@ -53,7 +54,6 @@ public class MagicHelper
      * @param cost XP level cost
      * @return true if the item can be enchanted, false if should follow vanilla rules  
      */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     public static ResultCanEnchant canEnchant(ItemStack pumpkin, ItemStack magicItem) {
         
         // It's a pumpkin, check if can combine
@@ -179,6 +179,31 @@ public class MagicHelper
         list.add(newEnchantment);
         return getEnchantedPumpkin(list);
     }
+    
+    
+    
+    
+    /**
+     * Applies all related effects on a golem that was just created
+     * with a enchanted pumpkin.
+     * 
+     */
+    public static void applyMagicEffectsOnNewlySpawnedGolem(EntityGolem golem, ItemStack enchantedPumpkin)
+    {
+        if (ConfigurationHandler.onDebug) {
+            LogHelper.info("-- Enchanted Golem found at [" + golem.getPosition() + "], applying extra info");
+        }
+        
+        MagicHelper.applyPumpkinExtraInfo(golem, enchantedPumpkin);
+        MagicHelper.applyPassiveEffects(golem);
+        MagicHelper.applyRefreshEffects(golem);
+        
+        // Heals the golem, if needed (so enchantments that raise health actually work)
+        if (golem.getHealth() < golem.getMaxHealth()) {
+            golem.heal(golem.getMaxHealth());
+        }        
+    }
+    
     
     
     
