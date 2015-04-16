@@ -64,7 +64,7 @@ public class ExtendedGolem implements IExtendedEntityProperties
     
     public void setEnchantments(int[] enchantmentIds)
     {
-        this.enchantments = GolemEnchantment.convert(enchantmentIds);
+        this.enchantments = GolemEnchantment.convertToEnchantArray(enchantmentIds);
     }
 
 

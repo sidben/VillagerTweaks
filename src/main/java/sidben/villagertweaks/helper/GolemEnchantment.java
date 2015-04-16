@@ -150,7 +150,7 @@ public class GolemEnchantment
             int[] pumpkinEnchants = MagicHelper.getEnchantmentIds(item);
             
             if (pumpkinEnchants != null && pumpkinEnchants.length > 0) {
-                arrayList = convert(pumpkinEnchants);
+                arrayList = convertToEnchantArray(pumpkinEnchants);
             }
 
         }
@@ -172,8 +172,17 @@ public class GolemEnchantment
      * Gets a list of all valid enchantments with the given IDs.
      * 
      */
-    public static GolemEnchantment[] convert(int[] ids)
+    public static GolemEnchantment[] convertToEnchantArray(int[] ids)
     {
+        final ArrayList<GolemEnchantment> list = convertToEnchantList(ids);
+        return list.toArray(new GolemEnchantment[list.size()]);
+    }
+
+    /**
+     * Gets a list of all valid enchantments with the given IDs.
+     * 
+     */
+    public static ArrayList<GolemEnchantment> convertToEnchantList(int[] ids) {
         final ArrayList<GolemEnchantment> list = new ArrayList<GolemEnchantment>();
 
 
@@ -186,8 +195,7 @@ public class GolemEnchantment
             }
         }
 
-
-        return list.toArray(new GolemEnchantment[list.size()]);
+        return list;
     }
 
 
