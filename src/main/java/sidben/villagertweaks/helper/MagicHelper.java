@@ -325,10 +325,12 @@ public class MagicHelper
     
 
     
-    private static final double healthBoostAmount = 0.6D;
+    private static final double healthBoostAmountIron = 0.6D;
+    private static final double healthBoostAmountSnow = 3.0D;
     private static final double speedAmount = 0.25D;
     
-    private static final AttributeModifier attReinforced = new AttributeModifier(UUID.fromString("179aa5d9-b25e-4f17-8bd5-44e6f39b8d5c"), "golem_reinforced", healthBoostAmount, 2);
+    private static final AttributeModifier attReinforcedIron = new AttributeModifier(UUID.fromString("179aa5d9-b25e-4f17-8bd5-44e6f39b8d5c"), "golem_reinforced", healthBoostAmountIron, 2);
+    private static final AttributeModifier attReinforcedSnow = new AttributeModifier(UUID.fromString("179aa5d9-b25e-4f17-8bd5-44e6f39b8d5c"), "golem_reinforced", healthBoostAmountSnow, 2);
     private static final AttributeModifier attQuick = new AttributeModifier(UUID.fromString("2139955f-7a5d-4e69-9e44-fc8f9b214a77"), "golem_quick", speedAmount, 2);
     
     
@@ -342,8 +344,15 @@ public class MagicHelper
         
         // Load the properties
         ExtendedGolem properties = null;
-        if (golem instanceof EntityIronGolem) properties = ExtendedGolem.get((EntityIronGolem)golem);
-        if (golem instanceof EntitySnowman) properties = ExtendedGolem.get((EntitySnowman)golem);
+        byte type = -1;      // 0 = Iron golem, 1 = snow golem
+        if (golem instanceof EntityIronGolem) { 
+            properties = ExtendedGolem.get((EntityIronGolem)golem);
+            type = 0;
+        }
+        if (golem instanceof EntitySnowman) { 
+            properties = ExtendedGolem.get((EntitySnowman)golem);
+            type = 1;
+        }
         
         
         if (properties != null && properties.getEnchantmentsAmount() > 0) 
@@ -364,8 +373,13 @@ public class MagicHelper
                         
                         if (iattributeinstance != null)
                         {
-                            iattributeinstance.removeModifier(attReinforced);
-                            iattributeinstance.applyModifier(attReinforced);
+                            if (type == 0) {
+                                iattributeinstance.removeModifier(attReinforcedIron);
+                                iattributeinstance.applyModifier(attReinforcedIron);
+                            } else if (type == 1) {
+                                iattributeinstance.removeModifier(attReinforcedSnow);
+                                iattributeinstance.applyModifier(attReinforcedSnow);
+                            }
                         }
                     
                     }
