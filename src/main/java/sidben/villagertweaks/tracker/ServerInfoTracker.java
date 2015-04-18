@@ -6,12 +6,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.monster.EntityGolem;
 import net.minecraft.entity.monster.EntityIronGolem;
 import net.minecraft.entity.monster.EntitySnowman;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.Vec3i;
 import net.minecraft.world.World;
 import sidben.villagertweaks.common.ExtendedVillagerZombie;
@@ -90,15 +93,18 @@ public class ServerInfoTracker
     public static enum EventType {
         GOLEM,          // A golem spawned on the world, most likely created by a player
         ZOMBIE,         // Zombie was about to be cured, used to transfer info to the new villager
-        VILLAGER        // Villager was killed by zombie, used to transfer info in case he is zombified
+        VILLAGER,       // Villager was killed by zombie, used to transfer info in case he is zombified
+        PUMPKIN;        // Enchanted pumpkins, used to track golems created with pumpkins from dispensers
+        
+        
+        private List<EventTracker>        myTracker                 = new ArrayList<EventTracker>();
+        protected List<EventTracker> getTracker() {
+            return myTracker;
+        }
     }
 
 
-    private static List<EventTracker>        GolemTracker                 = new ArrayList<EventTracker>();
-    private static List<EventTracker>        ZombieTracker                = new ArrayList<EventTracker>();
-    private static List<EventTracker>        VillagerTracker              = new ArrayList<EventTracker>();
-
-    private static HashMap<Integer, Integer> CuredZombies                 = new HashMap<Integer, Integer>();    // Tracks which players cured zombies
+    private static HashMap<Integer, Integer> CuredZombies                 = new HashMap<Integer, Integer>();    // Tracks which players cured zombies (used to reward achievements)
     private static int                       CuredZombiesListLastChange   = 0;                              // Tracks when the list of cured zombies was last updated
     private static HashMap<Integer, Integer> CuredVillagers               = new HashMap<Integer, Integer>();    // Tracks a villager just cured by a player
     private static int                       CuredVillagersListLastChange = 0;                              // Tracks when the list of cured villagers was last updated
@@ -129,20 +135,20 @@ public class ServerInfoTracker
 
     /**
      * Adds golem information that should be tracked on the server.
-     * Used to track when a player creates an iron golem.
+     * Used to track when a player creates an iron / snow golem.
      */
-    public static void add(EntityIronGolem golem)
+    public static void add(EntityGolem golem)
     {
         ServerInfoTracker.add(EventType.GOLEM, new EventTracker(golem));
     }
 
     /**
-     * Adds golem information that should be tracked on the server.
-     * Used to track when a player creates a snow golem.
+     * Adds pumpkin information that should be tracked on the server.
+     * Used to track when golem creates a golem.
      */
-    public static void add(EntitySnowman golem)
+    public static void add(ItemStack pumpkin, BlockPos pos)
     {
-        ServerInfoTracker.add(EventType.GOLEM, new EventTracker(golem));
+        ServerInfoTracker.add(EventType.PUMPKIN, new EventTracker(pumpkin, pos));
     }
 
     /**
@@ -210,23 +216,7 @@ public class ServerInfoTracker
 
 
         // Adds the event to the specific list
-        switch (type) {
-            case GOLEM:
-                ServerInfoTracker.GolemTracker.add(event);
-                break;
-
-            case ZOMBIE:
-                ServerInfoTracker.ZombieTracker.add(event);
-                break;
-
-            case VILLAGER:
-                ServerInfoTracker.VillagerTracker.add(event);
-                break;
-
-            default:
-                break;
-        }
-
+        type.getTracker().add(event);
 
     }
 
@@ -248,25 +238,29 @@ public class ServerInfoTracker
             case GOLEM:
                 rangeLimit = 5;         // Crafted golem will always return 4, so 5 to play safe.
                 ageTolerance = 100;     // Arbitrary value, not really needed here
-
-                return seekValueOnList(ServerInfoTracker.GolemTracker, position, rangeLimit, ageTolerance);
+                break;
 
             case VILLAGER:
                 rangeLimit = 1;         // Seek at the exact spot (maybe should be zero?)
                 ageTolerance = 5;       // Only 5 ticks tolerance to play safe, since "zombification" happens on the same tick
-
-                return seekValueOnList(ServerInfoTracker.VillagerTracker, position, rangeLimit, ageTolerance);
+                break;
 
             case ZOMBIE:
                 rangeLimit = 1;         // Seek at the exact spot (maybe should be zero?)
-                ageTolerance = 5;       // Only 3 ticks tolerance to play safe, since the cure should happen on the next 1 tick
+                ageTolerance = 3;       // Only 3 ticks tolerance to play safe, since the cure should happen on the next 1 tick
+                break;
 
-                return seekValueOnList(ServerInfoTracker.ZombieTracker, position, rangeLimit, ageTolerance);
+            case PUMPKIN:
+                rangeLimit = 5;         // Crafted golem should return 4, so 5 to play safe.
+                ageTolerance = 3;       // 3 ticks to play safe, should happen on the same tick
+                break;
 
             default:
                 return null;
 
         }
+
+        return seekValueOnList(type.getTracker(), position, rangeLimit, ageTolerance);
 
     }
 
@@ -369,9 +363,10 @@ public class ServerInfoTracker
         // Clean expired from the events tracker
         final int expireAllUntil = thisTick - 100;     // Maximum amount of time an entry stays at the list
 
-        cleanExpiredList(ServerInfoTracker.GolemTracker, expireAllUntil);
-        cleanExpiredList(ServerInfoTracker.VillagerTracker, expireAllUntil);
-        cleanExpiredList(ServerInfoTracker.ZombieTracker, expireAllUntil);
+        cleanExpiredList(ServerInfoTracker.EventType.GOLEM.getTracker(), expireAllUntil);
+        cleanExpiredList(ServerInfoTracker.EventType.VILLAGER.getTracker(), expireAllUntil);
+        cleanExpiredList(ServerInfoTracker.EventType.ZOMBIE.getTracker(), expireAllUntil);
+        cleanExpiredList(ServerInfoTracker.EventType.PUMPKIN.getTracker(), expireAllUntil);
 
 
         // Debug
@@ -448,9 +443,10 @@ public class ServerInfoTracker
 
         canStartTracking = true;
 
-        GolemTracker.clear();
-        ZombieTracker.clear();
-        VillagerTracker.clear();
+        EventType.GOLEM.getTracker().clear();
+        EventType.ZOMBIE.getTracker().clear();
+        EventType.VILLAGER.getTracker().clear();
+        EventType.PUMPKIN.getTracker().clear();
 
         CuredZombies.clear();
         CuredVillagers.clear();
@@ -473,34 +469,10 @@ public class ServerInfoTracker
     {
         LogHelper.info("----------------------------------------------------------");
 
-        LogHelper.info(" Golem Tracker: " + ServerInfoTracker.GolemTracker.size());
-        if (ServerInfoTracker.GolemTracker.size() > 0) {
-            for (final EventTracker e : ServerInfoTracker.GolemTracker) {
-                LogHelper.info("    [" + e.toString() + "]");
-            }
-        }
-
-        LogHelper.info(" Villager Tracker: " + ServerInfoTracker.VillagerTracker.size());
-        if (ServerInfoTracker.VillagerTracker.size() > 0) {
-            for (final EventTracker e : ServerInfoTracker.VillagerTracker) {
-                LogHelper.info("    [" + e.toString() + "]");
-            }
-        }
-
-        LogHelper.info(" Zombie Tracker: " + ServerInfoTracker.ZombieTracker.size());
-        if (ServerInfoTracker.ZombieTracker.size() > 0) {
-            for (final EventTracker e : ServerInfoTracker.ZombieTracker) {
-                LogHelper.info("    [" + e.toString() + "]");
-            }
-        }
-
-        LogHelper.info(" Cured Zombies Tracker: " + ServerInfoTracker.CuredZombies.size() + ", last updated in " + CuredZombiesListLastChange + ", will expire in "
-                + (CuredZombiesListLastChange + ListExpiration));
-        if (ServerInfoTracker.CuredZombies.size() > 0) {
-            for (final Entry<Integer, Integer> entry : ServerInfoTracker.CuredZombies.entrySet()) {
-                LogHelper.info("    Player [" + entry.getValue() + "] cured the zombie [" + entry.getKey() + "]");
-            }
-        }
+        debugEventType(EventType.GOLEM);
+        debugEventType(EventType.VILLAGER);
+        debugEventType(EventType.ZOMBIE);
+        debugEventType(EventType.PUMPKIN);
 
         LogHelper.info(" Cured Villagers Tracker: " + ServerInfoTracker.CuredVillagers.size() + ", last updated in " + CuredVillagersListLastChange + ", will expire in "
                 + (CuredVillagersListLastChange + ListExpiration));
@@ -513,6 +485,17 @@ public class ServerInfoTracker
         LogHelper.info("----------------------------------------------------------");
     }
 
+    
+    private static void debugEventType(EventType type) 
+    {
+        LogHelper.info(type.toString() + " : " + type.getTracker().size());
+        if (type.getTracker().size() > 0) {
+            for (final EventTracker e : type.getTracker()) {
+                LogHelper.info("    [" + e.toString() + "]");
+            }
+        }
+        
+    }
 
 
 }

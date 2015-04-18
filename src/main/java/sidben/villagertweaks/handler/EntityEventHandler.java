@@ -254,8 +254,9 @@ public class EntityEventHandler
         }
 
 
-        else if (event.entity instanceof EntityIronGolem) {
-            final EntityIronGolem golem = (EntityIronGolem) event.entity;
+        else if (event.entity instanceof EntityGolem) {
+            final EntityGolem golem = (EntityGolem) event.entity;
+            boolean isPlayerCreated = true;
 
 
             if (event.world.isRemote) {
@@ -263,37 +264,37 @@ public class EntityEventHandler
                 ClientInfoTracker.SyncGolemMessage(golem);
 
             } else {
-                if (golem.isPlayerCreated()) {
+                if (event.entity instanceof EntityIronGolem) isPlayerCreated = ((EntityIronGolem)event.entity).isPlayerCreated(); 
+                
+                
+                if (isPlayerCreated) {
                     // Found an iron golem, adds to the tracker so pumpkin info can be applied later
                     if (ConfigurationHandler.onDebug) {
-                        LogHelper.info("A player created iron golem joined world: [" + golem.toString() + "]");
+                        LogHelper.info("A golem joined world: [" + golem.toString() + "]");
                     }
-                    ServerInfoTracker.add(golem);
+                    
+                    // First check if there is a pumpkin on the tracker list, indicating this golem
+                    // was created by a dispenser. If not, adds the golem to the tracker so it can
+                    // be compared with a player MultiPlaceEvent action.
+                    final EventTracker tracked = ServerInfoTracker.seek(EventType.PUMPKIN, golem.getPosition());
+                    if (tracked != null) {
+                        ItemStack pumpkin = tracked.getPumpkin();
+                        MagicHelper.applyMagicEffectsOnNewlySpawnedGolem(golem, pumpkin);
+                    } else {
+                        ServerInfoTracker.add(golem);
+
+                        // Apply the passive golem enchantments
+                        MagicHelper.applyPassiveEffects(golem);
+                        
+                        // Apply the refresh enchants for the first time
+                        MagicHelper.applyRefreshEffects(golem);
+                    }
 
                 }
-                
-                // Apply the passive golem enchantments
-                MagicHelper.applyPassiveEffects(golem);
-                
-                // Apply the refresh enchants for the first time
-                MagicHelper.applyRefreshEffects(golem);
 
             }
 
         }
-
-
-        else if (event.entity instanceof EntitySnowman && !event.world.isRemote) {
-            final EntitySnowman golem = (EntitySnowman) event.entity;
-
-            // Found an snow golem, adds to the tracker so pumpkin info can be applied later
-            if (ConfigurationHandler.onDebug) {
-                LogHelper.info("A snowman joined the world: [" + golem.toString() + "]");
-            }
-            ServerInfoTracker.add(golem);
-
-        }
-
 
 
     }
@@ -383,13 +384,17 @@ public class EntityEventHandler
     @SubscribeEvent
     public void onLivingAttack(LivingAttackEvent event)
     {
-        LogHelper.info("== onLivingAttack() ==");
+        Entity target = event.entity;
 
+        
+        if (target instanceof EntityIronGolem || event.source.getSourceOfDamage() instanceof EntityIronGolem) {
+            LogHelper.info("== onLivingAttack() ==");
+        }
+
+        
         // NOTE: since the offensive enchantments apply special effect and don't just add more damage, 
         // I can intercept this event. If I were to do any damage modifier, the correct event is LivingHurtEvent.
         // NOTE 2: This code also works on LivingHurtEvent, but I feel it's more appropriate here.
-
-        Entity target = event.entity;
         
         // A golem attacked a target, apply the offensive enchantments
         if (event.source.getDamageType() == "mob") {
@@ -411,14 +416,18 @@ public class EntityEventHandler
     @SubscribeEvent
     public void onLivingHurt(LivingHurtEvent event)
     {
-        LogHelper.info("== onLivingHurt() ==");
-        LogHelper.info("    " + event.entity);
-        LogHelper.info("    source: " + event.source.getDamageType());
-        LogHelper.info("    source: " + event.source.getSourceOfDamage());
-        LogHelper.info("    damage: " + event.ammount);
-        
-        
         Entity target = event.entity;
+        
+
+        if (target instanceof EntityIronGolem || event.source.getSourceOfDamage() instanceof EntityIronGolem) {
+            LogHelper.info("== onLivingHurt() ==");
+            LogHelper.info("    " + event.entity);
+            LogHelper.info("    source: " + event.source.getDamageType());
+            LogHelper.info("    source: " + event.source.getSourceOfDamage());
+            LogHelper.info("    damage: " + event.ammount);
+        }
+
+        
         
         // A golem was attacked, apply the defensive enchantments
         if (target instanceof EntityIronGolem) {

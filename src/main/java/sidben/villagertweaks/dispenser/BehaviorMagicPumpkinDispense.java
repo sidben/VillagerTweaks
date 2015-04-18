@@ -1,6 +1,8 @@
 package sidben.villagertweaks.dispenser;
 
 import sidben.villagertweaks.helper.LogHelper;
+import sidben.villagertweaks.helper.MagicHelper;
+import sidben.villagertweaks.tracker.ServerInfoTracker;
 import net.minecraft.block.BlockDispenser;
 import net.minecraft.block.BlockPumpkin;
 import net.minecraft.dispenser.BehaviorDefaultDispenseItem;
@@ -33,6 +35,11 @@ public class BehaviorMagicPumpkinDispense extends BehaviorDefaultDispenseItem
         {
             if (!world.isRemote)
             {
+                // Check if it's an enchanted pumpkin. If so, add to the tracker.
+                if (stack.getTagCompound().getTagList(MagicHelper.GolemEnchantmentsNBTKey, 3) != null) {
+                    ServerInfoTracker.add(stack, blockpos);
+                }
+                
                 world.setBlockState(blockpos, blockpumpkin.getDefaultState(), 3);
             }
 

@@ -20,6 +20,11 @@ import sidben.villagertweaks.client.particle.ParticlePotionEffect;
 import sidben.villagertweaks.client.particle.ParticlePotionEffect.EffectType;
 
 
+
+//TODO: fix this mess of enchantment list types... :(
+
+
+
 /**
  * Represents enchantments that can be applied to golems.
  * 

@@ -1,12 +1,17 @@
 package sidben.villagertweaks.tracker;
 
-import net.minecraft.entity.monster.EntityIronGolem;
-import net.minecraft.entity.monster.EntitySnowman;
+import java.util.ArrayList;
+import net.minecraft.entity.monster.EntityGolem;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.passive.EntityVillager;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.Vec3i;
 import sidben.villagertweaks.common.ExtendedVillagerZombie;
+import sidben.villagertweaks.helper.GolemEnchantment;
+import sidben.villagertweaks.helper.MagicHelper;
 
+
+// TODO: add inheritance, so I can test the type of tracker and don't rely on trust
 
 
 public class EventTracker
@@ -100,18 +105,15 @@ public class EventTracker
         this(zombie.getEntityId(), zombie.getPosition(), zombie.getCustomNameTag(), properties);
     }
 
-    public EventTracker(EntityIronGolem golem) {
+    public EventTracker(EntityGolem golem) {
         this(golem.getEntityId(), golem.getPosition(), "", null);
         // NOTE: custom info will be applied by the pumpkin, no need to track
         // anything but the golem ID and position. Pumpkin code will find the entity
         // and get whatever information it needs.
     }
 
-    public EventTracker(EntitySnowman golem) {
-        this(golem.getEntityId(), golem.getPosition(), "", null);
-        // NOTE: custom info will be applied by the pumpkin, no need to track
-        // anything but the golem ID and position. Pumpkin code will find the entity
-        // and get whatever information it needs.
+    public EventTracker(ItemStack pumpkin, Vec3i pos) {
+        this(0, pos, pumpkin.getDisplayName(), MagicHelper.getEnchantmentIds(pumpkin));
     }
 
 
@@ -168,6 +170,31 @@ public class EventTracker
             villager.setProfession(properties.getProfession());
         }
 
+    }
+    
+    
+    
+    /**
+     * Creates a new pumpkin ItemStack with the info this object is tracking.
+     * 
+     */
+    public ItemStack getPumpkin()
+    {
+
+        // Note: I must trust that this object actually contain a pumpkin info.
+        final int[] enchantIds = (int[]) this.getObject();
+        
+        // Enchantment IDs
+        ArrayList<GolemEnchantment> enchantedList = GolemEnchantment.convertToEnchantList(enchantIds);
+        ItemStack pumpkin = MagicHelper.getEnchantedPumpkin(enchantedList);
+
+        // Custom name
+        if (this.getCustomName() != "") {
+            pumpkin.setStackDisplayName(this.getCustomName());
+        }
+
+
+        return pumpkin;
     }
 
 
