@@ -599,14 +599,14 @@ public class MagicHelper
      * 
      */
     public static float applyDefenseEffects(Entity golem, DamageSource source, float ammount) {
-        float realDamage = ammount;
+        float originalDamage = ammount;
+        float realDamage = 0F;
         float damageModifier = 0F;
         
         
         // Load the properties
         ExtendedGolem properties = null;
-        if (golem instanceof EntityIronGolem) properties = ExtendedGolem.get((EntityIronGolem)golem);
-        if (golem instanceof EntitySnowman) properties = ExtendedGolem.get((EntitySnowman)golem);
+        properties = ExtendedGolem.get((EntityGolem) golem);
         
 
         if (properties != null && properties.getEnchantmentsAmount() > 0) 
@@ -747,7 +747,24 @@ public class MagicHelper
 
         
         
-        return realDamage * (1.0F - damageModifier);
+        
+        realDamage = originalDamage * (1.0F - damageModifier);
+        if (realDamage > 1F) {
+            // round down
+            realDamage = (float) Math.floor(realDamage);
+        }
+        
+        
+        // Debug
+        if (ConfigurationHandler.onDebug) {
+            LogHelper.info("Applying defense enchantments on golem");
+            LogHelper.info("    golem: " + golem);
+            LogHelper.info("    damage source: " + source);
+            LogHelper.info("    damage value: " + originalDamage + " -> " + realDamage);
+        }
+        
+        
+        return realDamage;
     }
 
 

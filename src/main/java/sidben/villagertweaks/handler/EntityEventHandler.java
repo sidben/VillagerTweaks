@@ -5,8 +5,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntityGolem;
 import net.minecraft.entity.monster.EntityIronGolem;
-import net.minecraft.entity.monster.EntityPigZombie;
-import net.minecraft.entity.monster.EntitySnowman;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.init.Items;
@@ -268,7 +266,7 @@ public class EntityEventHandler
                 
                 
                 if (isPlayerCreated) {
-                    // Found an iron golem, adds to the tracker so pumpkin info can be applied later
+                    // Found a golem, adds to the tracker so pumpkin info can be applied later
                     if (ConfigurationHandler.onDebug) {
                         LogHelper.info("A golem joined world: [" + golem.toString() + "]");
                     }
@@ -329,19 +327,20 @@ public class EntityEventHandler
 
         }
 
-        // Iron golems special effects
-        else if (event.entity instanceof EntityIronGolem) {
-            final EntityIronGolem golem = (EntityIronGolem) event.entity;
+        // Golems special effects
+        else if (event.entity instanceof EntityGolem) {
+            final EntityGolem golem = (EntityGolem) event.entity;
 
             if (golem.worldObj.isRemote) {
                 final Random rand = golem.worldObj.rand;
                 final int particleRatio = (golem.getEntityId() % 50) + 100;
 
-                if (rand.nextInt(60) == 0) {
+                // Iron Golem - Smokes when damaged
+                if (golem instanceof EntityIronGolem && rand.nextInt(60) == 0) {
                     // Check the golem health
                     final EnumGolemHealth golemStatus = EnumGolemHealth.getGolemHealth(golem);
 
-                    // Spawn smoke if he is highly damaged
+                    // Spawn smoke if highly damaged
                     if (golemStatus == EnumGolemHealth.HIGHLY_DAMAGED) {
                         final EnumParticleTypes particle = rand.nextInt(10) < 4 ? EnumParticleTypes.SMOKE_LARGE : EnumParticleTypes.CLOUD;
 
@@ -387,7 +386,7 @@ public class EntityEventHandler
         Entity target = event.entity;
 
         
-        if (target instanceof EntityIronGolem || event.source.getSourceOfDamage() instanceof EntityIronGolem) {
+        if (target instanceof EntityGolem || event.source.getSourceOfDamage() instanceof EntityGolem) {
             LogHelper.info("== onLivingAttack() ==");
         }
 
@@ -398,13 +397,13 @@ public class EntityEventHandler
         
         // A golem attacked a target, apply the offensive enchantments
         if (event.source.getDamageType() == "mob") {
-            if (event.source.getSourceOfDamage() instanceof EntityIronGolem) {
+            if (event.source.getSourceOfDamage() instanceof EntityGolem) {
                 MagicHelper.applyAttackEffects(event.source.getSourceOfDamage(), target);
             }
         }
         
         // A golem was attacked by a target, check if should cancel the event
-        if (target instanceof EntityIronGolem) {
+        if (target instanceof EntityGolem) {
             boolean ignoreDamage = MagicHelper.applyDamageCancelEffects(target, event.source);
             if (ignoreDamage) event.setCanceled(true);
         }
@@ -419,7 +418,7 @@ public class EntityEventHandler
         Entity target = event.entity;
         
 
-        if (target instanceof EntityIronGolem || event.source.getSourceOfDamage() instanceof EntityIronGolem) {
+        if (target instanceof EntityGolem || event.source.getSourceOfDamage() instanceof EntityGolem) {
             LogHelper.info("== onLivingHurt() ==");
             LogHelper.info("    " + event.entity);
             LogHelper.info("    source: " + event.source.getDamageType());
@@ -430,12 +429,12 @@ public class EntityEventHandler
         
         
         // A golem was attacked, apply the defensive enchantments
-        if (target instanceof EntityIronGolem) {
+        if (target instanceof EntityGolem) {
             event.ammount = MagicHelper.applyDefenseEffects(target, event.source, event.ammount);
         }
 
         // A golem caused damage, apply damage modifiers
-        else if (event.source.getDamageType() == "mob" && event.source.getSourceOfDamage() instanceof EntityIronGolem) {
+        else if (event.source.getDamageType() == "mob" && event.source.getSourceOfDamage() instanceof EntityGolem) {
             event.ammount = MagicHelper.applyDamagingEffects(event.source.getSourceOfDamage(), target, event.ammount);
         }
         
