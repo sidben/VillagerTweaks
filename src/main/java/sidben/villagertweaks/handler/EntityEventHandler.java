@@ -397,12 +397,16 @@ public class EntityEventHandler
         // I can intercept this event. If I were to do any damage modifier, the correct event is LivingHurtEvent.
         // NOTE 2: This code also works on LivingHurtEvent, but I feel it's more appropriate here.
         
-        // A golem attacked a target, apply the offensive enchantments
-        if (event.source.getDamageType() == "mob") {
-            if (event.source.getSourceOfDamage() instanceof EntityGolem) {
-                MagicHelper.applyAttackEffects(event.source.getSourceOfDamage(), target);
-            }
+        // An iron golem attacked a target, apply the offensive enchantments
+        if (event.source.getDamageType() == "mob" && event.source.getSourceOfDamage() instanceof EntityIronGolem) {
+            MagicHelper.applyAttackEffects(event.source.getSourceOfDamage(), target);
         }
+
+        // A snow golem attacked a target, apply the offensive enchantments
+        else if (event.source.getSourceOfDamage() instanceof EntitySnowball && ((EntitySnowball)event.source.getSourceOfDamage()).getThrower() instanceof EntitySnowman) {
+            MagicHelper.applyAttackEffects(((EntitySnowball)event.source.getSourceOfDamage()).getThrower(), target);
+        }
+
         
         // A golem was attacked by a target, check if should cancel the event
         if (target instanceof EntityGolem) {

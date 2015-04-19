@@ -428,6 +428,9 @@ public class MagicHelper
         // Load the properties
         ExtendedGolem properties = ExtendedGolem.get((EntityGolem) golem);
         
+        // 0 = Iron golem, 1 = snow golem
+        int type = (golem instanceof EntityIronGolem) ? 0 : (golem instanceof EntitySnowman) ? 1 : -1;   
+
         // Must have a target
         if (target == null) return;
         
@@ -445,12 +448,23 @@ public class MagicHelper
                      * Pushes mobs (higher and/or back)  
                      *---------------------------------------------------------------*/
                     if (e == GolemEnchantment.knockback) {
+
+                        float motionHori = 0F;
+                        float motionVert = 0F; 
                         
+                        if (type == 0) {
+                            motionHori = 1.5F;
+                            motionVert = 0.2F;
+                        }
+                        else if (type == 1) {
+                            motionHori = 1.3F;
+                        }
+
                         // code ref: EntityMob.attackEntityAsMob and EntityIronGolem.attackEntityAsMob
-                        target.motionX += (-MathHelper.sin(golem.rotationYaw * (float)Math.PI / 180.0F) * 1.5F);
-                        target.motionY += 0.2D;
-                        target.motionZ += (MathHelper.cos(golem.rotationYaw * (float)Math.PI / 180.0F) * 1.5F);
-                    
+                        target.motionX += (-MathHelper.sin(golem.rotationYaw * (float)Math.PI / 180.0F) * motionHori);
+                        target.motionY += motionVert;
+                        target.motionZ += (MathHelper.cos(golem.rotationYaw * (float)Math.PI / 180.0F) * motionHori);
+
                     }
 
                     
@@ -460,7 +474,13 @@ public class MagicHelper
                      *---------------------------------------------------------------*/
                     else if (e == GolemEnchantment.fire) {
                         
-                        target.setFire(6);  // Fire aspect I = 4
+                        // vanilla fire aspect = 4
+                        if (type == 0) { 
+                            target.setFire(6);  
+                        } 
+                        else if (type == 1) {
+                            // snowman don't set mobs on fire
+                        }
                     
                     }
                     
