@@ -5,8 +5,10 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntityGolem;
 import net.minecraft.entity.monster.EntityIronGolem;
+import net.minecraft.entity.monster.EntitySnowman;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.passive.EntityVillager;
+import net.minecraft.entity.projectile.EntitySnowball;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
@@ -433,11 +435,16 @@ public class EntityEventHandler
             event.ammount = MagicHelper.applyDefenseEffects(target, event.source, event.ammount);
         }
 
-        // A golem caused damage, apply damage modifiers
-        else if (event.source.getDamageType() == "mob" && event.source.getSourceOfDamage() instanceof EntityGolem) {
+        // An iron golem caused damage, apply damage modifiers
+        else if (event.source.getDamageType() == "mob" && event.source.getSourceOfDamage() instanceof EntityIronGolem) {
             event.ammount = MagicHelper.applyDamagingEffects(event.source.getSourceOfDamage(), target, event.ammount);
         }
         
+        // A snow golem caused damage, apply damage modifiers
+        else if (event.source.getSourceOfDamage() instanceof EntitySnowball && ((EntitySnowball)event.source.getSourceOfDamage()).getThrower() instanceof EntitySnowman) {
+            event.ammount = MagicHelper.applyDamagingEffects(((EntitySnowball)event.source.getSourceOfDamage()).getThrower(), target, event.ammount);
+        }
+
     }
 
     
