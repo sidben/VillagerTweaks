@@ -343,16 +343,10 @@ public class MagicHelper
     public static void applyPassiveEffects(EntityGolem golem) {
         
         // Load the properties
-        ExtendedGolem properties = null;
-        byte type = -1;      // 0 = Iron golem, 1 = snow golem
-        if (golem instanceof EntityIronGolem) { 
-            properties = ExtendedGolem.get((EntityIronGolem)golem);
-            type = 0;
-        }
-        if (golem instanceof EntitySnowman) { 
-            properties = ExtendedGolem.get((EntitySnowman)golem);
-            type = 1;
-        }
+        ExtendedGolem properties = ExtendedGolem.get((EntityGolem) golem);
+        
+        // 0 = Iron golem, 1 = snow golem
+        int type = (golem instanceof EntityIronGolem) ? 0 : (golem instanceof EntitySnowman) ? 1 : -1;   
         
         
         if (properties != null && properties.getEnchantmentsAmount() > 0) 
@@ -432,9 +426,7 @@ public class MagicHelper
     public static void applyAttackEffects(Entity golem, Entity target) {
 
         // Load the properties
-        ExtendedGolem properties = null;
-        if (golem instanceof EntityIronGolem) properties = ExtendedGolem.get((EntityIronGolem)golem);
-        if (golem instanceof EntitySnowman) properties = ExtendedGolem.get((EntitySnowman)golem);
+        ExtendedGolem properties = ExtendedGolem.get((EntityGolem) golem);
         
         // Must have a target
         if (target == null) return;
@@ -492,9 +484,11 @@ public class MagicHelper
         
         
         // Load the properties
-        ExtendedGolem properties = null;
-        if (golem instanceof EntityIronGolem) properties = ExtendedGolem.get((EntityIronGolem)golem);
-        if (golem instanceof EntitySnowman) properties = ExtendedGolem.get((EntitySnowman)golem);
+        ExtendedGolem properties = ExtendedGolem.get((EntityGolem) golem);
+
+        // 0 = Iron golem, 1 = snow golem
+        int type = (golem instanceof EntityIronGolem) ? 0 : (golem instanceof EntitySnowman) ? 1 : -1;   
+
         
         LogHelper.info("== applyDamagingEffects() - " + golem.getEntityId() + " ==");
        
@@ -510,7 +504,7 @@ public class MagicHelper
                      * do more damage (simulate strength potion).
                      *---------------------------------------------------------------*/
                     if (e == GolemEnchantment.max) {
-                        ammount *= 1.3F;
+                        realDamage *= 1.3F;
                     }
                     
                     
@@ -520,8 +514,16 @@ public class MagicHelper
                      *---------------------------------------------------------------*/
                     else if (e == GolemEnchantment.strength) {
 
-                        // original damage = 7 to 22, my version does 16 to 28
-                        realDamage = (float)(16 + golem.worldObj.rand.nextInt(12));
+                        if (type == 0) {
+                            // original damage = 7 to 22, my version does 16 to 28
+                            realDamage = (float)(16 + golem.worldObj.rand.nextInt(12));
+                        } else if (type == 1 && ammount == 0) {
+                            // snowball with no damage, causes fixed damage of 1
+                            realDamage = 1F;
+                        } else if (type == 1 && ammount > 0) {
+                            // snowball with damage (example: Blazes), simulate strength potion
+                            realDamage *= 1.3F;
+                        }
                     
                     }
                     
@@ -532,7 +534,14 @@ public class MagicHelper
         } // if (properties are valid)
         
         
-        LogHelper.info("    real damage: " + realDamage);
+        
+        // Debug
+        if (ConfigurationHandler.onDebug) {
+            LogHelper.info("Applying attack (damage modifier) enchantments on golem");
+            LogHelper.info("    golem: " + golem);
+            LogHelper.info("    target: " + target);
+            LogHelper.info("    damage value: " + ammount + " -> " + realDamage);
+        }        
         
         
         return realDamage;
@@ -605,8 +614,7 @@ public class MagicHelper
         
         
         // Load the properties
-        ExtendedGolem properties = null;
-        properties = ExtendedGolem.get((EntityGolem) golem);
+        ExtendedGolem properties = ExtendedGolem.get((EntityGolem) golem);
         
 
         if (properties != null && properties.getEnchantmentsAmount() > 0) 
