@@ -104,11 +104,11 @@ public class LayerIronGolemGlint implements LayerRenderer
         if (!entity.isInvisible() && showGlint) {
             GlStateManager.depthMask(true);
             this.golemRender.bindTexture(RES_ITEM_GLINT);
-            GlStateManager.matrixMode(5890);
+            GlStateManager.matrixMode(GL11.GL_TEXTURE);
             GlStateManager.loadIdentity();
             final float f7 = entity.ticksExisted + par3;
             GlStateManager.translate(f7 * 0.01F, f7 * 0.01F, 0.0F);
-            GlStateManager.matrixMode(5888);
+            GlStateManager.matrixMode(GL11.GL_MODELVIEW);
             GlStateManager.enableBlend();
 
             /*
@@ -139,9 +139,9 @@ public class LayerIronGolemGlint implements LayerRenderer
             
             this.golemModel.render(entity, par1, par2, par4, par5, par6, par7);
 
-            GlStateManager.matrixMode(5890);
+            GlStateManager.matrixMode(GL11.GL_TEXTURE);
             GlStateManager.loadIdentity();
-            GlStateManager.matrixMode(5888);
+            GlStateManager.matrixMode(GL11.GL_MODELVIEW);
             GlStateManager.enableLighting();
             GlStateManager.disableBlend();
         }

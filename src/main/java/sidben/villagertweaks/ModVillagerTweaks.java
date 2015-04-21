@@ -5,6 +5,7 @@ import net.minecraft.block.BlockDispenser;
 import net.minecraft.client.Minecraft;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.monster.EntityIronGolem;
+import net.minecraft.entity.monster.EntitySnowman;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
@@ -19,6 +20,7 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 import sidben.villagertweaks.client.renderer.entity.RenderCrackedIronGolem;
+import sidben.villagertweaks.client.renderer.entity.RenderCustomSnowMan;
 import sidben.villagertweaks.client.renderer.entity.RenderZombieVillager;
 import sidben.villagertweaks.creativetab.ModCreativeTabs;
 import sidben.villagertweaks.dispenser.BehaviorMagicPumpkinDispense;
@@ -90,6 +92,9 @@ public class ModVillagerTweaks
         if (event.getSide() == Side.CLIENT) {
             Minecraft.getMinecraft().getRenderManager().entityRenderMap.remove(EntityIronGolem.class);
             Minecraft.getMinecraft().getRenderManager().entityRenderMap.put(EntityIronGolem.class, new RenderCrackedIronGolem(Minecraft.getMinecraft().getRenderManager()));
+
+            Minecraft.getMinecraft().getRenderManager().entityRenderMap.remove(EntitySnowman.class);
+            Minecraft.getMinecraft().getRenderManager().entityRenderMap.put(EntitySnowman.class, new RenderCustomSnowMan(Minecraft.getMinecraft().getRenderManager()));
 
             Minecraft.getMinecraft().getRenderManager().entityRenderMap.remove(EntityZombie.class);
             Minecraft.getMinecraft().getRenderManager().entityRenderMap.put(EntityZombie.class, new RenderZombieVillager(Minecraft.getMinecraft().getRenderManager()));
