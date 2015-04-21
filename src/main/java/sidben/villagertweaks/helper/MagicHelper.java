@@ -163,6 +163,8 @@ public class MagicHelper
         final Map pumpkinEnchants = EnchantmentHelper.getEnchantments(item);
         pumpkinEnchants.put(Enchantment.infinity.effectId, 1);
         EnchantmentHelper.setEnchantments(pumpkinEnchants, item);
+        
+        // TODO: check stack.addEnchantment
 
         
         return item;
@@ -524,7 +526,13 @@ public class MagicHelper
                      * do more damage (simulate strength potion).
                      *---------------------------------------------------------------*/
                     if (e == GolemEnchantment.max) {
-                        realDamage *= 1.3F;
+                        if (type == 0) {
+                            realDamage *= 1.3F;
+                        } else if (type == 1 && ammount == 0) {
+                            // snowball with no damage, causes fixed damage of 1
+                            realDamage = 1F;
+                        }
+                        // Note: Mighty snow golem don't add dmg if the snowball already does damage.
                     }
                     
                     
@@ -537,12 +545,20 @@ public class MagicHelper
                         if (type == 0) {
                             // original damage = 7 to 22, my version does 16 to 28
                             realDamage = (float)(16 + golem.worldObj.rand.nextInt(12));
-                        } else if (type == 1 && ammount == 0) {
-                            // snowball with no damage, causes fixed damage of 1
-                            realDamage = 1F;
-                        } else if (type == 1 && ammount > 0) {
-                            // snowball with damage (example: Blazes), simulate strength potion
-                            realDamage *= 1.3F;
+                        } else if (type == 1) {
+                            if (ammount == 0) {
+                                // snowball with no damage, causes fixed damage of 1
+                                realDamage = 1F;
+                            } else if (ammount > 0) {
+                                // snowball with damage (example: Blazes), simulate strength potion
+                                realDamage *= 1.3F;
+                            }
+                            
+                            // chance for 1 extra damage (20% chance)
+                            if (realDamage > 0 && golem.worldObj.rand.nextInt(10) < 2) {
+                                realDamage += 1F;
+                            }
+                            
                         }
                     
                     }
@@ -579,9 +595,7 @@ public class MagicHelper
         
         
         // Load the properties
-        ExtendedGolem properties = null;
-        if (golem instanceof EntityIronGolem) properties = ExtendedGolem.get((EntityIronGolem)golem);
-        if (golem instanceof EntitySnowman) properties = ExtendedGolem.get((EntitySnowman)golem);
+        ExtendedGolem properties = ExtendedGolem.get((EntityGolem) golem);
 
         
         if (properties != null && properties.getEnchantmentsAmount() > 0) 
@@ -807,6 +821,10 @@ public class MagicHelper
         // Load the properties
         ExtendedGolem properties = ExtendedGolem.get(golem);
         
+        // 0 = Iron golem, 1 = snow golem
+        int type = (golem instanceof EntityIronGolem) ? 0 : (golem instanceof EntitySnowman) ? 1 : -1;   
+
+        
 
         if (properties != null && properties.getEnchantmentsAmount() > 0) 
         {
@@ -828,21 +846,39 @@ public class MagicHelper
                     if (e == GolemEnchantment.max) {
                         
                         if (golem.worldObj.isDaytime()) {
-                            if (EnumGolemHealth.getGolemHealth(golem) == EnumGolemHealth.HIGHLY_DAMAGED) {
+                            if (type == 0) {
+                                // Iron Golem
+                                if (EnumGolemHealth.getGolemHealth(golem) == EnumGolemHealth.HIGHLY_DAMAGED) {
+                                    refreshPotionEffect(golem, Potion.regeneration, 2);
+                                } else {
+                                    refreshPotionEffect(golem, Potion.regeneration, 1);
+                                }
+                            }
+                            else if (type == 1) {
+                                // Snow Golem
                                 refreshPotionEffect(golem, Potion.regeneration, 2);
-                            } else {
-                                refreshPotionEffect(golem, Potion.regeneration, 1);
+                                refreshPotionEffect(golem, Potion.absorption, 1);
+                                refreshPotionEffect(golem, Potion.resistance, 1);
                             }
                             
                         }
                         else {
-                            if (EnumGolemHealth.getGolemHealth(golem) == EnumGolemHealth.HIGHLY_DAMAGED) {
-                                refreshPotionEffect(golem, Potion.resistance, 2);
-                            } else {
-                                refreshPotionEffect(golem, Potion.resistance, 1);
+                            if (type == 0) {
+                                // Iron Golem
+                                if (EnumGolemHealth.getGolemHealth(golem) == EnumGolemHealth.HIGHLY_DAMAGED) {
+                                    refreshPotionEffect(golem, Potion.resistance, 2);
+                                } else {
+                                    refreshPotionEffect(golem, Potion.resistance, 1);
+                                }
+                                refreshPotionEffect(golem, Potion.moveSpeed, 1);
+                                refreshPotionEffect(golem, Potion.absorption, 4);
                             }
-                            refreshPotionEffect(golem, Potion.moveSpeed, 1);
-                            refreshPotionEffect(golem, Potion.absorption, 4);
+                            else if (type == 1) {
+                                // Snow Golem
+                                refreshPotionEffect(golem, Potion.resistance, 2);
+                                refreshPotionEffect(golem, Potion.moveSpeed, 1);
+                                refreshPotionEffect(golem, Potion.absorption, 4);
+                            }
                             
                         }
                     
