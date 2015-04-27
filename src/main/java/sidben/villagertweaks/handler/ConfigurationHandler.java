@@ -17,6 +17,7 @@ public class ConfigurationHandler
     public static boolean       canNameVillagers          = true;
     public static boolean       zombieVillagerDropEmerald = true;
     public static boolean       zombieDropFeather         = true;
+    public static int       enchantedPumpkinDropChance         = 40;
 
 
     // Instance
@@ -44,6 +45,8 @@ public class ConfigurationHandler
         canNameVillagers = config.getBoolean("villager_naming", Configuration.CATEGORY_GENERAL, true, "Enables naming villagers with Name Tags.");
         zombieVillagerDropEmerald = config.getBoolean("zombie_villager_drops_emerald", Configuration.CATEGORY_GENERAL, true, "Enables zombie villagers dropping emeralds.");
         zombieDropFeather = config.getBoolean("zombie_drops_feather", Configuration.CATEGORY_GENERAL, true, "Enables regular zombies dropping feathers.");
+        enchantedPumpkinDropChance = config.getInt("ench_pumpkin_drop_chance", Configuration.CATEGORY_GENERAL, 40, 0, 100, "Chance of enchanted golems dropping the enchanted pumpkin on death.");
+//        uniqueEnchantedPumpkinDropChance = config.getInt("unique_ench_drop_chance", Configuration.CATEGORY_GENERAL, 50, 0, 100, "Chance of 'Migthy' enchanted golems dropping the enchanted pumpkin on death.");
 
         // saving the configuration to its file
         if (config.hasChanged()) {

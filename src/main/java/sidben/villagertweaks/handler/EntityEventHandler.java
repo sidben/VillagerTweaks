@@ -132,7 +132,48 @@ public class EntityEventHandler
             }
 
         }
+        
+        
+        // Look for a golem
+        else if (event.entity instanceof EntityGolem && !event.entity.worldObj.isRemote && ConfigurationHandler.enchantedPumpkinDropChance > 0) {
+            
+            // ----------------------------------------------------
+            // Enchanted Pumpkin
+            // ----------------------------------------------------
+            final EntityGolem golem = (EntityGolem) event.entity;
+            final ExtendedGolem properties = ExtendedGolem.get(golem);
 
+            if (properties != null) {
+                if (properties.getEnchantmentsAmount() > 0) {
+
+                    // Golem has enchantments, try to drop the pumpkin
+                    final int chancePumpkin = golem.worldObj.rand.nextInt(100) + 1;
+                    if (chancePumpkin <= ConfigurationHandler.enchantedPumpkinDropChance) {
+                    
+                        // Adds the pumpkin to the drop list
+                        // ToDo: Holy crap me, fix this crazy mess of lists. LOOK WHAT YOU MADE ME DO! 
+                        final ItemStack pumpkin = MagicHelper.getEnchantedPumpkin(GolemEnchantment.convertToEnchantList(GolemEnchantment.convert(properties.getEnchantments())));
+                        if (golem.hasCustomName()) {
+                            pumpkin.setStackDisplayName(golem.getCustomNameTag());
+                        }
+                        
+                        
+                        final EntityItem item = new EntityItem(golem.worldObj, golem.posX, golem.posY, golem.posZ);
+                        item.getDataWatcher().updateObject(10, pumpkin);
+                        event.drops.add(item);
+                        
+                        // ToDo: make MagicHelper.getEnchantedPumpkin(EntityGolem golem)
+                        
+                    }
+                    
+                }
+                
+                
+//                MagicHelper.getEnchantedPumpkin(newEnchantments)
+//                properties.getEnchantments()
+            }
+
+        }
 
 
     }
